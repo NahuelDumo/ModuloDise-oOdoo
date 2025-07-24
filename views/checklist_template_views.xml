@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista formulario para plantillas de checklist -->
+    <record id="view_form_checklist_template" model="ir.ui.view">
+        <field name="name">design.checklist.template.form</field>
+        <field name="model">design.checklist_template</field>
+        <field name="arch" type="xml">
+            <form string="Plantilla de Checklist">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="categoria_id"/>
+                        <field name="etapa"/>
+                    </group>
+                    <notebook>
+                        <page string="Items de la plantilla">
+                            <field name="item_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="orden"/>
+                                    <field name="comentario_default"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista árbol para plantillas de checklist -->
+    <record id="view_tree_checklist_template" model="ir.ui.view">
+        <field name="name">design.checklist.template.tree</field>
+        <field name="model">design.checklist_template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="categoria_id"/>
+                <field name="etapa"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Acción para plantillas de checklist -->
+    <record id="action_checklist_template" model="ir.actions.act_window">
+        <field name="name">Plantillas de Checklist</field>
+        <field name="res_model">design.checklist_template</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menú principal del módulo -->
+    <menuitem id="menu_diseno_root" 
+              name="Diseños" 
+              sequence="10"
+              web_icon="project,static/description/icon.png"/>
+
+    <!-- Submenús -->
+    <menuitem id="menu_diseno_diseno" 
+              name="Diseños" 
+              parent="menu_diseno_root"
+              action="action_diseno_design"
+              sequence="10"/>
+
+    <menuitem id="menu_diseno_plantillas" 
+              name="Plantillas de Checklist" 
+              parent="menu_diseno_root"
+              action="action_diseno_checklist_template"
+              sequence="20"/>
+
+    <menuitem id="menu_diseno_configuracion" 
+              name="Configuración" 
+              parent="menu_diseno_root"
+              sequence="100"/>
+
+    <!-- Acciones de menú -->
+    <record id="action_diseno_design" model="ir.actions.act_window">
+        <field name="name">Diseños</field>
+        <field name="res_model">design.design</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crea tu primer diseño
+            </p>
+        </field>
+    </record>
+
+    <record id="action_diseno_checklist_template" model="ir.actions.act_window">
+        <field name="name">Plantillas de Checklist</field>
+        <field name="res_model">design.checklist_template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crea tu primera plantilla de checklist
+            </p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista formulario para el historial de revisiones -->
+    <record id="view_form_revision_log" model="ir.ui.view">
+        <field name="name">design.revision.log.form</field>
+        <field name="model">design.revision_log</field>
+        <field name="arch" type="xml">
+            <form string="Registro de Revisión">
+                <sheet>
+                    <group>
+                        <field name="design_id" readonly="1"/>
+                        <field name="usuario_id" readonly="1"/>
+                        <field name="tipo" readonly="1"/>
+                        <field name="observaciones" readonly="1"/>
+                        <field name="create_date" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista árbol para el historial de revisiones -->
+    <record id="view_tree_revision_log" model="ir.ui.view">
+        <field name="name">design.revision.log.tree</field>
+        <field name="model">design.revision_log</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="design_id"/>
+                <field name="usuario_id"/>
+                <field name="tipo"/>
+                <field name="create_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Acción para el historial de revisiones -->
+    <record id="action_revision_log" model="ir.actions.act_window">
+        <field name="name">Historial de Revisiones</field>
+        <field name="res_model">design.revision_log</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

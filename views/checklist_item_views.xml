@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista formulario para ítems de checklist -->
+    <record id="view_form_checklist_item" model="ir.ui.view">
+        <field name="name">design.checklist.item.form</field>
+        <field name="model">design.checklist_item</field>
+        <field name="arch" type="xml">
+            <form string="Ítem de Checklist">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="design_id" invisible="1"/>
+                        <field name="comentario"/>
+                        <group>
+                            <field name="validado_por_disenador"/>
+                            <field name="fecha_disenador" readonly="1"/>
+                            <field name="usuario_disenador" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="validado_por_validador"/>
+                            <field name="fecha_validador" readonly="1"/>
+                            <field name="usuario_validador" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista árbol para ítems de checklist -->
+    <record id="view_tree_checklist_item" model="ir.ui.view">
+        <field name="name">design.checklist.item.tree</field>
+        <field name="model">design.checklist_item</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="validado_por_disenador"/>
+                <field name="validado_por_validador"/>
+                <field name="comentario"/>
+            </tree>
+        </field>
+    </record>
+</odoo>
