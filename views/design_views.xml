@@ -17,8 +17,12 @@
             <field name="cliente_id"/>
             <field name="task_id"/>
             <field name="categoria_id"/>
-            <field name="etapa"/>
-            <field name="state"/>
+            <group>
+              <field name="etapa"/>
+              <field name="state"/>
+              <field name="visible_para_cliente" invisible="1"/>
+              <field name="aprobado_cliente" invisible="1"/>
+            </group>
             <field name="image" widget="image"/>
           </group>
 
