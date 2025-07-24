@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_design_design,access_design_design,model_design_design,,1,1,1,1
+access_checklist_item,access_checklist_item,model_design_checklist_item,,1,1,1,1
+access_checklist_template,access_checklist_template,model_design_checklist_template,,1,1,1,1
+access_checklist_template_item,access_checklist_template_item,model_design_checklist_template_item,,1,1,1,1
+access_revision_log,access_revision_log,model_design_revision_log,,1,1,1,1
+access_wizard_rechazo,access_wizard_rechazo,model_design_wizard_rechazo,,1,1,1,1

@@ -1,0 +1,77 @@
+<odoo>
+  <record id="view_form_design" model="ir.ui.view">
+    <field name="name">design.design.form</field>
+    <field name="model">design.design</field>
+    <field name="arch" type="xml">
+      <form string="Diseño">
+        <header>
+          <button name="abrir_wizard_rechazo" type="object" string="Rechazar diseño"
+                  class="btn btn-danger" attrs="{'invisible': [('etapa','=','completo')]}"/>
+          <button name="marcar_como_aprobado_por_cliente" type="object" string="Aprobar diseño"
+                  class="btn btn-primary" attrs="{'invisible': [('visible_para_cliente','=',False)]}"/>
+        </header>
+
+        <sheet>
+          <group>
+            <field name="name"/>
+            <field name="cliente_id"/>
+            <field name="task_id"/>
+            <field name="categoria_id"/>
+            <field name="etapa"/>
+            <field name="state"/>
+            <field name="image" widget="image"/>
+          </group>
+
+          <notebook>
+            <page string="Checklist">
+              <field name="checklist_ids">
+                <tree editable="bottom">
+                  <field name="name"/>
+                  <field name="validado_por_disenador"/>
+                  <field name="validado_por_validador"/>
+                  <field name="comentario"/>
+                </tree>
+              </field>
+            </page>
+
+            <page string="Historial">
+              <field name="historial_ids">
+                <tree>
+                  <field name="usuario_id"/>
+                  <field name="tipo"/>
+                  <field name="observaciones"/>
+                  <field name="create_date"/>
+                </tree>
+              </field>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_tree_design" model="ir.ui.view">
+    <field name="name">design.design.tree</field>
+    <field name="model">design.design</field>
+    <field name="arch" type="xml">
+      <tree>
+        <field name="name"/>
+        <field name="cliente_id"/>
+        <field name="etapa"/>
+        <field name="state"/>
+        <field name="visible_para_cliente"/>
+        <field name="aprobado_cliente"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="action_design_design" model="ir.actions.act_window">
+    <field name="name">Diseños</field>
+    <field name="res_model">design.design</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+
+  <menuitem id="menu_design_root" name="Módulo Diseño"/>
+  <menuitem id="menu_design_disenos" name="Diseños" parent="menu_design_root"
+            action="action_design_design"/>
+</odoo>

@@ -1,0 +1,17 @@
+<odoo>
+  <record id="view_wizard_rechazo_design" model="ir.ui.view">
+    <field name="name">design.wizard_rechazo.form</field>
+    <field name="model">design.wizard_rechazo</field>
+    <field name="arch" type="xml">
+      <form string="Motivo de Rechazo">
+        <group>
+          <field name="observacion"/>
+        </group>
+        <footer>
+          <button string="Rechazar" type="object" name="aplicar_rechazo" class="btn btn-danger"/>
+          <button string="Cancelar" special="cancel"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+</odoo>
