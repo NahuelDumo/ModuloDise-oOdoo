@@ -75,7 +75,7 @@
     <field name="view_mode">tree,form</field>
   </record>
 
-  <menuitem id="menu_design_root" name="Módulo Diseño"/>
+  <menuitem id="menu_design_root" name="Diseños"/>
   <menuitem id="menu_design_disenos" name="Diseños" parent="menu_design_root"
             action="action_design_design"/>
 </odoo>

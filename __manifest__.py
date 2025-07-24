@@ -1,6 +1,6 @@
 # modulo_diseno/__manifest__.py
 {
-    "name": "Modulo de Diseño",
+    "name": "Módulo de Diseños",
     "version": "1.0",
     "category": "Project",
     "summary": "Gestión de listas de verificación para diseños con validación y etapas",
