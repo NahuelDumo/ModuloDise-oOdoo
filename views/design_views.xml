@@ -69,13 +69,5 @@
     </field>
   </record>
 
-  <record id="action_design_design" model="ir.actions.act_window">
-    <field name="name">Diseños</field>
-    <field name="res_model">design.design</field>
-    <field name="view_mode">tree,form</field>
-  </record>
-
-  <menuitem id="menu_design_root" name="Diseños"/>
-  <menuitem id="menu_design_disenos" name="Diseños" parent="menu_design_root"
-            action="action_design_design"/>
+  <!-- Las acciones y menús se han movido a menu.xml -->
 </odoo>

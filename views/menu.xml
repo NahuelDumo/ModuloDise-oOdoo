@@ -6,23 +6,30 @@
               sequence="10"
               web_icon="project,static/description/icon.png"/>
 
-    <!-- Submenús -->
-    <menuitem id="menu_diseno_diseno" 
-              name="Diseños" 
+    <!-- Menú Operaciones -->
+    <menuitem id="menu_diseno_operaciones" 
+              name="Operaciones" 
               parent="menu_diseno_root"
-              action="action_design_design"
               sequence="10"/>
 
-    <menuitem id="menu_diseno_plantillas" 
-              name="Plantillas de Checklist" 
-              parent="menu_diseno_root"
-              action="action_checklist_template"
-              sequence="20"/>
-
+    <!-- Menú Configuración -->
     <menuitem id="menu_diseno_configuracion" 
               name="Configuración" 
               parent="menu_diseno_root"
               sequence="100"/>
+
+    <!-- Submenús de Operaciones -->
+    <menuitem id="menu_diseno_diseno" 
+              name="Diseños" 
+              parent="menu_diseno_operaciones"
+              action="action_diseno_design"
+              sequence="10"/>
+
+    <menuitem id="menu_diseno_plantillas" 
+              name="Plantillas de Checklist" 
+              parent="menu_diseno_operaciones"
+              action="action_diseno_checklist_template"
+              sequence="20"/>
 
     <!-- Acciones de menú -->
     <record id="action_diseno_design" model="ir.actions.act_window">
