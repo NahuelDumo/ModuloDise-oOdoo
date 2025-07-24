@@ -1,6 +1,6 @@
 # modulo_diseno/models/checklist_item.py
 
-from odoo import models, fields
+from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 from datetime import datetime
 
