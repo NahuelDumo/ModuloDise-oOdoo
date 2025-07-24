@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Grupo de usuario Diseñador -->
+    <record id="group_disenador" model="res.groups">
+        <field name="name">Diseñador</field>
+        <field name="category_id" ref="base.module_category_services_project"/>
+    </record>
+
+    <!-- Grupo de usuario Validador -->
+    <record id="group_validador" model="res.groups">
+        <field name="name">Validador</field>
+        <field name="category_id" ref="base.module_category_services_project"/>
+    </record>
+
+    <!-- Grupo de usuario Cliente -->
+    <record id="group_cliente" model="res.groups">
+        <field name="name">Cliente</field>
+        <field name="category_id" ref="base.module_category_services_project"/>
+    </record>
+
+    <!-- Reglas de acceso para los modelos -->
+    
+    <!-- Regla para el modelo design.design -->
+    <record id="design_design_rule" model="ir.rule">
+        <field name="name">Regla de diseño</field>
+        <field name="model_id" search="[('model', '=', 'design.design')]" model="ir.model"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- Regla para el modelo design.checklist_item -->
+    <record id="design_checklist_item_rule" model="ir.rule">
+        <field name="name">Regla de ítems de checklist</field>
+        <field name="model_id" search="[('model', '=', 'design.checklist_item')]" model="ir.model"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+</odoo>
