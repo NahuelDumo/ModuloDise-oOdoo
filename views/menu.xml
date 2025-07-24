@@ -10,13 +10,13 @@
     <menuitem id="menu_diseno_diseno" 
               name="Diseños" 
               parent="menu_diseno_root"
-              action="action_diseno_design"
+              action="action_design_design"
               sequence="10"/>
 
     <menuitem id="menu_diseno_plantillas" 
               name="Plantillas de Checklist" 
               parent="menu_diseno_root"
-              action="action_diseno_checklist_template"
+              action="action_checklist_template"
               sequence="20"/>
 
     <menuitem id="menu_diseno_configuracion" 
