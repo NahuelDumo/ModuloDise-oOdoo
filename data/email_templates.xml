@@ -30,7 +30,7 @@
                     <p>Estimado/a,</p>
                     <p>El diseño <strong>${object.name}</strong> ha sido aprobado por el validador.</p>
                     <p>Puedes continuar con el siguiente paso del proceso.</p>
-                    <p>Atentamente,<br/>Equipo de Validación</p>
+                    <p>Atentamente,<br/>Equipo de Odooq</p>
                 </div>
             </field>
         </record>
@@ -48,7 +48,7 @@
                     <p>El diseño <strong>${object.name}</strong> ha sido rechazado por las siguientes razones:</p>
                     <p>${object.observaciones_rechazo or 'Sin observaciones adicionales.'}</p>
                     <p>Por favor, revisa los comentarios y realiza las correcciones necesarias.</p>
-                    <p>Atentamente,<br/>Equipo de Validación</p>
+                    <p>Atentamente,<br/>Equipo de Odoo</p>
                 </div>
             </field>
         </record>
@@ -65,7 +65,7 @@
                     <p>Estimado/a ${object.cliente_id.name or 'cliente'},</p>
                     <p>El diseño <strong>${object.name}</strong> ha sido aprobado correctamente.</p>
                     <p>¡Gracias por tu colaboración!</p>
-                    <p>Atentamente,<br/>Equipo de Diseño</p>
+                    <p>Atentamente,<br/>Equipo de Odoo</p>
                 </div>
             </field>
         </record>
