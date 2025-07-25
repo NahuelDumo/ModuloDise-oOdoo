@@ -13,9 +13,6 @@
                         <button name="marcar_como_aprobado_por_cliente" type="object" string="Aprobar diseño"
                                 class="btn btn-primary"
                                 attrs="{'invisible': [('visible_para_cliente','=',False)]}"/>
-                        <field name="message_follower_ids" widget="mail_followers"/>
-                        <field name="activity_ids" widget="mail_activity"/>
-                        <field name="message_ids" widget="mail_thread"/>
                     </header>
 
                     <sheet>
@@ -49,11 +46,14 @@
                             </page>
 
                             <page string="Historial">
-                                <div class="oe_chatter">
-                                    <field name="message_follower_ids" widget="mail_followers"/>
-                                    <field name="activity_ids" widget="mail_activity"/>
-                                    <field name="message_ids" widget="mail_thread"/>
-                                </div>
+                                <field name="historial_ids">
+                                    <tree>
+                                        <field name="usuario_id"/>
+                                        <field name="tipo"/>
+                                        <field name="observaciones"/>
+                                        <field name="create_date"/>
+                                    </tree>
+                                </field>
                             </page>
                         </notebook>
                     </sheet>
