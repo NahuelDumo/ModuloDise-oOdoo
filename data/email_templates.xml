@@ -17,7 +17,6 @@
                 </div>
             </field>
         </record>
-
         <!-- Email al diseñador cuando la validación es aprobada -->
         <record id="email_template_diseno_validado" model="mail.template">
             <field name="name">Notificación de Validación Aprobada</field>
@@ -34,7 +33,6 @@
                 </div>
             </field>
         </record>
-
         <!-- Email de notificación de rechazo -->
         <record id="email_template_diseno_rechazado" model="mail.template">
             <field name="name">Notificación de Rechazo</field>
@@ -52,7 +50,6 @@
                 </div>
             </field>
         </record>
-
         <!-- Email de notificación al cliente -->
         <record id="email_template_aprobacion_cliente" model="mail.template">
             <field name="name">Notificación de Aprobación de Cliente</field>
@@ -69,7 +66,6 @@
                 </div>
             </field>
         </record>
-
         <!-- Email al diseñador -->
         <record id="email_template_disenio_validado" model="mail.template">
             <field name="name">Notificación a Diseñador</field>
@@ -84,9 +80,6 @@
                 ]]>
             </field>
         </record>
-    </data>
-
-    <data noupdate="1">
         <!-- Secuencia para la validación del diseño -->
         <record id="seq_design_validation" model="ir.sequence">
             <field name="name">Validación de Diseño</field>
