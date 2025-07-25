@@ -1,60 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <record id="view_form_design" model="ir.ui.view">
-    <field name="name">design.design.form</field>
-    <field name="model">design.design</field>
-    <field name="arch" type="xml">
-      <form string="Diseño">
-        <header>
-          <button name="abrir_wizard_rechazo" type="object" string="Rechazar diseño"
-                  class="btn btn-danger"
-                  attrs="{'invisible': [('etapa','=','completo')]}"/>
-          <button name="marcar_como_aprobado_por_cliente" type="object" string="Aprobar diseño"
-                  class="btn btn-primary"
-                  attrs="{'invisible': [('visible_para_cliente','=',False)]}"/>
-        </header>
+    <data>
+        <record id="view_form_design" model="ir.ui.view">
+            <field name="name">design.design.form</field>
+            <field name="model">design.design</field>
+            <field name="arch" type="xml">
+                <form string="Diseño">
+                    <header>
+                        <button name="abrir_wizard_rechazo" type="object" string="Rechazar diseño"
+                                class="btn btn-danger"
+                                attrs="{'invisible': [('etapa','=','completo')]}"/>
+                        <button name="marcar_como_aprobado_por_cliente" type="object" string="Aprobar diseño"
+                                class="btn btn-primary"
+                                attrs="{'invisible': [('visible_para_cliente','=',False)]}"/>
+                    </header>
 
-        <sheet>
-          <group string="Información del diseño">
-            <field name="name"/>
-            <field name="cliente_id"/>
-            <field name="categoria_id"/>
-            <field name="task_id"/>
-          </group>
+                    <sheet>
+                        <group string="Información del diseño">
+                            <field name="name"/>
+                            <field name="cliente_id"/>
+                            <field name="categoria_id"/>
+                            <field name="task_id"/>
+                        </group>
 
-          <group string="Etapa y estado">
-            <field name="etapa" readonly="1"/>
-            <field name="state" readonly="1"/>
-          </group>
+                        <group string="Etapa y estado">
+                            <field name="etapa" readonly="1"/>
+                            <field name="state" readonly="1"/>
+                        </group>
 
-          <group string="Diseño adjunto">
-            <field name="image" widget="image" class="oe_avatar"/>
-          </group>
+                        <group string="Diseño adjunto">
+                            <field name="image" widget="image" class="oe_avatar"/>
+                        </group>
 
-          <notebook>
-            <page string="Checklist">
-              <field name="checklist_ids">
-                <tree editable="bottom">
-                  <field name="name"/>
-                  <field name="validado_por_disenador"/>
-                  <field name="validado_por_validador"/>
-                  <field name="comentario"/>
-                </tree>
-              </field>
-            </page>
+                        <notebook>
+                            <page string="Checklist">
+                                <field name="checklist_ids">
+                                    <tree editable="bottom">
+                                        <field name="name"/>
+                                        <field name="validado_por_disenador"/>
+                                        <field name="validado_por_validador"/>
+                                        <field name="comentario"/>
+                                    </tree>
+                                </field>
+                            </page>
 
-            <page string="Historial">
-              <field name="historial_ids">
-                <tree>
-                  <field name="usuario_id"/>
-                  <field name="tipo"/>
-                  <field name="observaciones"/>
-                  <field name="create_date"/>
-                </tree>
-              </field>
-            </page>
-          </notebook>
-        </sheet>
-      </form>
-    </field>
-  </record>
+                            <page string="Historial">
+                                <field name="historial_ids">
+                                    <tree>
+                                        <field name="usuario_id"/>
+                                        <field name="tipo"/>
+                                        <field name="observaciones"/>
+                                        <field name="create_date"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
 </odoo>

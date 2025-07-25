@@ -9,14 +9,17 @@
             <field name="email_from">${user.email or 'no-reply@example.com'}</field>
             <field name="email_to">${object.get_validators_emails()}</field>
             <field name="body_html">
+                <![CDATA[
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                     <p>Estimado/a,</p>
                     <p>El diseño <strong>${object.name}</strong> ha sido completado por el diseñador y está pendiente de tu validación.</p>
                     <p>Puedes revisarlo accediendo a Odoo.</p>
                     <p>Atentamente,<br/>Equipo de Odoo</p>
                 </div>
+                ]]>
             </field>
         </record>
+        
         <!-- Email al diseñador cuando la validación es aprobada -->
         <record id="email_template_diseno_validado" model="mail.template">
             <field name="name">Notificación de Validación Aprobada</field>
@@ -25,14 +28,17 @@
             <field name="email_from">${user.email or 'no-reply@example.com'}</field>
             <field name="email_to">${object.get_disenador_email() or user.email}</field>
             <field name="body_html">
+                <![CDATA[
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                     <p>Estimado/a,</p>
                     <p>El diseño <strong>${object.name}</strong> ha sido aprobado por el validador.</p>
                     <p>Puedes continuar con el siguiente paso del proceso.</p>
                     <p>Atentamente,<br/>Equipo de Odoo</p>
                 </div>
+                ]]>
             </field>
         </record>
+        
         <!-- Email de notificación de rechazo -->
         <record id="email_template_diseno_rechazado" model="mail.template">
             <field name="name">Notificación de Rechazo</field>
@@ -41,6 +47,7 @@
             <field name="email_from">${user.email or 'no-reply@example.com'}</field>
             <field name="email_to">${object.get_disenador_email() or user.email}</field>
             <field name="body_html">
+                <![CDATA[
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                     <p>Estimado/a,</p>
                     <p>El diseño <strong>${object.name}</strong> ha sido rechazado por las siguientes razones:</p>
@@ -48,8 +55,10 @@
                     <p>Por favor, revisa los comentarios y realiza las correcciones necesarias.</p>
                     <p>Atentamente,<br/>Equipo de Odoo</p>
                 </div>
+                ]]>
             </field>
         </record>
+        
         <!-- Email de notificación al cliente -->
         <record id="email_template_aprobacion_cliente" model="mail.template">
             <field name="name">Notificación de Aprobación de Cliente</field>
@@ -58,14 +67,17 @@
             <field name="email_from">${user.email or 'no-reply@example.com'}</field>
             <field name="email_to">${object.cliente_id.email or user.email}</field>
             <field name="body_html">
+                <![CDATA[
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                     <p>Estimado/a ${object.cliente_id.name or 'cliente'},</p>
                     <p>El diseño <strong>${object.name}</strong> ha sido aprobado correctamente.</p>
                     <p>¡Gracias por tu colaboración!</p>
                     <p>Atentamente,<br/>Equipo de Odoo</p>
                 </div>
+                ]]>
             </field>
         </record>
+        
         <!-- Email al diseñador -->
         <record id="email_template_disenio_validado" model="mail.template">
             <field name="name">Notificación a Diseñador</field>
@@ -73,13 +85,14 @@
             <field name="subject">Diseño validado: ${object.name}</field>
             <field name="email_from">${user.email or 'no-reply@example.com'}</field>
             <field name="email_to">${object.get_disenador_email()}</field>
-            <field name="body_html" type="html">
+            <field name="body_html">
                 <![CDATA[
-                    <p>Hola,</p>
-                    <p>El diseño <strong>${object.name}</strong> ha sido validado y puede continuar a la siguiente etapa.</p>
+                <p>Hola,</p>
+                <p>El diseño <strong>${object.name}</strong> ha sido validado y puede continuar a la siguiente etapa.</p>
                 ]]>
             </field>
         </record>
+        
         <!-- Secuencia para la validación del diseño -->
         <record id="seq_design_validation" model="ir.sequence">
             <field name="name">Validación de Diseño</field>
