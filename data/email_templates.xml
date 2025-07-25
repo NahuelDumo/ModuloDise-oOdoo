@@ -30,7 +30,7 @@
                     <p>Estimado/a,</p>
                     <p>El diseño <strong>${object.name}</strong> ha sido aprobado por el validador.</p>
                     <p>Puedes continuar con el siguiente paso del proceso.</p>
-                    <p>Atentamente,<br/>Equipo de Odooq</p>
+                    <p>Atentamente,<br/>Equipo de Odoo</p>
                 </div>
             </field>
         </record>
@@ -84,6 +84,16 @@
                 ]]>
             </field>
         </record>
+    </data>
 
+    <data noupdate="1">
+        <!-- Secuencia para la validación del diseño -->
+        <record id="seq_design_validation" model="ir.sequence">
+            <field name="name">Validación de Diseño</field>
+            <field name="code">design.validation</field>
+            <field name="prefix">VAL-%(year)s-</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+        </record>
     </data>
 </odoo>

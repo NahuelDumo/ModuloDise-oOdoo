@@ -16,7 +16,6 @@
         "security/ir.model.access.csv",
 
         # Datos iniciales
-        "data/sequence.xml",
         "data/email_templates.xml",
 
         # Vistas principales
