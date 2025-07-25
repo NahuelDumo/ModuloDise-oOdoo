@@ -1,26 +1,31 @@
-# modulo_diseno/__manifest__.py
 {
     "name": "Módulo de Diseños",
     "version": "1.0",
     "category": "Project",
-    "summary": "Gestión de listas de verificación para diseños con validación y etapas",
+    "summary": "Gestión de diseños con listas de verificación por etapas y validación",
     "author": "Nahuel Dumo",
     "license": "AGPL-3",
-    "depends": ["base", "project", "mail", "portal"],
+    "depends": [
+        "base",
+        "project",
+        "mail"
+    ],
     "data": [
-        # Primero los archivos de seguridad
+        # Seguridad
         "security/security.xml",
         "security/ir.model.access.csv",
-        
-        # Luego las vistas que definen las acciones
-        "views/checklist_template_views.xml",
+
+        # Datos iniciales
+        "data/sequence.xml",
+        "data/email_templates.xml",
+
+        # Vistas principales
+        "views/menu.xml",
         "views/design_views.xml",
+        "views/checklist_template_views.xml",
         "views/checklist_item_views.xml",
-        "views/revision_log_views.xml",
-        "views/wizard_views.xml",
-        
-        # Finalmente los menús que referencian las acciones
-        "views/menu.xml"
+        "views/validation_views.xml",
+        "views/history_views.xml"
     ],
     "application": True,
     "installable": True,

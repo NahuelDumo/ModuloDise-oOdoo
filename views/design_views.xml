@@ -6,24 +6,28 @@
       <form string="Diseño">
         <header>
           <button name="abrir_wizard_rechazo" type="object" string="Rechazar diseño"
-                  class="btn btn-danger" attrs="{'invisible': [('etapa','=','completo')]}"/>
+                  class="btn btn-danger"
+                  attrs="{'invisible': [('etapa','=','completo')]}"/>
           <button name="marcar_como_aprobado_por_cliente" type="object" string="Aprobar diseño"
-                  class="btn btn-primary" attrs="{'invisible': [('visible_para_cliente','=',False)]}"/>
+                  class="btn btn-primary"
+                  attrs="{'invisible': [('visible_para_cliente','=',False)]}"/>
         </header>
 
         <sheet>
-          <group>
+          <group string="Información del diseño">
             <field name="name"/>
             <field name="cliente_id"/>
-            <field name="task_id"/>
             <field name="categoria_id"/>
-            <group>
-              <field name="etapa"/>
-              <field name="state"/>
-              <field name="visible_para_cliente" invisible="1"/>
-              <field name="aprobado_cliente" invisible="1"/>
-            </group>
-            <field name="image" widget="image"/>
+            <field name="task_id"/>
+          </group>
+
+          <group string="Etapa y estado">
+            <field name="etapa" readonly="1"/>
+            <field name="state" readonly="1"/>
+          </group>
+
+          <group string="Diseño adjunto">
+            <field name="image" widget="image" class="oe_avatar"/>
           </group>
 
           <notebook>
@@ -53,21 +57,4 @@
       </form>
     </field>
   </record>
-
-  <record id="view_tree_design" model="ir.ui.view">
-    <field name="name">design.design.tree</field>
-    <field name="model">design.design</field>
-    <field name="arch" type="xml">
-      <tree>
-        <field name="name"/>
-        <field name="cliente_id"/>
-        <field name="etapa"/>
-        <field name="state"/>
-        <field name="visible_para_cliente"/>
-        <field name="aprobado_cliente"/>
-      </tree>
-    </field>
-  </record>
-
-  <!-- Las acciones y menús se han movido a menu.xml -->
 </odoo>
