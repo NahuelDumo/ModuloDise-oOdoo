@@ -25,7 +25,7 @@
     <record id="design_design_rule" model="ir.rule">
         <field name="name">Diseñador: solo sus diseños</field>
         <field name="model_id" search="[('model', '=', 'design.design')]" model="ir.model"/>
-        <field name="domain_force">['|', ('user_id', '=', user.id), ('state', 'in', ['validado', 'aprobado'])]</field>
+        <field name="domain_force">['|', ('create_uid', '=', user.id), ('state', 'in', ['validado', 'aprobado'])]</field>
         <field name="groups" eval="[(4, ref('group_disenador'))]"/>
     </record>
 
@@ -33,7 +33,7 @@
     <record id="design_checklist_item_rule" model="ir.rule">
         <field name="name">Diseñador: solo sus checklist items</field>
         <field name="model_id" search="[('model', '=', 'design.checklist_item')]" model="ir.model"/>
-        <field name="domain_force">[('design_id.user_id', '=', user.id)]</field>
+        <field name="domain_force">[('design_id.create_uid', '=', user.id)]</field>
         <field name="groups" eval="[(4, ref('group_disenador'))]"/>
     </record>
 
