@@ -23,7 +23,6 @@
         "views/design_views.xml",
         "views/checklist_template_views.xml",
         "views/checklist_item_views.xml",
-        "views/validation_views.xml",
         "views/revision_log_views.xml"
     ],
     "application": True,
