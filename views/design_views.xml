@@ -26,6 +26,7 @@
                         <group string="Etapa y estado">
                             <field name="etapa" readonly="1"/>
                             <field name="state" readonly="1"/>
+                            <field name="visible_para_cliente" invisible="1"/>
                         </group>
 
                         <group string="Diseño adjunto">
