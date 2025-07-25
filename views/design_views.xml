@@ -35,12 +35,12 @@
 
                         <notebook>
                             <page string="Checklist">
-                                <field name="checklist_ids">
-                                    <tree editable="bottom">
-                                        <field name="name"/>
-                                        <field name="validado_por_disenador"/>
-                                        <field name="validado_por_validador"/>
-                                        <field name="comentario"/>
+                                <field name="checklist_ids" readonly="1">
+                                    <tree>
+                                        <field name="name" readonly="1"/>
+                                        <field name="validado_por_disenador" attrs="{'readonly': [('parent.state', 'not in', ['borrador', 'en_validacion'])]}"/>
+                                        <field name="validado_por_validador" readonly="1"/>
+                                        <field name="comentario" attrs="{'readonly': [('parent.state', 'not in', ['borrador', 'en_validacion'])]}"/>
                                     </tree>
                                 </field>
                             </page>
