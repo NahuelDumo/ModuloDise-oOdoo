@@ -376,7 +376,7 @@ class Design(models.Model):
             })
             
             # Enviar notificación al validador
-            template = self.env.ref('modulo_diseno.email_template_diseno_pendiente_validar')
+            template = self.env.ref('modulodisenoodoo.email_template_diseno_pendiente_validar')
             if template:
                 template.with_context(
                     lang=self.env.user.lang,
