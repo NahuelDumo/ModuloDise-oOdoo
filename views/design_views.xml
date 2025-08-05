@@ -12,7 +12,8 @@
                                 attrs="{'invisible': ['|', ('diseño_subido','=',True), '|', ('state','=','aprobado'), ('state','=','rechazado')]}"/>
                         <button name="abrir_wizard_rechazo" type="object" string="Rechazar diseño"
                                 class="btn btn-danger"
-                                attrs="{'invisible': ['|', '|', ('etapa','=','completo'), ('state','=','aprobado'), '!', '&amp;', '&amp;', ('state','=','validacion'), ('diseño_subido','=',True), ('can_reject','=',True)]}"/>
+                                attrs="{'invisible': [('can_reject', '=', False)]}" 
+                                confirm="¿Está seguro de que desea rechazar este diseño?"/>
                         <button name="marcar_como_aprobado_por_cliente" type="object" string="Aprobar diseño"
                                 class="btn btn-primary"
                                 attrs="{'invisible': [('visible_para_cliente','=',False)]}"/>

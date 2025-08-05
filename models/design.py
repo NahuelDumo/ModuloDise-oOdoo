@@ -48,9 +48,10 @@ class Design(models.Model):
         ('rechazado', 'Rechazado'),
     ], string="Estado", default='borrador', tracking=True)
     
-    # Nuevos campos
-    diseño_subido = fields.Boolean("Diseño subido", default=False, tracking=True)
-    fecha_subida_diseno = fields.Datetime("Fecha de subida del diseño", readonly=True)
+    # Campos para control de estado
+    diseño_subido = fields.Boolean(string='Diseño subido', default=False, copy=False)
+    fecha_subida_diseno = fields.Datetime(string='Fecha de subida', copy=False, readonly=True)
+    can_reject = fields.Boolean(string='Puede ser rechazado', compute='_compute_can_reject', store=False)
     
     # Campos de comentarios
     comentario_validador = fields.Text("Comentarios del validador", 
@@ -211,6 +212,13 @@ class Design(models.Model):
                 })
 
         return record
+
+    @api.depends('state', 'diseño_subido')
+    def _compute_can_reject(self):
+        """Determina si el diseño puede ser rechazado."""
+        for record in self:
+            # Solo puede ser rechazado si está en estado de validación y ha sido subido
+            record.can_reject = record.state == 'validacion' and record.diseño_subido
 
     def _check_checklist_completo(self):
         """Verifica si el checklist está completo."""
