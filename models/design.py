@@ -229,21 +229,35 @@ class Design(models.Model):
         return all(item.validado_por_disenador for item in self.checklist_ids)
 
     def _enviar_notificacion_checklist_completo(self):
-        """Envía notificación cuando el checklist está completo."""
-        template = self.env.ref('ModuloDisenoOdoo.modulolistasdeverificacion_email_template_checklist_completado')
+        """
+        Envía notificación al validador cuando el diseñador completa el checklist.
+        Este método se llama desde el write cuando se detecta que se ha completado el checklist.
+        """
         for record in self:
-            if template and record._check_checklist_completo():
-                template.with_context(
-                    lang=self.env.user.lang,
-                    user_name=self.env.user.name,
-                ).send_mail(record.id, force_send=True, email_values=None)
-                
-                # Registrar en el historial
+            if record._check_checklist_completo():
+                # Registrar primero en el historial que el diseñador completó su checklist
                 self.env['design.revision_log'].create({
                     'design_id': record.id,
-                    'tipo': 'notificacion',
-                    'observaciones': 'Notificación enviada: Checklist completado y listo para validación.'
+                    'usuario_id': self.env.user.id,
+                    'tipo': 'validacion_disenador',
+                    'observaciones': 'El diseñador ha completado el checklist. Enviando notificación al validador.'
                 })
+                
+                # Enviar notificación al validador
+                template = self.env.ref('ModuloDisenoOdoo.modulolistasdeverificacion_email_template_checklist_completado', raise_if_not_found=False)
+                if template:
+                    template.with_context(
+                        lang=self.env.user.lang,
+                        user_name=self.env.user.name,
+                    ).send_mail(record.id, force_send=True, email_values=None)
+                    
+                    # Registrar que se envió la notificación al validador
+                    self.env['design.revision_log'].create({
+                        'design_id': record.id,
+                        'usuario_id': self.env.user.id,
+                        'tipo': 'validacion_disenador',
+                        'observaciones': 'Notificación enviada al validador para revisar el checklist completado.'
+                    })
 
     def write(self, vals):
         # Verificar si se están modificando campos protegidos después de subir el diseño
