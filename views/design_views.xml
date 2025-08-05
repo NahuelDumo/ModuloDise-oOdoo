@@ -42,12 +42,12 @@
 
                         <notebook>
                             <page string="Checklist">
-                                <field name="checklist_ids" attrs="{'readonly': [('parent.diseño_subido','=',False)]}">
+                                <field name="checklist_ids" attrs="{'readonly': [('diseño_subido','=',False)]}">
                                     <tree>
                                         <field name="name" readonly="1"/>
-                                        <field name="validado_por_disenador" attrs="{'readonly': ['|', ('parent.state', 'not in', ['borrador', 'validacion']), ('parent.diseño_subido','=',False)]}"/>
-                                        <field name="validado_por_validador" attrs="{'readonly': ['|', ('parent.state', '!=', 'validacion'), ('parent.diseño_subido','=',False)]}"/>
-                                        <field name="comentario" attrs="{'readonly': [('parent.diseño_subido','=',False)]}"/>
+                                        <field name="validado_por_disenador" attrs="{'readonly': ['|', ('state', 'not in', ['borrador', 'validacion']), ('diseño_subido','=',False)]}"/>
+                                        <field name="validado_por_validador" attrs="{'readonly': ['|', ('state', '!=', 'validacion'), ('diseño_subido','=',False)]}"/>
+                                        <field name="comentario" attrs="{'readonly': [('diseño_subido','=',False)]}"/>
                                     </tree>
                                 </field>
                             </page>
