@@ -225,7 +225,8 @@ class Design(models.Model):
         self.ensure_one()
         if not self.checklist_ids:
             return False
-        return all(item.cumplido for item in self.checklist_ids)
+        # Verificar que todos los ítems estén validados por el diseñador
+        return all(item.validado_por_disenador for item in self.checklist_ids)
 
     def _enviar_notificacion_checklist_completo(self):
         """Envía notificación cuando el checklist está completo."""
