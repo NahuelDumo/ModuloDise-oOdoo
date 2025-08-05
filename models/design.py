@@ -81,13 +81,13 @@ class Design(models.Model):
                 record._notificar_a_disenador()
 
     def _notificar_a_validadores(self):
-        validadores = self.env.ref('modulo_diseno.group_validador').users
-        template = self.env.ref('modulo_diseno.email_template_diseño_pendiente_validar')
+        validadores = self.env.ref('ModuloDisenoOdoo.group_validador').users
+        template = self.env.ref('ModuloDisenoOdoo.email_template_diseño_pendiente_validar')
         for validador in validadores:
             template.send_mail(self.id, force_send=True, email_values={'email_to': validador.email})
 
     def _notificar_a_disenador(self):
-        template = self.env.ref('modulo_diseno.email_template_diseño_validado')
+        template = self.env.ref('ModuloDisenoOdoo.email_template_diseño_validado')
         template.send_mail(self.id, force_send=True, email_values={'email_to': self.create_uid.email})
 
     def action_rechazar_diseno(self):
@@ -95,7 +95,7 @@ class Design(models.Model):
         self.ensure_one()
         
         # Verificar permisos
-        if not self.env.user.has_group('modulo_diseno.group_validador') and not self.env.user.has_group('base.group_system'):
+        if not self.env.user.has_group('ModuloDisenoOdoo.group_validador') and not self.env.user.has_group('base.group_system'):
             raise AccessError(_("Solo los validadores pueden rechazar diseños."))
             
         # Verificar que el diseño esté en un estado que permita el rechazo
@@ -266,7 +266,7 @@ class Design(models.Model):
             protected_fields = set(vals.keys()) - set(self._fields_editables_after_upload)
             if protected_fields:
                 # Verificar si el usuario es administrador o validador
-                is_validador = self.env.user.has_group('modulo_diseno.group_validador')
+                is_validador = self.env.user.has_group('ModuloDisenoOdoo.group_validador')
                 is_admin = self.env.user.has_group('base.group_system')
                 
                 if not (is_validador or is_admin):
