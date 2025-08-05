@@ -1,6 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data noupdate="0">
+        <!-- Email al diseñador cuando se crea un nuevo diseño -->
+        <record id="email_template_diseno_creado" model="mail.template">
+            <field name="name">Notificación de Nuevo Diseño</field>
+            <field name="model_id" ref="model_design_design"/>
+            <field name="subject">Nuevo diseño creado: ${object.name}</field>
+            <field name="email_from">${user.email or 'no-reply@example.com'}</field>
+            <field name="email_to">${object.user_id.email or object.create_uid.email or ''}</field>
+            <field name="body_html">
+                <![CDATA[
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <p>Estimado/a ${object.user_id.name or 'Diseñador'},</p>
+                    
+                    <p>Se ha creado un nuevo diseño que ha sido asignado a ti:</p>
+                    
+                    <div style="background-color: #f0f7ff; border-left: 4px solid #2196F3; padding: 15px; margin: 15px 0; border-radius: 4px;">
+                        <h3 style="margin-top: 0; color: #0d47a1;">${object.name or 'Nuevo Diseño'}</h3>
+                        <p><strong>Cliente:</strong> ${object.cliente_id.name or 'No especificado'}</p>
+                        <p><strong>Fecha de creación:</strong> ${object.create_date or ''}</p>
+                        <p><strong>Estado actual:</strong> ${dict(object._fields['state'].selection).get(object.state) or 'Nuevo'}</p>
+                    </div>
+                    
+                    <p>Puedes comenzar a trabajar en este diseño accediendo al sistema a través del siguiente enlace:</p>
+                    
+                    <div style="margin: 25px 0; text-align: center;">
+                        <a href="${object.get_base_url()}/web#id=${object.id}&amp;model=design.design&amp;view_type=form" 
+                           style="background-color: #2196F3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">
+                            Ir al Diseño
+                        </a>
+                    </div>
+                    
+                    <p>Recuerda que puedes consultar los requisitos y el checklist asociado en la ficha del diseño.</p>
+                    
+                    <p>¡Buena suerte con tu nuevo proyecto!</p>
+                    
+                    <p>Atentamente,<br/>Equipo de Gestión de Diseños</p>
+                    
+                    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">
+                    <p style="font-size: 12px; color: #777; margin-bottom: 0;">
+                        Este es un mensaje automático, por favor no respondas a este correo.
+                    </p>
+                </div>
+                ]]>
+            </field>
+        </record>
+        
+        <!-- Email al validador cuando el checklist está completo -->
+        <record id="email_template_checklist_completado" model="mail.template">
+            <field name="name">Notificación de Checklist Completado</field>
+            <field name="model_id" ref="model_design_design"/>
+            <field name="subject">Checklist completado: ${object.name} - Requiere validación</field>
+            <field name="email_from">${user.email or 'no-reply@example.com'}</field>
+            <field name="email_to">${object.get_validators_emails()}</field>
+            <field name="body_html">
+                <![CDATA[
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <p>Estimado/a Validador,</p>
+                    <p>El diseño <strong>${object.name}</strong> ha completado el checklist de verificación y está listo para tu revisión.</p>
+                    <p><strong>Diseñador:</strong> ${object.create_uid.name or 'No especificado'}</p>
+                    <p><strong>Cliente:</strong> ${object.cliente_id.name or 'No especificado'}</p>
+                    <p><strong>Estado actual:</strong> ${object.state}</p>
+                    <p>Por favor, inicia sesión en el sistema para revisar y validar el diseño.</p>
+                    <div style="margin: 25px 0; text-align: center;">
+                        <a href="${object.get_base_url()}/web#id=${object.id}&amp;model=design.design&amp;view_type=form" 
+                           style="background-color: #875A7B; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                            Revisar Diseño
+                        </a>
+                    </div>
+                    <p>Atentamente,<br/>Sistema de Gestión de Diseños</p>
+                </div>
+                ]]>
+            </field>
+        </record>
+
         <!-- Email al validador -->
         <record id="email_template_diseno_pendiente_validar" model="mail.template">
             <field name="name">Notificación a Validador</field>
@@ -24,16 +97,38 @@
         <record id="email_template_diseno_validado" model="mail.template">
             <field name="name">Notificación de Validación Aprobada</field>
             <field name="model_id" ref="model_design_design"/>
-            <field name="subject">Validación aprobada: ${object.name}</field>
+            <field name="subject">✅ Validación aprobada: ${object.name}</field>
             <field name="email_from">${user.email or 'no-reply@example.com'}</field>
             <field name="email_to">${object.get_disenador_email() or user.email}</field>
             <field name="body_html">
                 <![CDATA[
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                    <p>Estimado/a,</p>
-                    <p>El diseño <strong>${object.name}</strong> ha sido aprobado por el validador.</p>
-                    <p>Puedes continuar con el siguiente paso del proceso.</p>
-                    <p>Atentamente,<br/>Equipo de Odoo</p>
+                    <p>Estimado/a ${object.create_uid.name or 'Diseñador'},</p>
+                    <p>¡Buenas noticias! El diseño <strong>${object.name}</strong> ha sido aprobado por el validador.</p>
+                    
+                    <div style="background-color: #f0f9f0; border-left: 4px solid #4CAF50; padding: 10px 15px; margin: 15px 0;">
+                        <p><strong>Estado actual:</strong> ${dict(object._fields['state'].selection).get(object.state)}</p>
+                        <p><strong>Validador:</strong> ${user.name}</p>
+                        <p><strong>Fecha de aprobación:</strong> ${object.write_date or ''}</p>
+                    </div>
+                    
+                    <p>Puedes ver los detalles del diseño haciendo clic en el siguiente enlace:</p>
+                    
+                    <div style="margin: 25px 0; text-align: center;">
+                        <a href="${object.get_base_url()}/web#id=${object.id}&amp;model=design.design&amp;view_type=form" 
+                           style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                            Ver Diseño
+                        </a>
+                    </div>
+                    
+                    <p>Si tienes alguna pregunta, no dudes en contactar al validador.</p>
+                    
+                    <p>Atentamente,<br/>Sistema de Gestión de Diseños</p>
+                    
+                    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">
+                    <p style="font-size: 12px; color: #777;">
+                        Este es un mensaje automático, por favor no responda a este correo.
+                    </p>
                 </div>
                 ]]>
             </field>
@@ -43,17 +138,39 @@
         <record id="email_template_diseno_rechazado" model="mail.template">
             <field name="name">Notificación de Rechazo</field>
             <field name="model_id" ref="model_design_design"/>
-            <field name="subject">Diseño rechazado: ${object.name}</field>
+            <field name="subject">❌ Diseño rechazado: ${object.name}</field>
             <field name="email_from">${user.email or 'no-reply@example.com'}</field>
             <field name="email_to">${object.get_disenador_email() or user.email}</field>
             <field name="body_html">
                 <![CDATA[
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                    <p>Estimado/a,</p>
-                    <p>El diseño <strong>${object.name}</strong> ha sido rechazado por las siguientes razones:</p>
-                    <p>${object.observaciones_rechazo or 'Sin observaciones adicionales.'}</p>
-                    <p>Por favor, revisa los comentarios y realiza las correcciones necesarias.</p>
-                    <p>Atentamente,<br/>Equipo de Odoo</p>
+                    <p>Estimado/a ${object.create_uid.name or 'Diseñador'},</p>
+                    <p>Lamentamos informarte que el diseño <strong>${object.name}</strong> ha sido rechazado por el validador.</p>
+                    
+                    <div style="background-color: #fef6f6; border-left: 4px solid #f44336; padding: 10px 15px; margin: 15px 0;">
+                        <p><strong>Razón del rechazo:</strong></p>
+                        <p>${object.observaciones_rechazo or 'No se proporcionaron observaciones adicionales.'}</p>
+                        <p><strong>Validador:</strong> ${user.name}</p>
+                        <p><strong>Fecha de rechazo:</strong> ${object.fecha_rechazo or ''}</p>
+                    </div>
+                    
+                    <p>Por favor, revisa los comentarios del validador y realiza las correcciones necesarias. Una vez realizados los cambios, podrás volver a enviar el diseño para su revisión.</p>
+                    
+                    <div style="margin: 25px 0; text-align: center;">
+                        <a href="${object.get_base_url()}/web#id=${object.id}&amp;model=design.design&amp;view_type=form" 
+                           style="background-color: #f44336; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                            Revisar Comentarios
+                        </a>
+                    </div>
+                    
+                    <p>Si tienes alguna pregunta o necesitas aclaraciones, no dudes en contactar al validador.</p>
+                    
+                    <p>Atentamente,<br/>Sistema de Gestión de Diseños</p>
+                    
+                    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">
+                    <p style="font-size: 12px; color: #777;">
+                        Este es un mensaje automático, por favor no responda a este correo.
+                    </p>
                 </div>
                 ]]>
             </field>

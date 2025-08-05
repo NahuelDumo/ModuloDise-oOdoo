@@ -23,7 +23,10 @@
         "views/design_views.xml",
         "views/checklist_template_views.xml",
         "views/checklist_item_views.xml",
-        "views/revision_log_views.xml"
+        "views/revision_log_views.xml",
+        
+        # Vistas de wizards
+        "wizards/rechazo_wizard_views.xml"
     ],
     "application": True,
     "installable": True,

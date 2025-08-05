@@ -7,9 +7,12 @@
             <field name="arch" type="xml">
                 <form string="Diseño">
                     <header>
+                        <button name="subir_diseno" type="object" string="Subir diseño"
+                                class="oe_highlight"
+                                attrs="{'invisible': ['|', ('diseño_subido','=',True), '|', ('state','=','aprobado'), ('state','=','rechazado')]}"/>
                         <button name="abrir_wizard_rechazo" type="object" string="Rechazar diseño"
                                 class="btn btn-danger"
-                                attrs="{'invisible': [('etapa','=','completo')]}"/>
+                                attrs="{'invisible': ['|', '|', ('etapa','=','completo'), ('state','=','aprobado'), '!', '&amp;', '&amp;', ('state','=','validacion'), ('diseño_subido','=',True), ('can_reject','=',True)]}"/>
                         <button name="marcar_como_aprobado_por_cliente" type="object" string="Aprobar diseño"
                                 class="btn btn-primary"
                                 attrs="{'invisible': [('visible_para_cliente','=',False)]}"/>
@@ -26,6 +29,8 @@
                         <group string="Etapa y estado">
                             <field name="etapa" readonly="1"/>
                             <field name="state" readonly="1"/>
+                            <field name="diseño_subido" invisible="1"/>
+                            <field name="fecha_subida_diseno" readonly="1"/>
                             <field name="visible_para_cliente" invisible="1"/>
                         </group>
 
@@ -35,12 +40,12 @@
 
                         <notebook>
                             <page string="Checklist">
-                                <field name="checklist_ids" readonly="1">
+                                <field name="checklist_ids" attrs="{'readonly': [('parent.diseño_subido','=',False)]}">
                                     <tree>
                                         <field name="name" readonly="1"/>
-                                        <field name="validado_por_disenador" attrs="{'readonly': [('parent.state', 'not in', ['borrador', 'en_validacion'])]}"/>
-                                        <field name="validado_por_validador" readonly="1"/>
-                                        <field name="comentario" attrs="{'readonly': [('parent.state', 'not in', ['borrador', 'en_validacion'])]}"/>
+                                        <field name="validado_por_disenador" attrs="{'readonly': ['|', ('parent.state', 'not in', ['borrador', 'validacion']), ('parent.diseño_subido','=',False)]}"/>
+                                        <field name="validado_por_validador" attrs="{'readonly': ['|', ('parent.state', '!=', 'validacion'), ('parent.diseño_subido','=',False)]}"/>
+                                        <field name="comentario" attrs="{'readonly': [('parent.diseño_subido','=',False)]}"/>
                                     </tree>
                                 </field>
                             </page>
@@ -54,6 +59,25 @@
                                         <field name="create_date"/>
                                     </tree>
                                 </field>
+                            </page>
+                            
+                            <page string="Comentarios">
+                                <group>
+                                    <group string="Comentarios del Validador">
+                                        <field name="comentario_validador" attrs="{'readonly': [('diseño_subido', '=', False)]}"/>
+                                    </group>
+                                    <group string="Comentarios del Diseñador">
+                                        <field name="comentario_disenador" attrs="{'readonly': [('diseño_subido', '=', False)]}"/>
+                                    </group>
+                                </group>
+                            </page>
+                            
+                            <page string="Información Adicional">
+                                <group>
+                                    <field name="fecha_subida_diseno" readonly="1"/>
+                                    <field name="fecha_aprobacion_cliente" readonly="1"/>
+                                    <field name="fecha_rechazo" readonly="1"/>
+                                </group>
                             </page>
                         </notebook>
                     </sheet>
