@@ -230,7 +230,7 @@ class Design(models.Model):
 
     def _enviar_notificacion_checklist_completo(self):
         """Envía notificación cuando el checklist está completo."""
-        template = self.env.ref('modulo_diseno.email_template_checklist_completado')
+        template = self.env.ref('modulolistasdeverificacion.modulolistasdeverificacion_email_template_checklist_completado')
         for record in self:
             if template and record._check_checklist_completo():
                 template.with_context(
