@@ -31,6 +31,7 @@
                             <field name="etapa" readonly="1"/>
                             <field name="state" readonly="1"/>
                             <field name="diseño_subido" invisible="1"/>
+                            <field name="can_reject" invisible="1"/>
                             <field name="fecha_subida_diseno" readonly="1"/>
                             <field name="visible_para_cliente" invisible="1"/>
                         </group>
