@@ -61,6 +61,14 @@ class Design(models.Model):
                                       help="Comentarios del diseñador sobre el diseño",
                                       tracking=True)
 
+    is_designer = fields.Boolean(compute='_compute_user_roles', string='Is Designer')
+    is_validator = fields.Boolean(compute='_compute_user_roles', string='Is Validator')
+
+    def _compute_user_roles(self):
+        for record in self:
+            record.is_designer = self.env.user.has_group('ModuloDisenoOdoo.group_disenador')
+            record.is_validator = self.env.user.has_group('ModuloDisenoOdoo.group_validador')
+
     @api.depends('checklist_ids.validado_por_disenador', 'checklist_ids.validado_por_validador')
     def _compute_estado_checklist(self):
         for record in self:
@@ -345,7 +353,7 @@ class Design(models.Model):
 
 
     def get_validators_emails(self):
-        group = self.env.ref('modulo_diseno.group_validador')
+        group = self.env.ref('ModuloDisenoOdoo.group_validador')
         return ','.join(user.partner_id.email for user in group.users if user.partner_id.email)
 
     def get_disenador_email(self):

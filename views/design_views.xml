@@ -45,8 +45,8 @@
                                 <field name="checklist_ids">
                                     <tree>
                                         <field name="name" readonly="1"/>
-                                        <field name="validado_por_disenador" attrs="{'readonly': ['|', ('parent.diseño_subido', '=', True), '|', ('parent.state', 'not in', ['borrador', 'validacion']), ('parent.diseño_subido', '=', False)]}"/>
-                                        <field name="validado_por_validador" attrs="{'readonly': ['|', ('parent.diseño_subido', '=', True), '|', ('parent.state', '!=', 'validacion'), ('parent.diseño_subido', '=', False)]}"/>
+                                        <field name="validado_por_disenador" attrs="{'readonly': [('parent.is_validator', '=', True)]}"/>
+                                        <field name="validado_por_validador" attrs="{'readonly': [('parent.is_designer', '=', True)]}"/>
                                         <field name="comentario" attrs="{'readonly': [('parent.diseño_subido', '=', True)]}"/>
                                     </tree>
                                 </field>
