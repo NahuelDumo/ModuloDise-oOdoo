@@ -1,8 +1,15 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_design_design,access_design_design,model_design_design,,1,1,1,1
-access_checklist_item,access_checklist_item,model_design_checklist_item,,1,1,1,1
-access_checklist_template,access_checklist_template,model_design_checklist_template,,1,1,1,1
-access_checklist_template_item,access_checklist_template_item,model_design_checklist_template_item,,1,1,1,1
-access_revision_log,access_revision_log,model_design_revision_log,,1,1,1,0
-access_revision_log_admin,access_revision_log_admin,model_design_revision_log,base.group_system,1,1,1,1
-access_wizard_rechazo,access_wizard_rechazo,model_design_wizard_rechazo,,1,1,1,1
+
+access_design_design_disenador,design.design disenador,model_design_design,ModuloDisenoOdoo.group_disenador,1,1,1,0
+access_design_design_validador,design.design validador,model_design_design,ModuloDisenoOdoo.group_validador,1,1,0,0
+access_design_design_cliente,design.design cliente,model_design_design,ModuloDisenoOdoo.group_cliente,1,0,0,0
+
+access_checklist_item_disenador,design.checklist_item disenador,model_design_checklist_item,ModuloDisenoOdoo.group_disenador,1,1,1,1
+access_checklist_item_validador,design.checklist_item validador,model_design_checklist_item,ModuloDisenoOdoo.group_validador,1,1,1,1
+
+access_revision_log_user,design.revision_log user,model_design_revision_log,base.group_user,1,0,0,0
+
+access_checklist_template_admin,design.checklist_template admin,model_design_checklist_template,base.group_system,1,1,1,1
+access_checklist_template_item_admin,design.checklist_template_item admin,model_design_checklist_template_item,base.group_system,1,1,1,1
+
+access_wizard_rechazo_user,design.wizard_rechazo user,model_design_wizard_rechazo,base.group_user,1,1,1,1
