@@ -56,14 +56,14 @@
                                                attrs="{
                                                    'readonly': [
                                                        '|', 
-                                                       ('parent.diseño_subido', '=', True), 
+                                                       ('diseño_subido', '=', True), 
                                                        '|', 
-                                                       ('parent.state', 'not in', ['borrador', 'validacion']), 
+                                                       ('state', 'not in', ['borrador', 'validacion']), 
                                                        '|',
-                                                       ('parent.state', '=', 'aprobado'), 
+                                                       ('state', '=', 'aprobado'), 
                                                        '|',
-                                                       ('parent.state', '=', 'rechazado'),
-                                                       ('parent.is_designer', '=', False)
+                                                       ('state', '=', 'rechazado'),
+                                                       ('is_designer', '=', False)
                                                    ]
                                                }"/>
                                         
@@ -72,14 +72,14 @@
                                                attrs="{
                                                    'readonly': [
                                                        '|', 
-                                                       ('parent.diseño_subido', '=', True), 
+                                                       ('diseño_subido', '=', True), 
                                                        '|', 
-                                                       ('parent.state', '!=', 'validacion'), 
+                                                       ('state', '!=', 'validacion'), 
                                                        '|',
-                                                       ('parent.state', '=', 'aprobado'), 
+                                                       ('state', '=', 'aprobado'), 
                                                        '|',
-                                                       ('parent.state', '=', 'rechazado'),
-                                                       ('parent.is_validator', '=', False)
+                                                       ('state', '=', 'rechazado'),
+                                                       ('is_validator', '=', False)
                                                    ]
                                                }"/>
                                                
