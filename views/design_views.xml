@@ -48,12 +48,24 @@
                                 <field name="checklist_ids">
                                     <tree>
                                         <field name="name" readonly="1"/>
+                                        <!-- Diseñador puede editar su campo, validador solo ver -->
                                         <field name="validado_por_disenador" 
                                                groups="ModuloDisenoOdoo.group_disenador"
                                                attrs="{'readonly': ['|', ('parent.diseño_subido', '=', True), '|', ('parent.state', 'not in', ['borrador', 'validacion']), ('parent.state', '=', 'aprobado'), ('parent.state', '=', 'rechazado')]}"/>
+                                        <!-- Validador solo puede ver el campo del diseñador -->
+                                        <field name="validado_por_disenador" 
+                                               groups="ModuloDisenoOdoo.group_validador"
+                                               readonly="1"/>
+                                               
+                                        <!-- Validador puede editar su campo, diseñador solo ver -->
                                         <field name="validado_por_validador" 
                                                groups="ModuloDisenoOdoo.group_validador"
                                                attrs="{'readonly': ['|', ('parent.diseño_subido', '=', True), '|', ('parent.state', '!=', 'validacion'), ('parent.state', '=', 'aprobado'), ('parent.state', '=', 'rechazado')]}"/>
+                                        <!-- Diseñador solo puede ver el campo del validador -->
+                                        <field name="validado_por_validador" 
+                                               groups="ModuloDisenoOdoo.group_disenador"
+                                               readonly="1"/>
+                                               
                                         <field name="comentario" 
                                                attrs="{'readonly': [('parent.diseño_subido', '=', True)]}"/>
                                     </tree>
@@ -73,13 +85,26 @@
                             
                             <page string="Comentarios">
                                 <group>
+                                    <!-- El validador puede editar sus comentarios -->
                                     <group string="Comentarios del Validador" groups="ModuloDisenoOdoo.group_validador">
                                         <field name="comentario_validador" 
                                                attrs="{'readonly': [('diseño_subido', '=', True)]}"/>
                                     </group>
+                                    <!-- El diseñador puede ver los comentarios del validador pero no editarlos -->
+                                    <group string="Comentarios del Validador" groups="ModuloDisenoOdoo.group_disenador">
+                                        <field name="comentario_validador" 
+                                               readonly="1"/>
+                                    </group>
+                                    
+                                    <!-- El diseñador puede editar sus comentarios -->
                                     <group string="Comentarios del Diseñador" groups="ModuloDisenoOdoo.group_disenador">
                                         <field name="comentario_disenador" 
                                                attrs="{'readonly': [('diseño_subido', '=', True)]}"/>
+                                    </group>
+                                    <!-- El validador puede ver los comentarios del diseñador pero no editarlos -->
+                                    <group string="Comentarios del Diseñador" groups="ModuloDisenoOdoo.group_validador">
+                                        <field name="comentario_disenador" 
+                                               readonly="1"/>
                                     </group>
                                 </group>
                             </page>
