@@ -376,7 +376,7 @@ class Design(models.Model):
             })
             
             # Enviar notificación al validador
-            template = self.env.ref('modulodisenoodoo.email_template_diseno_pendiente_validar')
+            template = self.env.ref('ModuloDisenoOdoo.email_template_diseno_pendiente_validar')
             if template:
                 template.with_context(
                     lang=self.env.user.lang,
@@ -407,4 +407,3 @@ class Design(models.Model):
                             if field not in self._fields_editables_after_upload:
                                 res['fields'].get(field, {})['readonly'] = True
         return res
-
