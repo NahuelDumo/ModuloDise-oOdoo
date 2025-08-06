@@ -60,6 +60,15 @@ class Design(models.Model):
     comentario_disenador = fields.Text("Comentarios del diseñador", 
                                       help="Comentarios del diseñador sobre el diseño",
                                       tracking=True)
+                                      
+    # Campos calculados para permisos
+    is_designer = fields.Boolean(compute='_compute_user_roles', string='Is Designer')
+    is_validator = fields.Boolean(compute='_compute_user_roles', string='Is Validator')
+    
+    def _compute_user_roles(self):
+        for record in self:
+            record.is_designer = self.env.user.has_group('ModuloDisenoOdoo.group_disenador')
+            record.is_validator = self.env.user.has_group('ModuloDisenoOdoo.group_validador')
 
     is_designer = fields.Boolean(compute='_compute_user_roles', string='Is Designer')
     is_validator = fields.Boolean(compute='_compute_user_roles', string='Is Validator')

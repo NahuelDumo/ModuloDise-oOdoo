@@ -9,14 +9,17 @@
                     <header>
                         <button name="subir_diseno" type="object" string="Subir diseño"
                                 class="oe_highlight"
-                                attrs="{'invisible': ['|', ('diseño_subido','=',True), '|', ('state','=','aprobado'), ('state','=','rechazado')]}"/>
+                                attrs="{'invisible': ['|', ('diseño_subido','=',True), '|', ('state','=','aprobado'), ('state','=','rechazado')]}"
+                                groups="ModuloDisenoOdoo.group_disenador"/>
                         <button name="abrir_wizard_rechazo" type="object" string="Rechazar diseño"
                                 class="btn btn-danger"
                                 attrs="{'invisible': [('can_reject', '=', False)]}" 
+                                groups="ModuloDisenoOdoo.group_validador"
                                 confirm="¿Está seguro de que desea rechazar este diseño?"/>
                         <button name="marcar_como_aprobado_por_cliente" type="object" string="Aprobar diseño"
                                 class="btn btn-primary"
-                                attrs="{'invisible': [('visible_para_cliente','=',False)]}"/>
+                                attrs="{'invisible': [('visible_para_cliente','=',False)]}"
+                                groups="ModuloDisenoOdoo.group_cliente"/>
                     </header>
 
                     <sheet>
@@ -45,9 +48,14 @@
                                 <field name="checklist_ids">
                                     <tree>
                                         <field name="name" readonly="1"/>
-                                        <field name="validado_por_disenador" attrs="{'readonly': [('parent.is_validator', '=', True)]}"/>
-                                        <field name="validado_por_validador" attrs="{'readonly': [('parent.is_designer', '=', True)]}"/>
-                                        <field name="comentario" attrs="{'readonly': [('parent.diseño_subido', '=', True)]}"/>
+                                        <field name="validado_por_disenador" 
+                                               groups="ModuloDisenoOdoo.group_disenador"
+                                               attrs="{'readonly': ['|', ('parent.diseño_subido', '=', True), '|', ('parent.state', 'not in', ['borrador', 'validacion']), ('parent.state', '=', 'aprobado'), ('parent.state', '=', 'rechazado')]}"/>
+                                        <field name="validado_por_validador" 
+                                               groups="ModuloDisenoOdoo.group_validador"
+                                               attrs="{'readonly': ['|', ('parent.diseño_subido', '=', True), '|', ('parent.state', '!=', 'validacion'), ('parent.state', '=', 'aprobado'), ('parent.state', '=', 'rechazado')]}"/>
+                                        <field name="comentario" 
+                                               attrs="{'readonly': [('parent.diseño_subido', '=', True)]}"/>
                                     </tree>
                                 </field>
                             </page>
@@ -65,11 +73,13 @@
                             
                             <page string="Comentarios">
                                 <group>
-                                    <group string="Comentarios del Validador">
-                                        <field name="comentario_validador" attrs="{'readonly': [('diseño_subido', '=', False)]}"/>
+                                    <group string="Comentarios del Validador" groups="ModuloDisenoOdoo.group_validador">
+                                        <field name="comentario_validador" 
+                                               attrs="{'readonly': [('diseño_subido', '=', True)]}"/>
                                     </group>
-                                    <group string="Comentarios del Diseñador">
-                                        <field name="comentario_disenador" attrs="{'readonly': [('diseño_subido', '=', False)]}"/>
+                                    <group string="Comentarios del Diseñador" groups="ModuloDisenoOdoo.group_disenador">
+                                        <field name="comentario_disenador" 
+                                               attrs="{'readonly': [('diseño_subido', '=', True)]}"/>
                                     </group>
                                 </group>
                             </page>
