@@ -49,6 +49,12 @@
                             <page string="Checklist">
                                 <field name="checklist_ids">
                                     <tree>
+                                        <!-- Campos necesarios para los attrs -->
+                                        <field name="diseño_subido" invisible="1"/>
+                                        <field name="state" invisible="1"/>
+                                        <field name="is_designer" invisible="1"/>
+                                        <field name="is_validator" invisible="1"/>
+                                        
                                         <field name="name" readonly="1"/>
                                         
                                         <!-- Campo validado_por_disenador - editable por diseñador, solo lectura para validador -->
