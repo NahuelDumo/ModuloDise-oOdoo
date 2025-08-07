@@ -1,23 +1,32 @@
-# -*- coding: utf-8 -*-
-
 from odoo import models, fields, api, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, AccessError
 
 class DesignRechazoWizard(models.TransientModel):
-    _name = 'design.rechazo.wizard'
-    _description = 'Wizard para rechazar un diseño'
+    _name = 'design.rechazo.wizard'  # Cambiado para coincidir con la vista
+    _description = 'Wizard para rechazar diseños'
 
-    design_id = fields.Many2one('design.design', string='Diseño', required=True, readonly=True)
-    motivo = fields.Text(string='Motivo del Rechazo', required=True)
+    design_id = fields.Many2one('design.design', string='Diseño', required=True)
+    motivo = fields.Text('Motivo del rechazo', required=True, 
+                        help='Explique las razones por las que rechaza este diseño')
     
-    def action_confirmar_rechazo(self):
-        """Confirma el rechazo del diseño con el motivo proporcionado."""
+    def action_confirmar_rechazo(self):  # Cambiado para coincidir con la vista
+        """Ejecuta el rechazo del diseño"""
         self.ensure_one()
-        if not self.motivo.strip():
-            raise ValidationError(_("Debe proporcionar un motivo para el rechazo."))
+        
+        # Verificar permisos
+        if not self.env.user.has_group('ModuloDisenoOdoo.group_validador'):
+            raise AccessError(_("Solo los validadores pueden rechazar diseños."))
+        
+        # Verificar que el diseño existe y está en estado válido
+        if not self.design_id:
+            raise UserError(_("No se ha seleccionado un diseño válido."))
             
-        # Llamar al método de rechazo en el modelo de diseño
+        if self.design_id.state not in ['validacion', 'cliente']:
+            raise UserError(_("El diseño no está en un estado que permita el rechazo."))
+        
+        # Llamar al método de rechazo del diseño
         self.design_id.marcar_como_rechazado(self.motivo)
         
-        # Cerrar el wizard
-        return {'type': 'ir.actions.act_window_close'}
+        return {
+            'type': 'ir.actions.act_window_close',
+        }

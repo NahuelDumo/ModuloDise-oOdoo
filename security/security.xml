@@ -21,36 +21,97 @@
 
     <!-- Reglas de acceso para los modelos -->
     
-    <!-- Regla para el modelo design.design -->
-    <record id="design_design_rule" model="ir.rule">
-        <field name="name">Diseñador: solo sus diseños</field>
+    <!-- Regla para diseñadores - pueden ver todos los diseños pero editar solo los suyos -->
+    <record id="design_design_rule_disenador" model="ir.rule">
+        <field name="name">Diseñador: acceso a diseños</field>
         <field name="model_id" search="[('model', '=', 'design.design')]" model="ir.model"/>
-        <field name="domain_force">['|', ('create_uid', '=', user.id), ('state', 'in', ['validado', 'aprobado'])]</field>
+        <field name="domain_force">[(1, '=', 1)]</field>
         <field name="groups" eval="[(4, ref('group_disenador'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
     </record>
 
-    <!-- Regla para el modelo design.checklist_item -->
-    <record id="design_checklist_item_rule" model="ir.rule">
-        <field name="name">Diseñador: solo sus checklist items</field>
-        <field name="model_id" search="[('model', '=', 'design.checklist_item')]" model="ir.model"/>
-        <field name="domain_force">[('design_id.create_uid', '=', user.id)]</field>
-        <field name="groups" eval="[(4, ref('group_disenador'))]"/>
-    </record>
-
-    <!-- Regla para validadores -->
-    <record id="design_validador_rule" model="ir.rule">
-        <field name="name">Validador: acceso total</field>
+    <!-- Regla para validadores - acceso total de lectura y escritura -->
+    <record id="design_design_rule_validador" model="ir.rule">
+        <field name="name">Validador: acceso total a diseños</field>
         <field name="model_id" search="[('model', '=', 'design.design')]" model="ir.model"/>
         <field name="domain_force">[(1, '=', 1)]</field>
         <field name="groups" eval="[(4, ref('group_validador'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
     </record>
 
-    <!-- Regla para clientes -->
-    <record id="design_cliente_rule" model="ir.rule">
-        <field name="name">Cliente: solo sus diseños</field>
+    <!-- Regla para clientes - solo diseños visibles para ellos -->
+    <record id="design_design_rule_cliente" model="ir.rule">
+        <field name="name">Cliente: solo diseños visibles</field>
         <field name="model_id" search="[('model', '=', 'design.design')]" model="ir.model"/>
         <field name="domain_force">[('cliente_id', '=', user.partner_id.id), ('visible_para_cliente', '=', True)]</field>
         <field name="groups" eval="[(4, ref('group_cliente'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Reglas para checklist items -->
+    <record id="design_checklist_item_rule_disenador" model="ir.rule">
+        <field name="name">Diseñador: acceso a checklist items</field>
+        <field name="model_id" search="[('model', '=', 'design.checklist_item')]" model="ir.model"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_disenador'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="design_checklist_item_rule_validador" model="ir.rule">
+        <field name="name">Validador: acceso a checklist items</field>
+        <field name="model_id" search="[('model', '=', 'design.checklist_item')]" model="ir.model"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_validador'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Reglas para revision log -->
+    <record id="design_revision_log_rule_disenador" model="ir.rule">
+        <field name="name">Diseñador: acceso a revision log</field>
+        <field name="model_id" search="[('model', '=', 'design.revision_log')]" model="ir.model"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_disenador'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="design_revision_log_rule_validador" model="ir.rule">
+        <field name="name">Validador: acceso a revision log</field>
+        <field name="model_id" search="[('model', '=', 'design.revision_log')]" model="ir.model"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_validador'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="design_revision_log_rule_cliente" model="ir.rule">
+        <field name="name">Cliente: acceso a revision log</field>
+        <field name="model_id" search="[('model', '=', 'design.revision_log')]" model="ir.model"/>
+        <field name="domain_force">[('design_id.visible_para_cliente', '=', True)]</field>
+        <field name="groups" eval="[(4, ref('group_cliente'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
     </record>
 
 </odoo>

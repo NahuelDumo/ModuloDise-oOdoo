@@ -11,11 +11,14 @@
                                 class="oe_highlight"
                                 attrs="{'invisible': ['|', ('diseño_subido','=',True), '|', ('state','=','aprobado'), ('state','=','rechazado')]}"
                                 groups="ModuloDisenoOdoo.group_disenador"/>
+                        
+                        <!-- Botón RECHAZAR solo visible para validadores -->
                         <button name="abrir_wizard_rechazo" type="object" string="Rechazar diseño"
                                 class="btn btn-danger"
                                 attrs="{'invisible': [('can_reject', '=', False)]}" 
                                 groups="ModuloDisenoOdoo.group_validador"
                                 confirm="¿Está seguro de que desea rechazar este diseño?"/>
+                        
                         <button name="marcar_como_aprobado_por_cliente" type="object" string="Aprobar diseño"
                                 class="btn btn-primary"
                                 attrs="{'invisible': [('visible_para_cliente','=',False)]}"
@@ -50,33 +53,37 @@
                                 <field name="checklist_ids">
                                     <tree>
                                         <!-- Campos necesarios para los attrs -->
+                                        <field name="current_user_is_designer" invisible="1"/>
+                                        <field name="current_user_is_validator" invisible="1"/>
                                         <field name="usuario_validador" invisible="1"/>
                                         <field name="usuario_disenador" invisible="1"/>
                                         
                                         <field name="name" readonly="1"/>
+                                        <field name="orden" invisible="1"/>
                                         
-                                        <!-- Campo validado_por_disenador - editable por diseñador, solo lectura para validador -->
+                                        <!-- Campo validado_por_disenador - solo editable por diseñador -->
                                         <field name="validado_por_disenador"
                                                attrs="{
-                                                   'readonly': [
-                                                       '|',
-                                                       ('usuario_validador', '!=', False),
-                                                       ('usuario_disenador', '!=', False)
-                                                   ]
+                                                   'readonly': [('current_user_is_designer', '=', False)]
                                                }"/>
                                         
-                                        <!-- Campo validado_por_validador - editable por validador, solo lectura para diseñador -->
+                                        <!-- Campo validado_por_validador - solo editable por validador -->
                                         <field name="validado_por_validador"
                                                attrs="{
-                                                   'readonly': [
-                                                       '|',
-                                                       ('usuario_validador', '!=', False),
-                                                       ('usuario_disenador', '=', False)
-                                                   ]
+                                                   'readonly': [('current_user_is_validator', '=', False)]
                                                }"/>
                                                
+                                        <!-- Comentario - editable por ambos -->
                                         <field name="comentario" 
-                                               attrs="{'readonly': [('usuario_validador', '!=', False)]}"/>
+                                               attrs="{'readonly': [
+                                                   '&', 
+                                                   ('current_user_is_designer', '=', False), 
+                                                   ('current_user_is_validator', '=', False)
+                                               ]}"/>
+                                        
+                                        <!-- Mostrar fechas y usuarios de validación -->
+                                        <field name="fecha_disenador" readonly="1"/>
+                                        <field name="fecha_validador" readonly="1"/>
                                     </tree>
                                 </field>
                             </page>
@@ -98,11 +105,7 @@
                                     <group string="Comentarios del Validador">
                                         <field name="comentario_validador"
                                                attrs="{
-                                                   'readonly': [
-                                                       '|',
-                                                       ('diseño_subido', '=', True),
-                                                       ('is_validator', '=', False)
-                                                   ]
+                                                   'readonly': [('is_validator', '=', False)]
                                                }"/>
                                     </group>
                                     
@@ -110,11 +113,7 @@
                                     <group string="Comentarios del Diseñador">
                                         <field name="comentario_disenador"
                                                attrs="{
-                                                   'readonly': [
-                                                       '|',
-                                                       ('diseño_subido', '=', True),
-                                                       ('is_designer', '=', False)
-                                                   ]
+                                                   'readonly': [('is_designer', '=', False)]
                                                }"/>
                                     </group>
                                 </group>
