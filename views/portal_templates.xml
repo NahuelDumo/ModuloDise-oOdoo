@@ -183,7 +183,7 @@
                                                     <form t-att-action="'/my/design/approve-with-changes'" method="post">
                                                         <div class="modal-body">
                                                             <p>Por favor, describe las correcciones necesarias:</p>
-                                                            <textarea name="message" class="form-control" rows="4" required></textarea>
+                                                            <textarea name="message" class="form-control" rows="4" required="required"></textarea>
                                                         </div>
                                                         <div class="modal-footer">
                                                             <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
