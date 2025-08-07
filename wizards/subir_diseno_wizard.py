@@ -28,8 +28,9 @@ class SubirDisenoWizard(models.TransientModel):
         # Registrar en el historial
         self.env['design.revision_log'].create({
             'design_id': self.design_id.id,
-            'tipo': 'resubida',
-            'observaciones': 'Nueva versión del diseño subida después de rechazo.'
+            'tipo': 'validacion_disenador',  
+            'observaciones': 'Nueva versión del diseño subida después de rechazo.',
+            'usuario_id': self.env.user.id  
         })
         
         # Notificar a los validadores
