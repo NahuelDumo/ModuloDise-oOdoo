@@ -3,6 +3,7 @@ from odoo import http, _
 from odoo.http import request, route
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
 from odoo.exceptions import AccessError, MissingError
+import logging
 
 class DesignPortal(CustomerPortal):
     
@@ -27,22 +28,38 @@ class DesignPortal(CustomerPortal):
     
     @route(['/my/designs', '/my/designs/page/<int:page>'], type='http', auth="user", website=True)
     def portal_my_designs(self, page=1, date_begin=None, date_end=None, sortby=None, **kw):
-        values = self._prepare_portal_layout_values()
-        Design = request.env['design.design']
-        domain = self._get_designs_domain()
+        _logger = logging.getLogger(__name__)
+        _logger.info("=== INICIO DE PORTAL_MY_DESIGNS ===")
         
+        # Obtener información del usuario actual
+        partner = request.env.user.partner_id
+        _logger.info(f"Usuario: {request.env.user.name}")
+        _logger.info(f"Partner ID: {partner.id}")
+        _logger.info(f"Partner Comercial ID: {partner.commercial_partner_id.id}")
+        
+        # Obtener el dominio de búsqueda
+        domain = self._get_designs_domain()
+        _logger.info(f"Dominio de búsqueda: {domain}")
+        
+        # Buscar diseños
+        Design = request.env['design.design']
+        designs = Design.search(domain)
+        _logger.info(f"Diseños encontrados: {len(designs)}")
+        for design in designs:
+            _logger.info(f"  - ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.name}")
+        
+        values = self._prepare_portal_layout_values()
         searchbar_sortings = {
             'date': {'label': _('Fecha'), 'order': 'create_date desc'},
             'name': {'label': _('Nombre'), 'order': 'name'},
         }
         
-        # Default sort by date
         if not sortby:
             sortby = 'date'
         order = searchbar_sortings[sortby]['order']
         
         # Pager
-        design_count = Design.search_count(domain)
+        design_count = len(designs)
         pager = portal_pager(
             url="/my/designs",
             url_args={'sortby': sortby},
@@ -51,7 +68,7 @@ class DesignPortal(CustomerPortal):
             step=self._items_per_page
         )
         
-        designs = Design.search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
+        designs = designs.sorted(order)
         
         values.update({
             'designs': designs,
@@ -61,6 +78,8 @@ class DesignPortal(CustomerPortal):
             'searchbar_sortings': searchbar_sortings,
             'sortby': sortby,
         })
+        
+        _logger.info("=== FIN DE PORTAL_MY_DESIGNS ===")
         return request.render("ModuloDisenoOdoo.portal_my_designs", values)
     
     @route(['/my/design/<int:design_id>'], type='http', auth="user", website=True)

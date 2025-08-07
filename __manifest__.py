@@ -12,6 +12,9 @@
         "portal",
         "website"
     ],
+    "external_dependencies": {
+        'python': ['logging']
+    },
     "data": [
         # Seguridad
         "security/security.xml",
