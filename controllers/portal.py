@@ -19,14 +19,31 @@ class DesignPortal(CustomerPortal):
     
     def _get_designs_domain(self):
         partner = request.env.user.partner_id
-        # Ampliamos los estados para incluir todos los estados donde el cliente puede ver el diseño
+        # Buscar diseños donde el partner actual sea el cliente o esté en la jerarquía del partner comercial
         domain = [
+            '|',
             ('cliente_id', 'child_of', partner.commercial_partner_id.ids),
-            ('state', 'in', ['cliente', 'correcciones_solicitadas', 'esperando_cliente', 'aprobado', 'rechazado'])
+            ('cliente_id', '=', partner.id)
         ]
-        _logger.info(f"Dominio construido: {domain}")
-        _logger.info(f"Partner: {partner.name} (ID: {partner.id})")
-        _logger.info(f"Commercial Partner: {partner.commercial_partner_id.name} (ID: {partner.commercial_partner_id.id})")
+        # Solo mostrar diseños en estados visibles para el cliente
+        domain += [('state', 'in', ['cliente', 'correcciones_solicitadas', 'aprobado', 'rechazado', 'esperando_cliente'])]
+        
+        _logger.info(f"Dominio de búsqueda: {domain}")
+        _logger.info(f"Partner actual: {partner.name} (ID: {partner.id})")
+        _logger.info(f"Partner comercial: {partner.commercial_partner_id.name} (ID: {partner.commercial_partner_id.id})")
+        
+        # Depuración: Mostrar todos los diseños del sistema
+        all_designs = request.env['design.design'].search([])
+        _logger.info(f"Total de diseños en el sistema: {len(all_designs)}")
+        for d in all_designs:
+            _logger.info(f"  - ID: {d.id}, Nombre: {d.name}, Cliente: {d.cliente_id.name if d.cliente_id else 'Ninguno'}, Estado: {d.state}")
+            
+        # Verificar qué diseños coinciden con el dominio
+        matching_designs = request.env['design.design'].search(domain)
+        _logger.info(f"Diseños que coinciden con el dominio: {len(matching_designs)}")
+        for d in matching_designs:
+            _logger.info(f"  - ID: {d.id}, Nombre: {d.name}, Cliente: {d.cliente_id.name if d.cliente_id else 'Ninguno'}")
+            
         return domain
     
     def _prepare_portal_layout_values(self):
@@ -204,14 +221,25 @@ class DesignPortal(CustomerPortal):
     
     def _document_check_access(self, model_name, document_id, access_token=None):
         """Verificar acceso a un documento"""
-        document = request.env[model_name].browse([document_id])
-        document_sudo = document.sudo()
-        
         try:
-            document.check_access_rights('read')
-            document.check_access_rule('read')
-        except AccessError:
-            # Si no tiene acceso normal, intentar con sudo
-            pass
+            # Obtener el registro con sudo inicialmente para evitar errores de acceso
+            document_sudo = request.env[model_name].sudo().browse(document_id).exists()
+            if not document_sudo:
+                _logger.warning(f"Documento {model_name} con ID {document_id} no encontrado")
+                raise MissingError(_("El documento no existe o fue eliminado"))
                 
-        return document_sudo
+            # Verificar si el usuario tiene acceso al registro
+            partner = request.env.user.partner_id
+            if document_sudo.cliente_id not in (partner | partner.commercial_partner_id):
+                _logger.warning(f"Intento de acceso no autorizado al diseño {document_id} por el usuario {request.env.user.id}")
+                raise AccessError(_("No tiene permiso para acceder a este diseño"))
+                
+            # Verificar permisos estándar
+            document_sudo.check_access_rights('read')
+            document_sudo.check_access_rule('read')
+            
+            return document_sudo
+            
+        except Exception as e:
+            _logger.error(f"Error en _document_check_access: {str(e)}", exc_info=True)
+            raise
