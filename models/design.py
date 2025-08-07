@@ -99,7 +99,7 @@ class Design(models.Model):
 
     def _notificar_a_validadores(self):
         validadores = self.env.ref('ModuloDisenoOdoo.group_validador').users
-        template = self.env.ref('ModuloDisenoOdoo.email_template_design_pendiente_validar')
+        template = self.env.ref('ModuloDisenoOdoo.email_template_diseno_pendiente_validar')
         for validador in validadores:
             template.send_mail(self.id, force_send=True, email_values={'email_to': validador.email})
 
