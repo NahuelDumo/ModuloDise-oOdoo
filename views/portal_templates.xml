@@ -207,7 +207,7 @@
                                                     <form t-att-action="'/my/design/reject'" method="post">
                                                         <div class="modal-body">
                                                             <p>Por favor, indica el motivo del rechazo:</p>
-                                                            <textarea name="message" class="form-control" rows="4" required></textarea>
+                                                            <textarea name="message" class="form-control" rows="4" required="required"></textarea>
                                                         </div>
                                                         <div class="modal-footer">
                                                             <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
