@@ -472,7 +472,7 @@ class Design(models.Model):
     def solicitar_nueva_verificacion(self):
         """
         Método llamado cuando el diseñador solicita una nueva verificación para un diseño rechazado.
-        Reinicia el flujo a la etapa 1 y permite subir un nuevo diseño.
+        Reinicia el flujo a la etapa 1, borra la imagen existente y permite subir un nuevo diseño.
         """
         self.ensure_one()
         
@@ -484,6 +484,9 @@ class Design(models.Model):
         if not self.env.user.has_group('ModuloDisenoOdoo.group_disenador'):
             raise UserError(_("Solo el diseñador puede solicitar una nueva verificación."))
         
+        # Guardar el nombre del diseño para usarlo en el mensaje
+        nombre_diseno = self.name
+        
         # Reiniciar los estados necesarios
         self.write({
             'state': 'borrador',  # Volver a borrador para permitir subir nuevo diseño
@@ -494,6 +497,8 @@ class Design(models.Model):
             'diseño_subido': False,  # Permitir subir nuevo diseño
             'fecha_subida_diseno': False,  # Limpiar fecha de subida anterior
             'image': False,  # Eliminar la imagen anterior
+            'visible_para_cliente': False,  # Ocultar del cliente hasta que se valide
+            'aprobado_cliente': False,  # Reiniciar aprobación del cliente
         })
         
         # Registrar en el historial
@@ -506,10 +511,11 @@ class Design(models.Model):
         # Notificar a los validadores
         self.message_post(
             body=_("""
-            <p>El diseñador ha solicitado una nueva verificación para este diseño.</p>
-            <p>Se ha reiniciado el flujo a la etapa 1.</p>
-            """),
-            subject=_("Nueva verificación solicitada"),
+            <p>El diseñador ha solicitado una nueva verificación para el diseño <strong>%s</strong>.</p>
+            <p>Se ha reiniciado el flujo a la etapa 1 y se ha eliminado la imagen anterior.</p>
+            <p>Por favor, espere a que el diseñador suba una nueva versión del diseño.</p>
+            """ % nombre_diseno),
+            subject=_("Nueva verificación solicitada para el diseño: %s") % nombre_diseno,
             partner_ids=[user.partner_id.id for user in self.env.ref('ModuloDisenoOdoo.group_validador').users]
         )
         
