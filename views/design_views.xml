@@ -76,7 +76,7 @@
                                         <!-- Comentario - editable por ambos -->
                                         <field name="comentario" 
                                                attrs="{'readonly': [
-                                                   '&', 
+                                                   '&amp;', 
                                                    ('current_user_is_designer', '=', False), 
                                                    ('current_user_is_validator', '=', False)
                                                ]}"/>
