@@ -7,6 +7,12 @@
             <field name="arch" type="xml">
                 <form string="Diseño">
                     <header>
+                        <!-- Botón de solicitud de nueva verificación (solo para diseñador cuando el estado es rechazado) -->
+                        <button name="solicitar_nueva_verificacion" type="object" string="Solicitar verificación nueva"
+                                class="oe_highlight"
+                                attrs="{'invisible': [('state', '!=', 'rechazado')]}"
+                                groups="ModuloDisenoOdoo.group_disenador"/>
+                        
                         <button name="subir_diseno" type="object" string="Subir diseño"
                                 class="oe_highlight"
                                 attrs="{'invisible': ['|', ('diseño_subido','=',True), '|', ('state','=','aprobado'), ('state','=','rechazado')]}"

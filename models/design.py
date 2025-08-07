@@ -468,3 +468,65 @@ class Design(models.Model):
                             if field not in self._fields_editables_after_upload:
                                 res['fields'].get(field, {})['readonly'] = True
         return res
+
+    def solicitar_nueva_verificacion(self):
+        """
+        Método llamado cuando el diseñador solicita una nueva verificación para un diseño rechazado.
+        Reinicia el flujo a la etapa 1 y permite subir un nuevo diseño.
+        """
+        self.ensure_one()
+        
+        # Verificar que el diseño esté en estado rechazado
+        if self.state != 'rechazado':
+            raise UserError(_("Solo se puede solicitar una nueva verificación para diseños rechazados."))
+        
+        # Verificar que el usuario actual sea el diseñador
+        if not self.env.user.has_group('ModuloDisenoOdoo.group_disenador'):
+            raise UserError(_("Solo el diseñador puede solicitar una nueva verificación."))
+        
+        # Reiniciar los estados necesarios
+        self.write({
+            'state': 'borrador',  # Volver a borrador para permitir subir nuevo diseño
+            'etapa': 'etapa1',    # Reiniciar a la etapa 1
+            'rechazado': False,   # Quitar estado de rechazado
+            'observaciones_rechazo': False,  # Limpiar observaciones
+            'fecha_rechazo': False,  # Limpiar fecha de rechazo
+            'diseño_subido': False,  # Permitir subir nuevo diseño
+            'fecha_subida_diseno': False,  # Limpiar fecha de subida anterior
+            'image': False,  # Eliminar la imagen anterior
+        })
+        
+        # Registrar en el historial
+        self.env['design.revision_log'].create({
+            'design_id': self.id,
+            'tipo': 'nueva_verificacion',
+            'observaciones': 'El diseñador ha solicitado una nueva verificación del diseño.'
+        })
+        
+        # Notificar a los validadores
+        self.message_post(
+            body=_("""
+            <p>El diseñador ha solicitado una nueva verificación para este diseño.</p>
+            <p>Se ha reiniciado el flujo a la etapa 1.</p>
+            """),
+            subject=_("Nueva verificación solicitada"),
+            partner_ids=[user.partner_id.id for user in self.env.ref('ModuloDisenoOdoo.group_validador').users]
+        )
+        
+        # Mostrar mensaje de confirmación al usuario
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Solicitud de verificación'),
+                'message': _('Se ha solicitado una nueva verificación. Por favor, suba el diseño actualizado.'),
+                'sticky': False,
+                'type': 'success',
+                'next': {
+                    'type': 'ir.actions.act_window',
+                    'res_model': 'design.design',
+                    'views': [[False, 'form']],
+                    'res_id': self.id,
+                }
+            }
+        }
