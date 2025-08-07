@@ -26,7 +26,8 @@
         "views/revision_log_views.xml",
         
         # Vistas de wizards
-        "wizards/rechazo_wizard_views.xml"
+        "wizards/rechazo_wizard_views.xml",
+        "wizards/subir_diseno_wizard_views.xml"
     ],
     "application": True,
     "installable": True,

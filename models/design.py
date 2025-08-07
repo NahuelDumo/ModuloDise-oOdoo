@@ -480,69 +480,24 @@ class Design(models.Model):
         return res
 
     def solicitar_nueva_verificacion(self):
-        """
-        Método llamado cuando el diseñador solicita una nueva verificación para un diseño rechazado.
-        Reinicia el flujo a la etapa 1, borra la imagen existente y permite subir un nuevo diseño.
-        """
+        """Abre el wizard para subir una nueva versión del diseño."""
         self.ensure_one()
         
-        # Verificar que el diseño esté en estado rechazado
+        # Verificar permisos
+        if not self.env.user.has_group('ModuloDisenoOdoo.group_disenador') and not self.env.user.has_group('base.group_system'):
+            raise AccessError(_("Solo los diseñadores pueden solicitar una nueva verificación."))
+            
         if self.state != 'rechazado':
             raise UserError(_("Solo se puede solicitar una nueva verificación para diseños rechazados."))
         
-        # Verificar que el usuario actual sea el diseñador
-        if not self.env.user.has_group('ModuloDisenoOdoo.group_disenador'):
-            raise UserError(_("Solo el diseñador puede solicitar una nueva verificación."))
-        
-        # Guardar el nombre del diseño para usarlo en el mensaje
-        nombre_diseno = self.name
-        
-        # Reiniciar los estados necesarios
-        self.write({
-            'state': 'borrador',  # Volver a borrador para permitir subir nuevo diseño
-            'etapa': 'etapa1',    # Reiniciar a la etapa 1
-            'rechazado': False,   # Quitar estado de rechazado
-            'observaciones_rechazo': False,  # Limpiar observaciones
-            'fecha_rechazo': False,  # Limpiar fecha de rechazo
-            'diseño_subido': False,  # Permitir subir nuevo diseño
-            'fecha_subida_diseno': False,  # Limpiar fecha de subida anterior
-            'image': False,  # Eliminar la imagen anterior
-            'visible_para_cliente': False,  # Ocultar del cliente hasta que se valide
-            'aprobado_cliente': False,  # Reiniciar aprobación del cliente
-        })
-        
-        # Registrar en el historial
-        self.env['design.revision_log'].create({
-            'design_id': self.id,
-            'tipo': 'nueva_verificacion',
-            'observaciones': 'El diseñador ha solicitado una nueva verificación del diseño.'
-        })
-        
-        # Notificar a los validadores
-        self.message_post(
-            body=_("""
-            <p>El diseñador ha solicitado una nueva verificación para el diseño <strong>%s</strong>.</p>
-            <p>Se ha reiniciado el flujo a la etapa 1 y se ha eliminado la imagen anterior.</p>
-            <p>Por favor, espere a que el diseñador suba una nueva versión del diseño.</p>
-            """ % nombre_diseno),
-            subject=_("Nueva verificación solicitada para el diseño: %s") % nombre_diseno,
-            partner_ids=[user.partner_id.id for user in self.env.ref('ModuloDisenoOdoo.group_validador').users]
-        )
-        
-        # Mostrar mensaje de confirmación al usuario
+        # Abrir el wizard para subir la nueva imagen
         return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Solicitud de verificación'),
-                'message': _('Se ha solicitado una nueva verificación. Por favor, suba el diseño actualizado.'),
-                'sticky': False,
-                'type': 'success',
-                'next': {
-                    'type': 'ir.actions.act_window',
-                    'res_model': 'design.design',
-                    'views': [[False, 'form']],
-                    'res_id': self.id,
-                }
-            }
+            'name': _('Subir Nueva Versión del Diseño'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'design.subir.diseno.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_design_id': self.id,
+            },
         }
