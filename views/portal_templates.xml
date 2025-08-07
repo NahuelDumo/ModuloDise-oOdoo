@@ -16,71 +16,74 @@
     </template>
 
     <!-- Plantilla para la lista de diseños del portal -->
-    <template id="portal_my_designs" name="Mis Diseños">
-        <t t-call="portal.portal_layout">
-            <t t-set="breadcrumbs_searchbar" t-value="True"/>
-            <t t-set="title">Mis Diseños</t>
-            
-            <div class="o_portal_submenu">
-                <a href="/my/home" class="btn btn-link">
-                    <i class="fa fa-arrow-left me-2"></i> Volver al inicio
-                </a>
-            </div>
-            
-            <div class="container mt-3">
-                <!-- Encabezado -->
-                <div class="row mb-3">
-                    <div class="col">
-                        <h3>Mis Diseños</h3>
+    <template id="portal_my_designs" name="Mis Diseños" inherit_id="portal.portal_my_home">
+        <xpath expr="//div[hasclass('o_portal_my_home')]" position="replace">
+            <div class="o_portal_my_home">
+                <!-- Menú de navegación -->
+                <div class="o_portal_submenu">
+                    <a href="/my/home" class="btn btn-link">
+                        <i class="fa fa-arrow-left me-2"></i> Volver al inicio
+                    </a>
+                </div>
+                
+                <div class="container mt-3">
+                    <!-- Encabezado -->
+                    <div class="row mb-4">
+                        <div class="col">
+                            <h2 class="mb-0">Mis Diseños</h2>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de diseños -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Diseño</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="designs" t-as="design">
+                                    <tr>
+                                        <td>
+                                            <a t-att-href="'/my/design/%s' % design.id" class="text-primary">
+                                                <span t-field="design.name"/>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <span t-field="design.create_date" t-options='{"widget": "date"}'/>
+                                        </td>
+                                        <td>
+                                            <span t-attf-class="badge #{'bg-warning' if design.state == 'cliente' else 'bg-success' if design.state == 'aprobado' else 'bg-danger'}">
+                                                <t t-esc="dict(design._fields['state'].selection).get(design.state)"/>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a t-att-href="'/my/design/%s' % design.id" class="btn btn-sm btn-outline-primary">
+                                                <i class="fa fa-eye me-1"></i> Ver
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-if="not designs">
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4">
+                                            <p class="text-muted mb-0">
+                                                <i class="fa fa-inbox fa-2x mb-2 text-muted"></i><br>
+                                                No hay diseños para mostrar.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
-                <!-- Tabla de diseños -->
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Diseño</th>
-                                <th>Fecha</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-foreach="designs" t-as="design">
-                                <tr>
-                                    <td>
-                                        <a t-att-href="'/my/design/%s' % design.id">
-                                            <span t-field="design.name"/>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <span t-field="design.create_date" t-options='{"widget": "date"}'/>
-                                    </td>
-                                    <td>
-                                        <span t-attf-class="badge #{'bg-warning' if design.state == 'cliente' else 'bg-success' if design.state == 'aprobado' else 'bg-danger'}">
-                                            <t t-esc="dict(design._fields['state'].selection).get(design.state)"/>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a t-att-href="'/my/design/%s' % design.id" class="btn btn-sm btn-outline-primary">
-                                            <i class="fa fa-eye"></i> Ver
-                                        </a>
-                                    </td>
-                                </tr>
-                            </t>
-                            <t t-if="not designs">
-                                <tr>
-                                    <td colspan="4" class="text-center">
-                                        <p class="text-muted">No hay diseños para mostrar.</p>
-                                    </td>
-                                </tr>
-                            </t>
-                        </tbody>
-                    </table>
-                </div>
             </div>
-        </t>
+        </xpath>
     </template>
     
     <!-- Plantilla para el detalle de un diseño -->
