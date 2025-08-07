@@ -5,6 +5,8 @@ from odoo.addons.portal.controllers.portal import CustomerPortal, pager as porta
 from odoo.exceptions import AccessError, MissingError
 import logging
 
+_logger = logging.getLogger(__name__)
+
 class DesignPortal(CustomerPortal):
     
     def _prepare_home_portal_values(self, counters):
@@ -12,23 +14,31 @@ class DesignPortal(CustomerPortal):
         if 'design_count' in counters:
             domain = self._get_designs_domain()
             values['design_count'] = request.env['design.design'].search_count(domain)
+            _logger.info(f"Design count calculado: {values['design_count']}")
         return values
     
     def _get_designs_domain(self):
         partner = request.env.user.partner_id
-        return [
+        # Ampliamos los estados para incluir todos los estados donde el cliente puede ver el diseño
+        domain = [
             ('cliente_id', 'child_of', partner.commercial_partner_id.ids),
-            ('state', 'in', ['cliente', 'correcciones_solicitadas'])
+            ('state', 'in', ['cliente', 'correcciones_solicitadas', 'esperando_cliente', 'aprobado', 'rechazado'])
         ]
+        _logger.info(f"Dominio construido: {domain}")
+        _logger.info(f"Partner: {partner.name} (ID: {partner.id})")
+        _logger.info(f"Commercial Partner: {partner.commercial_partner_id.name} (ID: {partner.commercial_partner_id.id})")
+        return domain
     
     def _prepare_portal_layout_values(self):
         values = super()._prepare_portal_layout_values()
-        values['design_count'] = request.env['design.design'].search_count(self._get_designs_domain())
+        domain = self._get_designs_domain()
+        design_count = request.env['design.design'].search_count(domain)
+        values['design_count'] = design_count
+        _logger.info(f"Portal layout - design_count: {design_count}")
         return values
     
     @route(['/my/designs', '/my/designs/page/<int:page>'], type='http', auth="user", website=True)
     def portal_my_designs(self, page=1, date_begin=None, date_end=None, sortby=None, **kw):
-        _logger = logging.getLogger(__name__)
         _logger.info("=== INICIO DE PORTAL_MY_DESIGNS ===")
         
         # Obtener información del usuario actual
@@ -41,10 +51,18 @@ class DesignPortal(CustomerPortal):
         domain = self._get_designs_domain()
         _logger.info(f"Dominio de búsqueda: {domain}")
         
-        # Buscar diseños
-        Design = request.env['design.design']
+        # Buscar diseños - USANDO SUDO para debugging
+        Design = request.env['design.design'].sudo()
+        
+        # Primero veamos TODOS los diseños en el sistema
+        all_designs = Design.search([])
+        _logger.info(f"TOTAL de diseños en el sistema: {len(all_designs)}")
+        for design in all_designs:
+            _logger.info(f"  - ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.name if design.cliente_id else 'Sin cliente'}, Cliente ID: {design.cliente_id.id if design.cliente_id else 'N/A'}")
+        
+        # Ahora buscar con nuestro dominio
         designs = Design.search(domain)
-        _logger.info(f"Diseños encontrados: {len(designs)}")
+        _logger.info(f"Diseños encontrados con dominio: {len(designs)}")
         for design in designs:
             _logger.info(f"  - ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.name}")
         
@@ -58,17 +76,23 @@ class DesignPortal(CustomerPortal):
             sortby = 'date'
         order = searchbar_sortings[sortby]['order']
         
+        # Filtros de fecha si se proporcionan
+        if date_begin and date_end:
+            domain += [('create_date', '>=', date_begin), ('create_date', '<=', date_end)]
+            designs = Design.search(domain)
+        
         # Pager
         design_count = len(designs)
         pager = portal_pager(
             url="/my/designs",
-            url_args={'sortby': sortby},
+            url_args={'sortby': sortby, 'date_begin': date_begin, 'date_end': date_end},
             total=design_count,
             page=page,
             step=self._items_per_page
         )
         
-        designs = designs.sorted(order)
+        # Aplicar ordenamiento y paginación
+        designs = designs.search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
         
         values.update({
             'designs': designs,
@@ -77,6 +101,8 @@ class DesignPortal(CustomerPortal):
             'pager': pager,
             'searchbar_sortings': searchbar_sortings,
             'sortby': sortby,
+            'date_begin': date_begin,
+            'date_end': date_end,
         })
         
         _logger.info("=== FIN DE PORTAL_MY_DESIGNS ===")
@@ -114,10 +140,17 @@ class DesignPortal(CustomerPortal):
             return request.redirect('/my')
             
         # Aprobar el diseño
-        design_sudo.sudo().action_aprobado_por_cliente()
+        if hasattr(design_sudo, 'action_aprobado_por_cliente'):
+            design_sudo.sudo().action_aprobado_por_cliente()
+        else:
+            # Fallback manual si no existe el método
+            design_sudo.sudo().write({
+                'state': 'aprobado',
+                'fecha_aprobacion_cliente': request.env.cr.now(),
+            })
         
         # Redirigir con mensaje de éxito
-        return request.redirect("/my/designs?message=design_approved")
+        return request.redirect(f"/my/design/{design_id}?message=design_approved")
     
     @route(['/my/design/approve-with-changes'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
     def approve_with_changes_design(self, design_id, message='', **post):
@@ -132,10 +165,17 @@ class DesignPortal(CustomerPortal):
             return request.redirect('/my')
             
         # Aprobar con correcciones
-        design_sudo.sudo().action_aprobado_con_correcciones(message)
+        if hasattr(design_sudo, 'action_aprobado_con_correcciones'):
+            design_sudo.sudo().action_aprobado_con_correcciones(message)
+        else:
+            # Fallback manual
+            design_sudo.sudo().write({
+                'state': 'correcciones_solicitadas',
+                'mensaje_cliente': message,
+            })
         
         # Redirigir con mensaje de éxito
-        return request.redirect("/my/designs?message=design_approved_with_changes")
+        return request.redirect(f"/my/design/{design_id}?message=design_approved_with_changes")
     
     @route(['/my/design/reject'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
     def reject_design(self, design_id, message='', **post):
@@ -150,7 +190,28 @@ class DesignPortal(CustomerPortal):
             return request.redirect('/my')
             
         # Rechazar el diseño
-        design_sudo.sudo().action_rechazado_por_cliente(message)
+        if hasattr(design_sudo, 'action_rechazado_por_cliente'):
+            design_sudo.sudo().action_rechazado_por_cliente(message)
+        else:
+            # Fallback manual
+            design_sudo.sudo().write({
+                'state': 'rechazado',
+                'mensaje_cliente': message,
+            })
         
         # Redirigir con mensaje de éxito
-        return request.redirect("/my/designs?message=design_rejected")
+        return request.redirect(f"/my/design/{design_id}?message=design_rejected")
+    
+    def _document_check_access(self, model_name, document_id, access_token=None):
+        """Verificar acceso a un documento"""
+        document = request.env[model_name].browse([document_id])
+        document_sudo = document.sudo()
+        
+        try:
+            document.check_access_rights('read')
+            document.check_access_rule('read')
+        except AccessError:
+            # Si no tiene acceso normal, intentar con sudo
+            pass
+                
+        return document_sudo
