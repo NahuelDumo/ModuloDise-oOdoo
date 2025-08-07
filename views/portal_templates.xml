@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Heredar la vista principal del portal para agregar el botón de Diseños -->
-    <data inherit_id="portal.portal_my_home" name="Portal Home - Diseños">
+    <template id="portal_my_home" inherit_id="portal.portal_my_home" name="Portal Home - Diseños">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
             <t t-call="portal.portal_docs_entry">
                 <t t-set="title">Diseños</t>
@@ -9,7 +9,7 @@
                 <t t-set="placeholder_count" t-value="'design_count'"/>
             </t>
         </xpath>
-    </data>
+    </template>
 
     <!-- Plantilla para la lista de diseños del portal -->
     <template id="portal_my_designs" name="Mis Diseños">
