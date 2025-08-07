@@ -244,7 +244,7 @@
                                                 <span t-field="design.task_id.name"/>
                                             </a>
                                         </t>
-                                        <t t-else>No hay tarea asociada</t>
+                                        <t t-else="">No hay tarea asociada</t>
                                     </dd>
                                     
                                     <dt>Diseñador:</dt>
@@ -286,7 +286,7 @@
                                         </t>
                                     </div>
                                 </t>
-                                <t t-else>
+                                <t t-else="">
                                     <p class="text-muted mb-0">No hay historial de revisiones</p>
                                 </t>
                             </div>
