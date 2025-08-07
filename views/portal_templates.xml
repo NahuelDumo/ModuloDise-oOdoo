@@ -15,24 +15,16 @@
     </template>
 
     <!-- Plantilla para la lista de diseños del portal -->
-    <template id="portal_my_designs" name="Mis Diseños" inherit_id="website.portal_my_home">
-        <xpath expr="//div[hasclass('o_portal_submenu')]" position="replace">
+    <template id="portal_my_designs" name="Mis Diseños">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-set="title">Mis Diseños</t>
+            
             <div class="o_portal_submenu">
                 <a href="/my/home" class="btn btn-link">
                     <i class="fa fa-arrow-left me-2"></i> Volver al inicio
                 </a>
             </div>
-        </xpath>
-        
-        <xpath expr="//div[hasclass('container')]//div[hasclass('o_portal_my_home')]" position="replace">
-            <div class="o_portal_my_home">
-                <div class="container mt-3">
-                    <!-- Encabezado -->
-                    <div class="row mb-3">
-                        <div class="col">
-                            <h3>Mis Diseños</h3>
-                        </div>
-                    </div>
             
             <div class="container mt-3">
                 <!-- Encabezado -->
