@@ -141,12 +141,14 @@ class Design(models.Model):
             record.image = False
             
             # Restablecer estados
+            record.rechazado = True  # Campo booleano requerido
             record.visible_para_cliente = False
             record.aprobado_cliente = False
             record.etapa = 'etapa1'  # Volver a la etapa 1 para permitir correcciones
             record.state = 'rechazado'
             record.diseño_subido = False  # Permitir subir un nuevo diseño
             record.fecha_subida_diseno = False  # Limpiar la fecha de subida
+            record.fecha_rechazo = fields.Datetime.now()  # Registrar fecha de rechazo
             
             # Registrar en el historial
             self.env['design.revision_log'].create({
