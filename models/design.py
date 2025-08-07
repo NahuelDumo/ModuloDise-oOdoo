@@ -151,7 +151,7 @@ class Design(models.Model):
             })
             
             # Enviar notificación de rechazo al diseñador
-            template = self.env.ref('modulo_diseno.email_template_diseno_rechazado')
+            template = self.env.ref('ModuloDisenoOdoo.email_template_diseno_rechazado')
             if template:
                 template.with_context(
                     lang=self.env.user.lang,
