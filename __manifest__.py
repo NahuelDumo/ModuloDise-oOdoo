@@ -9,7 +9,8 @@
         "base",
         "project",
         "mail",
-        "portal"
+        "portal",
+        "website"
     ],
     "data": [
         # Seguridad
