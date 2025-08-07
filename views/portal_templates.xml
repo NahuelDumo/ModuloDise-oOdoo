@@ -21,63 +21,56 @@
             <t t-set="title">Mis Diseños</t>
             
             <div class="container mt-3">
-                <!-- Mensajes de éxito -->
-                <t t-if="message == 'design_approved'">
-                    <div class="alert alert-success">
-                        <i class="fa fa-check-circle me-2"></i>¡El diseño ha sido aprobado exitosamente!
+                <!-- Encabezado -->
+                <div class="row mb-3">
+                    <div class="col">
+                        <h3>Mis Diseños</h3>
                     </div>
-                </t>
-                
-                <!-- Lista de diseños -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Diseños para revisar</h5>
-                    </div>
-                    <div class="card-body">
-                        <t t-if="designs">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Nombre</th>
-                                            <th>Fecha</th>
-                                            <th>Estado</th>
-                                            <th class="text-end">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <t t-foreach="designs" t-as="design">
-                                            <tr>
-                                                <td>
-                                                    <a t-att-href="'/my/design/%s' % design.id">
-                                                        <i class="fa fa-image me-2"></i>
-                                                        <span t-esc="design.name"/>
-                                                    </a>
-                                                </td>
-                                                <td t-field="design.create_date"/>
-                                                <td>
-                                                    <span t-attf-class="badge #{'bg-warning': design.state in ['cliente', 'correcciones_solicitadas'], 'bg-success': design.state == 'aprobado', 'bg-danger': design.state == 'rechazado'}">
-                                                        <t t-esc="dict(design._fields['state'].selection).get(design.state)"/>
-                                                    </span>
-                                                </td>
-                                                <td class="text-end">
-                                                    <a t-att-href="'/my/design/%s' % design.id" class="btn btn-sm btn-primary">
-                                                        <i class="fa fa-eye"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </t>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </t>
-                        <t t-else="">
-                            <div class="text-center py-5">
-                                <i class="fa fa-image fa-4x text-muted mb-3"></i>
-                                <p class="text-muted">No hay diseños para mostrar</p>
-                            </div>
-                        </t>
-                    </div>
+                </div>
+
+                <!-- Tabla de diseños -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Diseño</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="designs" t-as="design">
+                                <tr>
+                                    <td>
+                                        <a t-att-href="'/my/design/%s' % design.id">
+                                            <span t-field="design.name"/>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span t-field="design.create_date" t-options='{"widget": "date"}'/>
+                                    </td>
+                                    <td>
+                                        <span t-attf-class="badge #{'bg-warning' if design.state == 'cliente' else 'bg-success' if design.state == 'aprobado' else 'bg-danger'}">
+                                            <t t-esc="dict(design._fields['state'].selection).get(design.state)"/>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a t-att-href="'/my/design/%s' % design.id" class="btn btn-sm btn-outline-primary">
+                                            <i class="fa fa-eye"></i> Ver
+                                        </a>
+                                    </td>
+                                </tr>
+                            </t>
+                            <t t-if="not designs">
+                                <tr>
+                                    <td colspan="4" class="text-center">
+                                        <p class="text-muted">No hay diseños para mostrar.</p>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </t>
