@@ -400,10 +400,11 @@ class Design(models.Model):
         self.diseño_subido = True
         self.fecha_subida_diseno = fields.Datetime.now()
         
-        # Si el diseño estaba rechazado, volver al flujo normal
-        if self.state == 'rechazado':
-            self.state = 'validacion'  # Volver a validación para que el validador revise
-            self.etapa = 'etapa1'     # Mantener en etapa 1 hasta que se valide
+        # Si veníamos de un rechazo, reiniciamos el estado
+        if self.rechazado:
+            self.state = 'validacion'
+            self.etapa = 'etapa1'
+            self.rechazado = False
             
             # Registrar en el historial
             self.env['design.revision_log'].create({
@@ -423,11 +424,9 @@ class Design(models.Model):
                 partner_ids=[user.partner_id.id for user in self.env.ref('ModuloDisenoOdoo.group_validador').users]
             )
             
-            # Notificar por correo a los validadores
-            template = self.env.ref('ModuloDisenoOdoo.email_template_diseno_pendiente_validar', False)
-            if template:
-                template.send_mail(self.id, force_send=True)
-        
+            # Limpiar observaciones de rechazo después de usarlas
+            self.observaciones_rechazo = False
+            
         # Si es la primera vez que se sube el diseño
         elif self.state == 'borrador':
             self.state = 'validacion'
@@ -445,6 +444,17 @@ class Design(models.Model):
                 'observaciones': 'Diseño actualizado.'
             })
             
+        # Notificar a los validadores si no es una actualización después de rechazo (ya se notificó arriba)
+        if not self.rechazado and self.state == 'validacion':
+            self.message_post(
+                body=_("""
+                <p>Se ha subido un nuevo diseño para validación.</p>
+                <p>Por favor, revise el diseño y realice la validación correspondiente.</p>
+                """),
+                subject=_("Nuevo diseño para validar: %s") % self.name,
+                partner_ids=[user.partner_id.id for user in self.env.ref('ModuloDisenoOdoo.group_validador').users]
+            )
+        
         return True
 
     @api.constrains('image')
