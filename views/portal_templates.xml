@@ -17,7 +17,7 @@
 
     <!-- Plantilla para la lista de diseños del portal -->
     <template id="portal_my_designs" name="Mis Diseños" inherit_id="portal.portal_my_home">
-        <xpath expr="//div[hasclass('o_portal_my_home')]" position="replace">
+        <xpath expr="//div[@class='o_portal_my_home']" position="replace">
             <div class="o_portal_my_home">
                 <!-- Menú de navegación -->
                 <div class="o_portal_submenu">
