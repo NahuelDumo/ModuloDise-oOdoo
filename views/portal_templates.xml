@@ -57,7 +57,7 @@
                                 </table>
                             </div>
                         </t>
-                        <t t-else>
+                        <t t-else="">
                             <div class="text-center py-5">
                                 <i class="fa fa-image fa-4x text-muted mb-3"></i>
                                 <p class="text-muted">No hay diseños para mostrar</p>
