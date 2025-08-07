@@ -134,14 +134,19 @@ class Design(models.Model):
     def marcar_como_rechazado(self, motivo):
         """Marca el diseño como rechazado con el motivo proporcionado."""
         for record in self:
-            record.rechazado = True
-            record.observaciones_rechazo = motivo
-            record.fecha_rechazo = fields.Datetime.now()
+            # Guardar la información del diseño anterior
+            record.observaciones_rechazo = f"Motivo del rechazo: {motivo}"
+            
+            # Borrar la imagen adjunta
+            record.image = False
+            
+            # Restablecer estados
             record.visible_para_cliente = False
             record.aprobado_cliente = False
-            record.etapa = 'etapa1'
+            record.etapa = 'etapa1'  # Volver a la etapa 1 para permitir correcciones
             record.state = 'rechazado'
-            record.diseño_subido = False  # Permitir ediciones nuevamente
+            record.diseño_subido = False  # Permitir subir un nuevo diseño
+            record.fecha_subida_diseno = False  # Limpiar la fecha de subida
             
             # Registrar en el historial
             self.env['design.revision_log'].create({
@@ -150,18 +155,27 @@ class Design(models.Model):
                 'observaciones': f'Diseño rechazado. Motivo: {motivo}'
             })
             
-            # Enviar notificación de rechazo al diseñador
-            template = self.env.ref('ModuloDisenoOdoo.email_template_diseno_rechazado')
+            # Notificar al diseñador
+            record.message_post(
+                body=_(f"""
+                <p>El diseño ha sido rechazado por el validador.</p>
+                <p><strong>Motivo del rechazo:</strong> {motivo}</p>
+                <p>Por favor, suba un nuevo diseño con las correcciones solicitadas.</p>
+                """),
+                subject=_("Diseño Rechazado - Se requiere nueva versión"),
+                partner_ids=[record.create_uid.partner_id.id] if record.create_uid.partner_id else []
+            )
+            
+            # Enviar notificación por correo
+            template = self.env.ref('ModuloDisenoOdoo.email_template_diseno_rechazado', False)
             if template:
                 template.with_context(
                     lang=self.env.user.lang,
                     user_name=self.env.user.name,
-                ).send_mail(record.id, force_send=True, email_values=None)
-            
-            record.message_post(
-                body=_(f"Diseño rechazado. Motivo: {motivo}"),
-                subject=_("Diseño Rechazado")
-            )
+                    motivo_rechazo=motivo
+                ).send_mail(record.id, force_send=True, email_values={
+                    'email_to': record.create_uid.email if record.create_uid else False
+                })
         return True
 
         self.env['design.revision_log'].create({
@@ -374,33 +388,61 @@ class Design(models.Model):
 
     def subir_diseno(self):
         """Marca el diseño como subido y congela los datos."""
-        for record in self:
-            if not record.image:
-                raise ValidationError("No puede marcar el diseño como subido sin una imagen.")
-            
-            # Verificar si el checklist está completo
-            if not record._check_checklist_completo():
-                raise ValidationError("No puede subir el diseño sin completar todos los items del checklist.")
-                
-            record.diseño_subido = True
-            record.fecha_subida_diseno = fields.Datetime.now()
+        self.ensure_one()
+        
+        # Verificar que se haya subido una imagen
+        if not self.image:
+            raise UserError(_("Debe subir una imagen del diseño antes de continuar."))
+        
+        # Actualizar estados
+        self.diseño_subido = True
+        self.fecha_subida_diseno = fields.Datetime.now()
+        
+        # Si el diseño estaba rechazado, volver al flujo normal
+        if self.state == 'rechazado':
+            self.state = 'validacion'  # Volver a validación para que el validador revise
+            self.etapa = 'etapa1'     # Mantener en etapa 1 hasta que se valide
             
             # Registrar en el historial
             self.env['design.revision_log'].create({
-                'design_id': record.id,
-                'tipo': 'cambio_estado',
-                'observaciones': 'Diseño subido. Los datos del diseño ahora son de solo lectura.'
+                'design_id': self.id,
+                'tipo': 'resubida',
+                'observaciones': 'Nueva versión del diseño subida después de rechazo.'
             })
             
-            # Enviar notificación al validador
-            template = self.env.ref('ModuloDisenoOdoo.email_template_design_pendiente_validar')
-            if template:
-                template.with_context(
-                    lang=self.env.user.lang,
-                    user_name=self.env.user.name,
-                ).send_mail(record.id, force_send=True, email_values=None)
+            # Notificar al validador
+            self.message_post(
+                body=_("""
+                <p>Se ha subido una nueva versión del diseño después de un rechazo.</p>
+                <p><strong>Motivo del rechazo anterior:</strong> {}</p>
+                <p>Por favor, revise el nuevo diseño.</p>
+                """.format(self.observaciones_rechazo or 'No se especificó un motivo.')),
+                subject=_("Nueva versión de diseño subida para revisión"),
+                partner_ids=[user.partner_id.id for user in self.env.ref('ModuloDisenoOdoo.group_validador').users]
+            )
             
-            record.message_post(body=_("Diseño subido. Los datos del diseño ahora son de solo lectura."))
+            # Notificar por correo a los validadores
+            template = self.env.ref('ModuloDisenoOdoo.email_template_diseno_pendiente_validar', False)
+            if template:
+                template.send_mail(self.id, force_send=True)
+        
+        # Si es la primera vez que se sube el diseño
+        elif self.state == 'borrador':
+            self.state = 'validacion'
+            self.env['design.revision_log'].create({
+                'design_id': self.id,
+                'tipo': 'subida',
+                'observaciones': 'Primera versión del diseño subida.'
+            })
+        
+        # Si se está reemplazando un diseño existente
+        else:
+            self.env['design.revision_log'].create({
+                'design_id': self.id,
+                'tipo': 'actualizacion',
+                'observaciones': 'Diseño actualizado.'
+            })
+            
         return True
 
     @api.constrains('image')
