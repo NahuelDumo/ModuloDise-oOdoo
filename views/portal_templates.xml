@@ -5,20 +5,10 @@
         <xpath expr="//div[hasclass('o_portal_docs')]" position="after">
             <div class="o_portal_docs">
                 <div class="o_portal_my_doc_count text-center mb-2">
-                    <div class="text-truncate">
-                        <i class="fa fa-paint-brush fa-2x text-primary"></i>
-                    </div>
-                    <h4 class="mt-2 mb-0">
-                        <a href="/my/designs" class="text-primary">
-                            <span>Diseños</span>
-                        </a>
-                    </h4>
-                    <div class="text-muted">
-                        <t t-call="portal.portal_my_documents_count">
-                            <t t-set="count" t-value="request.env['design.design'].search_count(request.env['design.design']._get_designs_domain())" />
-                            <t t-esc="count" /> <span t-esc="'document' if count == 1 else 'documentos'" />
-                        </t>
-                    </div>
+                    <a href="/my/designs" class="text-primary">
+                        <i class="fa fa-paint-brush fa-2x"></i>
+                        <h4 class="mt-2 mb-0">Diseños</h4>
+                    </a>
                 </div>
             </div>
         </xpath>
