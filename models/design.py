@@ -104,7 +104,8 @@ class Design(models.Model):
             template.send_mail(self.id, force_send=True, email_values={'email_to': validador.email})
 
     def _notificar_a_disenador(self):
-        template = self.env.ref('ModuloDisenoOdoo.email_template_diseño_validado')
+        # Cambiado de 'email_template_diseño_validado' a 'email_template_diseno_validado' (sin la ñ)
+        template = self.env.ref('ModuloDisenoOdoo.email_template_diseno_validado')
         template.send_mail(self.id, force_send=True, email_values={'email_to': self.create_uid.email})
 
     def action_rechazar_diseno(self):

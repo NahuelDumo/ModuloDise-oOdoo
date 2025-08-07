@@ -251,6 +251,46 @@
             </field>
         </record>
         
+        <!-- Plantilla para notificar al diseñador cuando su diseño ha sido validado -->
+        <record id="email_template_diseno_validado" model="mail.template">
+            <field name="name">Notificación de Diseño Validado</field>
+            <field name="model_id" ref="model_design_design"/>
+            <field name="subject">✅ Tu diseño ha sido validado: ${object.name}</field>
+            <field name="email_from">${user.email or 'no-reply@example.com'}</field>
+            <field name="email_to">${object.create_uid.email}</field>
+            <field name="body_html">
+                <![CDATA[
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <p>Hola ${object.create_uid.name or 'Diseñador'},</p>
+                    
+                    <p>Tu diseño <strong>${object.name}</strong> ha sido validado correctamente.</p>
+                    
+                    <div style="background-color: #f0fff0; border-left: 4px solid #4CAF50; padding: 15px; margin: 15px 0; border-radius: 4px;">
+                        <h3 style="margin-top: 0; color: #2E7D32;">${object.name or 'Diseño'}</h3>
+                        <p><strong>Cliente:</strong> ${object.cliente_id.name or 'No especificado'}</p>
+                        <p><strong>Estado actual:</strong> ${dict(object._fields['state'].selection).get(object.state) or 'Validado'}</p>
+                    </div>
+                    
+                    <p>Puedes ver el estado actual de tu diseño en cualquier momento accediendo al sistema.</p>
+                    
+                    <div style="margin: 25px 0; text-align: center;">
+                        <a href="${object.get_base_url()}/web#id=${object.id}&amp;model=design.design&amp;view_type=form" 
+                           style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">
+                            Ver Diseño
+                        </a>
+                    </div>
+                    
+                    <p>Atentamente,<br/>Equipo de Validación de Diseños</p>
+                    
+                    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">
+                    <p style="font-size: 12px; color: #777; margin-bottom: 0;">
+                        Este es un mensaje automático, por favor no respondas a este correo.
+                    </p>
+                </div>
+                ]]>
+            </field>
+        </record>
+        
         <!-- Secuencia para la validación del diseño -->
         <record id="seq_design_validation" model="ir.sequence">
             <field name="name">Validación de Diseño</field>
