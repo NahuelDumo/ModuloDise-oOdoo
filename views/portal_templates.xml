@@ -2,15 +2,13 @@
 <odoo>
     <!-- Heredar la vista principal del portal para agregar el botón de Diseños -->
     <template id="portal_my_home" inherit_id="portal.portal_my_home" name="Portal Home - Diseños">
-        <xpath expr="//a[contains(@href, '/my/quotes')]/parent::li" position="after">
-            <li class="list-group-item">
-                <a class="list-group-item list-group-item-action d-flex align-items-center justify-content-between" 
-                   href="/my/designs" 
-                   title="Diseños">
-                    Diseños
-                    <span class="badge text-bg-secondary rounded-pill" t-esc="design_count">0</span>
-                </a>
-            </li>
+        <xpath expr="//div[hasclass('o_portal_my_home')]//div[hasclass('container')]//div[hasclass('row')]//div[hasclass('col-lg-10')]//div[hasclass('row')]//div[hasclass('col')]//div[hasclass('card')]//div[hasclass('card-body')]//div[hasclass('list-group')]" position="inside">
+            <a class="list-group-item list-group-item-action d-flex align-items-center justify-content-between" 
+               href="/my/designs" 
+               title="Diseños">
+                <i class="fa fa-paint-brush me-2"></i> Diseños
+                <span class="badge text-bg-secondary rounded-pill" t-esc="design_count">0</span>
+            </a>
         </xpath>
     </template>
 
