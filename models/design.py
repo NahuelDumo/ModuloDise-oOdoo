@@ -15,7 +15,8 @@ class Design(models.Model):
     ]
 
     name = fields.Char("Nombre del diseño", required=True, tracking=True)
-    image = fields.Binary("Diseño (imagen)")
+    image_ids = fields.One2many('design.image', 'design_id', string='Imágenes del diseño')
+    image = fields.Binary("Imagen principal", compute='_compute_main_image', store=True, tracking=True)
     cliente_id = fields.Many2one("res.partner", string="Cliente", required=True, tracking=True)
     task_id = fields.Many2one("project.task", string="Tarea asociada", tracking=True)
 
@@ -46,6 +47,7 @@ class Design(models.Model):
         ('cliente', 'Esperando cliente'),
         ('aprobado', 'Aprobado'),
         ('rechazado', 'Rechazado'),
+        ('correcciones_solicitadas', 'Correcciones Solicitadas'),
     ], string="Estado", default='borrador', tracking=True)
     
     # Campos para control de estado
@@ -139,7 +141,7 @@ class Design(models.Model):
             record.observaciones_rechazo = f"Motivo del rechazo: {motivo}"
             
             # Borrar la imagen adjunta
-            record.image = False
+            record.image_ids = False
             
             # Restablecer estados
             record.rechazado = True  # Campo booleano requerido
@@ -394,7 +396,7 @@ class Design(models.Model):
         self.ensure_one()
         
         # Verificar que se haya subido una imagen
-        if not self.image:
+        if not self.image_ids:
             raise UserError(_("Debe subir una imagen del diseño antes de continuar."))
         
         # Actualizar estados
@@ -458,10 +460,10 @@ class Design(models.Model):
         
         return True
 
-    @api.constrains('image')
+    @api.constrains('image_ids')
     def _check_image_present(self):
         for record in self:
-            if not record.image:
+            if not record.image_ids:
                 raise ValidationError("Debe subir la imagen del diseño.")
     
     @api.model
@@ -502,3 +504,62 @@ class Design(models.Model):
                 'default_design_id': self.id,
             },
         }
+
+    @api.depends('image_ids')
+    def _compute_main_image(self):
+        for record in self:
+            if record.image_ids:
+                record.image = record.image_ids[0].image
+            else:
+                record.image = False
+
+    mensaje_cliente = fields.Text("Mensaje del cliente")
+
+    def action_aprobado_por_cliente(self):
+        """Acción cuando el cliente aprueba el diseño"""
+        self.ensure_one()
+        self.state = 'aprobado'
+        self.aprobado_cliente = True
+        self.fecha_aprobacion_cliente = fields.Datetime.now()
+        
+        # Notificar a diseñador y validador
+        self.notificar_aprobacion_cliente()
+        
+    def action_rechazado_por_cliente(self, mensaje):
+        """Acción cuando el cliente rechaza el diseño"""
+        self.ensure_one()
+        self.state = 'rechazado'
+        self.rechazado = True
+        self.mensaje_cliente = mensaje
+        self.fecha_rechazo = fields.Datetime.now()
+        
+        # Notificar a diseñador y validador
+        self.notificar_rechazo_cliente()
+        
+    def action_aprobado_con_correcciones(self, mensaje):
+        """Acción cuando el cliente aprueba con correcciones"""
+        self.ensure_one()
+        self.state = 'correcciones_solicitadas'
+        self.mensaje_cliente = mensaje
+        self.fecha_aprobacion_cliente = fields.Datetime.now()
+        
+        # Notificar a diseñador y validador
+        self.notificar_correcciones_solicitadas()
+    
+    def notificar_aprobacion_cliente(self):
+        """Notificar aprobación del cliente"""
+        template = self.env.ref('ModuloDisenoOdoo.email_template_diseno_aprobado_cliente', raise_if_not_found=False)
+        if template:
+            template.send_mail(self.id, force_send=True)
+    
+    def notificar_rechazo_cliente(self):
+        """Notificar rechazo del cliente"""
+        template = self.env.ref('ModuloDisenoOdoo.email_template_diseno_rechazado_cliente', raise_if_not_found=False)
+        if template:
+            template.send_mail(self.id, force_send=True)
+    
+    def notificar_correcciones_solicitadas(self):
+        """Notificar que se solicitan correcciones"""
+        template = self.env.ref('ModuloDisenoOdoo.email_template_correcciones_solicitadas', raise_if_not_found=False)
+        if template:
+            template.send_mail(self.id, force_send=True)

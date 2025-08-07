@@ -8,7 +8,8 @@
     "depends": [
         "base",
         "project",
-        "mail"
+        "mail",
+        "portal"
     ],
     "data": [
         # Seguridad
@@ -27,7 +28,10 @@
         
         # Vistas de wizards
         "wizards/rechazo_wizard_views.xml",
-        "wizards/subir_diseno_wizard_views.xml"
+        "wizards/subir_diseno_wizard_views.xml",
+        
+        # Vistas del portal
+        "views/portal_templates.xml"
     ],
     "application": True,
     "installable": True,
