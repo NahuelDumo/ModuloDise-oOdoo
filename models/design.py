@@ -99,7 +99,7 @@ class Design(models.Model):
 
     def _notificar_a_validadores(self):
         validadores = self.env.ref('ModuloDisenoOdoo.group_validador').users
-        template = self.env.ref('ModuloDisenoOdoo.email_template_diseño_pendiente_validar')
+        template = self.env.ref('ModuloDisenoOdoo.email_template_design_pendiente_validar')
         for validador in validadores:
             template.send_mail(self.id, force_send=True, email_values={'email_to': validador.email})
 
@@ -352,7 +352,7 @@ class Design(models.Model):
     def abrir_wizard_rechazo(self):
         return {
             'type': 'ir.actions.act_window',
-            'res_model': 'design.wizard_rechazo',
+            'res_model': 'design.rechazo.wizard',  # Nombre corregido
             'view_mode': 'form',
             'target': 'new',
             'context': {
@@ -393,7 +393,7 @@ class Design(models.Model):
             })
             
             # Enviar notificación al validador
-            template = self.env.ref('ModuloDisenoOdoo.email_template_diseno_pendiente_validar')
+            template = self.env.ref('ModuloDisenoOdoo.email_template_design_pendiente_validar')
             if template:
                 template.with_context(
                     lang=self.env.user.lang,
