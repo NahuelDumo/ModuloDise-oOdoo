@@ -220,25 +220,33 @@ class DesignPortal(CustomerPortal):
         return request.redirect(f"/my/design/{design_id}?message=design_rejected")
     
     def _document_check_access(self, model_name, document_id, access_token=None):
-        """Verificar acceso a un documento"""
+        """Verificar acceso a un documento de manera segura para usuarios del portal"""
         try:
-            # Obtener el registro con sudo inicialmente para evitar errores de acceso
-            document_sudo = request.env[model_name].sudo().browse(document_id).exists()
-            if not document_sudo:
-                _logger.warning(f"Documento {model_name} con ID {document_id} no encontrado")
+            # Obtener el registro con el usuario actual
+            document = request.env[model_name].browse(document_id)
+            
+            # Verificar que el documento existe
+            if not document.exists():
+                _logger.warning(f"Documento {model_name} ID {document_id} no encontrado")
                 raise MissingError(_("El documento no existe o fue eliminado"))
                 
-            # Verificar si el usuario tiene acceso al registro
-            partner = request.env.user.partner_id
-            if document_sudo.cliente_id not in (partner | partner.commercial_partner_id):
-                _logger.warning(f"Intento de acceso no autorizado al diseño {document_id} por el usuario {request.env.user.id}")
+            # Verificar que el usuario sea el cliente asignado al diseño
+            if document.cliente_id.id != request.env.user.partner_id.id:
+                _logger.warning(
+                    f"Acceso denegado: Usuario {request.env.user.id} intentó acceder "
+                    f"al diseño {document_id} que pertenece al cliente {document.cliente_id.id}"
+                )
                 raise AccessError(_("No tiene permiso para acceder a este diseño"))
                 
-            # Verificar permisos estándar
-            document_sudo.check_access_rights('read')
-            document_sudo.check_access_rule('read')
-            
-            return document_sudo
+            # Verificar permisos básicos de lectura
+            try:
+                document.check_access_rights('read')
+                document.check_access_rule('read')
+            except AccessError as e:
+                _logger.warning(f"Error de permisos en documento {document_id}: {str(e)}")
+                raise AccessError(_("No tiene permiso para ver este documento"))
+                
+            return document
             
         except Exception as e:
             _logger.error(f"Error en _document_check_access: {str(e)}", exc_info=True)
