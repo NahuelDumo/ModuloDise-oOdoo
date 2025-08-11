@@ -5,9 +5,8 @@ from odoo.addons.portal.controllers.portal import CustomerPortal, pager as porta
 from odoo.exceptions import AccessError, MissingError
 import logging
 
-# Configurar el nivel de logging para este módulo
+# Configurar el logger
 _logger = logging.getLogger(__name__)
-_logger.setLevel(logging.DEBUG)
 
 class DesignPortal(CustomerPortal):
     
@@ -16,28 +15,28 @@ class DesignPortal(CustomerPortal):
         if 'design_count' in counters:
             domain = self._get_designs_domain()
             values['design_count'] = request.env['design.design'].search_count(domain)
-            _logger.debug(f"[PORTAL] Design count calculado: {values['design_count']}")
+            _logger.warning(f"[PORTAL] Design count calculado: {values['design_count']}")
         return values
     
     def _get_designs_domain(self):
         """Dominio base para buscar diseños visibles para el usuario actual.
         Coincide con la regla de seguridad design_design_rule_cliente."""
         partner = request.env.user.partner_id
-        _logger.debug(f"[PORTAL] Usuario: {request.env.user.name} (ID: {request.env.user.id})")
-        _logger.debug(f"[PORTAL] Partner: {partner.name} (ID: {partner.id})")
-        _logger.debug(f"[PORTAL] Partner Comercial: {partner.commercial_partner_id.name} (ID: {partner.commercial_partner_id.id})")
+        _logger.warning(f"[PORTAL] Usuario: {request.env.user.name} (ID: {request.env.user.id})")
+        _logger.warning(f"[PORTAL] Partner: {partner.name} (ID: {partner.id})")
+        _logger.warning(f"[PORTAL] Partner Comercial: {partner.commercial_partner_id.name} (ID: {partner.commercial_partner_id.id})")
         
         # Verificar si el partner tiene algún diseño asociado directamente
         designs_direct = request.env['design.design'].search([('cliente_id', '=', partner.id)])
-        _logger.debug(f"[PORTAL] Diseños asociados directamente al partner: {len(designs_direct)}")
+        _logger.warning(f"[PORTAL] Diseños asociados directamente al partner: {len(designs_direct)}")
         for idx, design in enumerate(designs_direct, 1):
-            _logger.debug(f"  {idx}. ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.display_name}")
+            _logger.warning(f"  {idx}. ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.display_name}")
         
         # Verificar diseños en la jerarquía del partner comercial
         designs_hierarchy = request.env['design.design'].search([('cliente_id', 'child_of', partner.commercial_partner_id.id)])
-        _logger.debug(f"[PORTAL] Diseños en la jerarquía del partner comercial: {len(designs_hierarchy)}")
+        _logger.warning(f"[PORTAL] Diseños en la jerarquía del partner comercial: {len(designs_hierarchy)}")
         for idx, design in enumerate(designs_hierarchy, 1):
-            _logger.debug(f"  {idx}. ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.display_name}")
+            _logger.warning(f"  {idx}. ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.display_name}")
         
         # Dominio final con todos los filtros
         domain = [
@@ -46,107 +45,88 @@ class DesignPortal(CustomerPortal):
             ('state', 'in', ['cliente', 'correcciones_solicitadas', 'aprobado', 'rechazado', 'esperando_cliente'])
         ]
         
-        _logger.debug(f"[PORTAL] Dominio de búsqueda: {domain}")
+        _logger.warning(f"[PORTAL] Dominio de búsqueda: {domain}")
         
         # Verificar cuántos diseños coinciden con el dominio completo
         matching_designs = request.env['design.design'].search(domain)
-        _logger.debug(f"[PORTAL] Diseños que coinciden con el dominio: {len(matching_designs)}")
+        _logger.warning(f"[PORTAL] Diseños que coinciden con el dominio: {len(matching_designs)}")
         for idx, design in enumerate(matching_designs, 1):
-            _logger.debug(f"  {idx}. ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.display_name}, Visible: {design.visible_para_cliente}")
+            _logger.warning(f"  {idx}. ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.display_name}, Visible: {design.visible_para_cliente}")
         
         return domain
     
-    def _prepare_portal_layout_values(self):
-        values = super()._prepare_portal_layout_values()
+    @http.route(['/my/designs', '/my/designs/page/<int:page>'], type='http', auth="user", website=True, sitemap=False)
+    def portal_my_designs(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='all', **kw):
+        """Muestra la lista de diseños del usuario en el portal."""
+        _logger.warning("[PORTAL] Entrando a portal_my_designs")
+        
+        # Obtener el dominio base
         domain = self._get_designs_domain()
+        
+        # Configurar la paginación
         design_count = request.env['design.design'].search_count(domain)
-        values['design_count'] = design_count
-        _logger.info(f"Portal layout - design_count: {design_count}")
-        return values
-    
-    @route(['/my/designs', '/my/designs/page/<int:page>'], type='http', auth="user", website=True)
-    def portal_my_designs(self, page=1, date_begin=None, date_end=None, sortby=None, **kw):
-        _logger.info("=== INICIO DE PORTAL_MY_DESIGNS ===")
-        
-        # Obtener información del usuario actual
-        partner = request.env.user.partner_id
-        _logger.info(f"Usuario: {request.env.user.name}")
-        _logger.info(f"Partner ID: {partner.id}")
-        _logger.info(f"Partner Comercial ID: {partner.commercial_partner_id.id}")
-        
-        # Obtener el dominio de búsqueda (ya incluye filtros de seguridad)
-        domain = self._get_designs_domain()
-        Design = request.env['design.design']
-        
-        # Buscar diseños respetando las reglas de seguridad (sin sudo)
-        designs = Design.search(domain, order='create_date desc')
-        _logger.info(f"[PORTAL] Diseños encontrados para {request.env.user.name}: {len(designs)}")
-        
-        # Solo para depuración en logs - no afecta la lógica
-        if _logger.isEnabledFor(logging.DEBUG):
-            for design in designs:
-                _logger.debug(f"  - ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.display_name}")
-        
-        values = self._prepare_portal_layout_values()
-        searchbar_sortings = {
-            'date': {'label': _('Fecha'), 'order': 'create_date desc'},
-            'name': {'label': _('Nombre'), 'order': 'name'},
-        }
-        
-        if not sortby:
-            sortby = 'date'
-        order = searchbar_sortings[sortby]['order']
-        
-        # Filtros de fecha si se proporcionan
-        if date_begin and date_end:
-            domain += [('create_date', '>=', date_begin), ('create_date', '<=', date_end)]
-            designs = Design.search(domain)
-        
-        # Pager
-        design_count = len(designs)
         pager = portal_pager(
             url="/my/designs",
-            url_args={'sortby': sortby, 'date_begin': date_begin, 'date_end': date_end},
             total=design_count,
             page=page,
             step=self._items_per_page
         )
         
-        # Aplicar ordenamiento y paginación
-        designs = designs.search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
+        # Obtener los diseños paginados
+        designs = request.env['design.design'].search(
+            domain,
+            limit=self._items_per_page,
+            offset=pager['offset'],
+            order='create_date desc'  # Ordenar por fecha de creación descendente
+        )
         
+        # Preparar valores para la plantilla
+        values = self._prepare_portal_layout_values()
         values.update({
             'designs': designs,
             'page_name': 'design',
             'default_url': '/my/designs',
             'pager': pager,
-            'searchbar_sortings': searchbar_sortings,
-            'sortby': sortby,
-            'date_begin': date_begin,
-            'date_end': date_end,
+            'design_count': design_count,
         })
         
-        _logger.info("=== FIN DE PORTAL_MY_DESIGNS ===")
-        return request.render("ModuloDisenoOdoo.portal_my_designs", values)
+        _logger.warning(f"[PORTAL] Mostrando {len(designs)} diseños de un total de {design_count}")
+        return request.render("ModuloListasDeVerificacion.portal_my_designs", values)
     
-    @route(['/my/design/<int:design_id>'], type='http', auth="user", website=True)
+    @http.route(['/my/design/<int:design_id>'], type='http', auth="user", website=True, sitemap=False)
     def portal_my_design(self, design_id, **kw):
+        """Muestra los detalles de un diseño específico en el portal."""
+        _logger.warning(f"[PORTAL] Solicitando diseño ID: {design_id}")
+        
         try:
-            design_sudo = self._document_check_access('design.design', design_id)
-        except (AccessError, MissingError):
-            return request.redirect('/my')
+            # Buscar el diseño asegurando que el usuario tenga acceso
+            design = request.env['design.design'].browse(design_id).sudo()
             
-        # Verificar que el usuario tenga acceso a este diseño
-        partner = request.env.user.partner_id
-        if design_sudo.cliente_id not in partner | partner.commercial_partner_id:
-            return request.redirect('/my')
+            # Verificar que el usuario tenga permiso para ver este diseño
+            domain = self._get_designs_domain()
+            if not design.exists() or design.id not in request.env['design.design'].search(domain).ids:
+                _logger.warning(f"[PORTAL] Acceso denegado al diseño ID: {design_id}")
+                return request.redirect('/my')
             
-        values = self._prepare_portal_layout_values()
-        values.update({
-            'design': design_sudo,
-            'page_name': 'design',
-        })
-        return request.render("ModuloDisenoOdoo.portal_my_design", values)
+            # Preparar valores para la plantilla
+            values = self._prepare_portal_layout_values()
+            values.update({
+                'design': design,
+                'page_name': 'design',
+            })
+            
+            _logger.warning(f"[PORTAL] Mostrando diseño ID: {design_id}")
+            return request.render("ModuloListasDeVerificacion.portal_my_design", values)
+            
+        except Exception as e:
+            _logger.error(f"[PORTAL] Error al mostrar diseño {design_id}: {str(e)}")
+            return request.redirect('/my/designs')
+    
+    def _prepare_portal_layout_values(self):
+        values = super()._prepare_portal_layout_values()
+        values['design_count'] = request.env['design.design'].search_count(self._get_designs_domain())
+        _logger.warning(f"[PORTAL] Portal layout - design_count: {values['design_count']}")
+        return values
     
     @route(['/my/design/approve'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
     def approve_design(self, design_id, message='', **post):
