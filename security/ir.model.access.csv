@@ -2,6 +2,7 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_design_design_disenador,design.design disenador,model_design_design,ModuloDisenoOdoo.group_disenador,1,1,1,0
 access_design_design_validador,design.design validador,model_design_design,ModuloDisenoOdoo.group_validador,1,1,0,0
 access_design_design_cliente,design.design cliente,model_design_design,ModuloDisenoOdoo.group_cliente,1,0,0,0
+access_design_design_portal,design.design portal,model_design_design,base.group_portal,1,0,0,0
 access_checklist_item_disenador,design.checklist_item disenador,model_design_checklist_item,ModuloDisenoOdoo.group_disenador,1,1,1,1
 access_checklist_item_validador,design.checklist_item validador,model_design_checklist_item,ModuloDisenoOdoo.group_validador,1,1,1,1
 access_revision_log_disenador,design.revision_log disenador,model_design_revision_log,ModuloDisenoOdoo.group_disenador,1,1,1,0

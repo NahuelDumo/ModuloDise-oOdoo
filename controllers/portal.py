@@ -18,32 +18,16 @@ class DesignPortal(CustomerPortal):
         return values
     
     def _get_designs_domain(self):
+        """Dominio base para buscar diseños visibles para el usuario actual.
+        Coincide con la regla de seguridad design_design_rule_cliente."""
         partner = request.env.user.partner_id
-        # Buscar diseños donde el partner actual sea el cliente o esté en la jerarquía del partner comercial
         domain = [
-            '|',
-            ('cliente_id', 'child_of', partner.commercial_partner_id.ids),
-            ('cliente_id', '=', partner.id)
+            ('cliente_id', 'child_of', partner.commercial_partner_id.id),
+            ('visible_para_cliente', '=', True),
+            ('state', 'in', ['cliente', 'correcciones_solicitadas', 'aprobado', 'rechazado', 'esperando_cliente'])
         ]
-        # Solo mostrar diseños en estados visibles para el cliente
-        domain += [('state', 'in', ['cliente', 'correcciones_solicitadas', 'aprobado', 'rechazado', 'esperando_cliente'])]
         
-        _logger.info(f"Dominio de búsqueda: {domain}")
-        _logger.info(f"Partner actual: {partner.name} (ID: {partner.id})")
-        _logger.info(f"Partner comercial: {partner.commercial_partner_id.name} (ID: {partner.commercial_partner_id.id})")
-        
-        # Depuración: Mostrar todos los diseños del sistema
-        all_designs = request.env['design.design'].search([])
-        _logger.info(f"Total de diseños en el sistema: {len(all_designs)}")
-        for d in all_designs:
-            _logger.info(f"  - ID: {d.id}, Nombre: {d.name}, Cliente: {d.cliente_id.name if d.cliente_id else 'Ninguno'}, Estado: {d.state}")
-            
-        # Verificar qué diseños coinciden con el dominio
-        matching_designs = request.env['design.design'].search(domain)
-        _logger.info(f"Diseños que coinciden con el dominio: {len(matching_designs)}")
-        for d in matching_designs:
-            _logger.info(f"  - ID: {d.id}, Nombre: {d.name}, Cliente: {d.cliente_id.name if d.cliente_id else 'Ninguno'}")
-            
+        _logger.info(f"[PORTAL] Dominio de búsqueda para {partner.name} (ID: {partner.id}): {domain}")
         return domain
     
     def _prepare_portal_layout_values(self):
@@ -64,24 +48,18 @@ class DesignPortal(CustomerPortal):
         _logger.info(f"Partner ID: {partner.id}")
         _logger.info(f"Partner Comercial ID: {partner.commercial_partner_id.id}")
         
-        # Obtener el dominio de búsqueda
+        # Obtener el dominio de búsqueda (ya incluye filtros de seguridad)
         domain = self._get_designs_domain()
-        _logger.info(f"Dominio de búsqueda: {domain}")
+        Design = request.env['design.design']
         
-        # Buscar diseños - USANDO SUDO para debugging
-        Design = request.env['design.design'].sudo()
+        # Buscar diseños respetando las reglas de seguridad (sin sudo)
+        designs = Design.search(domain, order='create_date desc')
+        _logger.info(f"[PORTAL] Diseños encontrados para {request.env.user.name}: {len(designs)}")
         
-        # Primero veamos TODOS los diseños en el sistema
-        all_designs = Design.search([])
-        _logger.info(f"TOTAL de diseños en el sistema: {len(all_designs)}")
-        for design in all_designs:
-            _logger.info(f"  - ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.name if design.cliente_id else 'Sin cliente'}, Cliente ID: {design.cliente_id.id if design.cliente_id else 'N/A'}")
-        
-        # Ahora buscar con nuestro dominio
-        designs = Design.search(domain)
-        _logger.info(f"Diseños encontrados con dominio: {len(designs)}")
-        for design in designs:
-            _logger.info(f"  - ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.name}")
+        # Solo para depuración en logs - no afecta la lógica
+        if _logger.isEnabledFor(logging.DEBUG):
+            for design in designs:
+                _logger.debug(f"  - ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.display_name}")
         
         values = self._prepare_portal_layout_values()
         searchbar_sortings = {
