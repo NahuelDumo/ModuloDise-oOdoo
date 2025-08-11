@@ -21,13 +21,33 @@ class DesignPortal(CustomerPortal):
         """Dominio base para buscar diseños visibles para el usuario actual.
         Coincide con la regla de seguridad design_design_rule_cliente."""
         partner = request.env.user.partner_id
+        _logger.info(f"[PORTAL] Usuario: {request.env.user.name} (ID: {request.env.user.id})")
+        _logger.info(f"[PORTAL] Partner: {partner.name} (ID: {partner.id})")
+        _logger.info(f"[PORTAL] Partner Comercial: {partner.commercial_partner_id.name} (ID: {partner.commercial_partner_id.id})")
+        
+        # Verificar si el partner tiene algún diseño asociado directamente
+        designs_direct = request.env['design.design'].search([('cliente_id', '=', partner.id)])
+        _logger.info(f"[PORTAL] Diseños asociados directamente al partner: {len(designs_direct)}")
+        
+        # Verificar diseños en la jerarquía del partner comercial
+        designs_hierarchy = request.env['design.design'].search([('cliente_id', 'child_of', partner.commercial_partner_id.id)])
+        _logger.info(f"[PORTAL] Diseños en la jerarquía del partner comercial: {len(designs_hierarchy)}")
+        
+        # Dominio final con todos los filtros
         domain = [
             ('cliente_id', 'child_of', partner.commercial_partner_id.id),
             ('visible_para_cliente', '=', True),
             ('state', 'in', ['cliente', 'correcciones_solicitadas', 'aprobado', 'rechazado', 'esperando_cliente'])
         ]
         
-        _logger.info(f"[PORTAL] Dominio de búsqueda para {partner.name} (ID: {partner.id}): {domain}")
+        _logger.info(f"[PORTAL] Dominio de búsqueda: {domain}")
+        
+        # Verificar cuántos diseños coinciden con el dominio completo
+        matching_designs = request.env['design.design'].search(domain)
+        _logger.info(f"[PORTAL] Diseños que coinciden con el dominio: {len(matching_designs)}")
+        for idx, design in enumerate(matching_designs, 1):
+            _logger.info(f"  {idx}. ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.display_name}")
+        
         return domain
     
     def _prepare_portal_layout_values(self):
