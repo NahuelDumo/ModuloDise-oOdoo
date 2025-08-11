@@ -5,7 +5,9 @@ from odoo.addons.portal.controllers.portal import CustomerPortal, pager as porta
 from odoo.exceptions import AccessError, MissingError
 import logging
 
+# Configurar el nivel de logging para este módulo
 _logger = logging.getLogger(__name__)
+_logger.setLevel(logging.DEBUG)
 
 class DesignPortal(CustomerPortal):
     
@@ -14,24 +16,28 @@ class DesignPortal(CustomerPortal):
         if 'design_count' in counters:
             domain = self._get_designs_domain()
             values['design_count'] = request.env['design.design'].search_count(domain)
-            _logger.info(f"Design count calculado: {values['design_count']}")
+            _logger.debug(f"[PORTAL] Design count calculado: {values['design_count']}")
         return values
     
     def _get_designs_domain(self):
         """Dominio base para buscar diseños visibles para el usuario actual.
         Coincide con la regla de seguridad design_design_rule_cliente."""
         partner = request.env.user.partner_id
-        _logger.info(f"[PORTAL] Usuario: {request.env.user.name} (ID: {request.env.user.id})")
-        _logger.info(f"[PORTAL] Partner: {partner.name} (ID: {partner.id})")
-        _logger.info(f"[PORTAL] Partner Comercial: {partner.commercial_partner_id.name} (ID: {partner.commercial_partner_id.id})")
+        _logger.debug(f"[PORTAL] Usuario: {request.env.user.name} (ID: {request.env.user.id})")
+        _logger.debug(f"[PORTAL] Partner: {partner.name} (ID: {partner.id})")
+        _logger.debug(f"[PORTAL] Partner Comercial: {partner.commercial_partner_id.name} (ID: {partner.commercial_partner_id.id})")
         
         # Verificar si el partner tiene algún diseño asociado directamente
         designs_direct = request.env['design.design'].search([('cliente_id', '=', partner.id)])
-        _logger.info(f"[PORTAL] Diseños asociados directamente al partner: {len(designs_direct)}")
+        _logger.debug(f"[PORTAL] Diseños asociados directamente al partner: {len(designs_direct)}")
+        for idx, design in enumerate(designs_direct, 1):
+            _logger.debug(f"  {idx}. ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.display_name}")
         
         # Verificar diseños en la jerarquía del partner comercial
         designs_hierarchy = request.env['design.design'].search([('cliente_id', 'child_of', partner.commercial_partner_id.id)])
-        _logger.info(f"[PORTAL] Diseños en la jerarquía del partner comercial: {len(designs_hierarchy)}")
+        _logger.debug(f"[PORTAL] Diseños en la jerarquía del partner comercial: {len(designs_hierarchy)}")
+        for idx, design in enumerate(designs_hierarchy, 1):
+            _logger.debug(f"  {idx}. ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.display_name}")
         
         # Dominio final con todos los filtros
         domain = [
@@ -40,13 +46,13 @@ class DesignPortal(CustomerPortal):
             ('state', 'in', ['cliente', 'correcciones_solicitadas', 'aprobado', 'rechazado', 'esperando_cliente'])
         ]
         
-        _logger.info(f"[PORTAL] Dominio de búsqueda: {domain}")
+        _logger.debug(f"[PORTAL] Dominio de búsqueda: {domain}")
         
         # Verificar cuántos diseños coinciden con el dominio completo
         matching_designs = request.env['design.design'].search(domain)
-        _logger.info(f"[PORTAL] Diseños que coinciden con el dominio: {len(matching_designs)}")
+        _logger.debug(f"[PORTAL] Diseños que coinciden con el dominio: {len(matching_designs)}")
         for idx, design in enumerate(matching_designs, 1):
-            _logger.info(f"  {idx}. ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.display_name}")
+            _logger.debug(f"  {idx}. ID: {design.id}, Nombre: {design.name}, Estado: {design.state}, Cliente: {design.cliente_id.display_name}, Visible: {design.visible_para_cliente}")
         
         return domain
     
