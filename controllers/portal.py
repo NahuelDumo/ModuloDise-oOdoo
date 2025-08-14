@@ -112,7 +112,7 @@ class DesignPortal(CustomerPortal):
         _logger.info(f"Se encontraron {design_count} diseños.")
         
         _logger.warning(f"[PORTAL] Mostrando {len(designs)} diseños de un total de {design_count}")
-        return request.render("ModuloListasDeVerificacion.portal_my_designs", values)
+        return request.render("ModuloDisenoOdoo.portal_my_designs", values)
     
     @http.route(['/my/design/<int:design_id>'], type='http', auth="user", website=True, sitemap=False)
     def portal_my_design(self, design_id, **kw):
