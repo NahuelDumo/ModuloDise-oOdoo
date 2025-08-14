@@ -147,6 +147,14 @@
                                     </dl>
                                 </div>
                                 
+                                <!-- Comentario del Diseñador -->
+                                <div class="mb-4">
+                                    <h5>Comentario del Diseñador</h5>
+                                    <div class="alert alert-info" role="alert">
+                                        <p class="mb-0" t-field="design.comentario_disenador"/>
+                                    </div>
+                                </div>
+
                                 <!-- Formulario de aprobación/rechazo -->
                                 <t t-if="design.state in ['cliente', 'correcciones_solicitadas']">
                                     <div class="mt-4 pt-3 border-top">

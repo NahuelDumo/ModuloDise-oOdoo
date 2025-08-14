@@ -21,10 +21,18 @@ class DesignPortal(CustomerPortal):
     def _get_designs_domain(self):
         """Dominio base para buscar diseños visibles para el usuario actual.
         Coincide con la regla de seguridad design_design_rule_cliente."""
-        partner = request.env.user.partner_id
-        _logger.warning(f"[PORTAL] Usuario: {request.env.user.name} (ID: {request.env.user.id})")
+        _logger.warning("-" * 50)
+        _logger.warning("[PORTAL] INICIO DE _get_designs_domain")
+        
+        # Obtener información del usuario y partner
+        user = request.env.user
+        partner = user.partner_id
+        commercial_partner = partner.commercial_partner_id
+        
+        _logger.warning(f"[PORTAL] Usuario: {user.name} (ID: {user.id})")
         _logger.warning(f"[PORTAL] Partner: {partner.name} (ID: {partner.id})")
-        _logger.warning(f"[PORTAL] Partner Comercial: {partner.commercial_partner_id.name} (ID: {partner.commercial_partner_id.id})")
+        _logger.warning(f"[PORTAL] Partner Comercial: {commercial_partner.name} (ID: {commercial_partner.id})")
+        _logger.warning(f"[PORTAL] Grupos del usuario: {[g.name for g in user.groups_id]}")
         
         # Verificar si el partner tiene algún diseño asociado directamente
         designs_direct = request.env['design.design'].search([('cliente_id', '=', partner.id)])
@@ -58,7 +66,11 @@ class DesignPortal(CustomerPortal):
     @http.route(['/my/designs', '/my/designs/page/<int:page>'], type='http', auth="user", website=True, sitemap=False)
     def portal_my_designs(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='all', **kw):
         """Muestra la lista de diseños del usuario en el portal."""
-        _logger.warning("[PORTAL] Entrando a portal_my_designs")
+        _logger.warning("=" * 50)
+        _logger.warning("[PORTAL] INICIO DE PORTAL_MY_DESIGNS")
+        _logger.warning(f"[PORTAL] Usuario actual: {request.env.user.name} (ID: {request.env.user.id})")
+        _logger.warning(f"[PORTAL] Parámetros de URL: page={page}, date_begin={date_begin}, date_end={date_end}")
+        _logger.warning("=" * 50)
         
         # Obtener el dominio base
         domain = self._get_designs_domain()

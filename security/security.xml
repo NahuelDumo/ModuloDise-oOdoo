@@ -45,16 +45,40 @@
         <field name="perm_unlink" eval="False"/>
     </record>
 
-    <!-- Regla para clientes/portal - solo diseños visibles en estados permitidos -->
+    <!-- Regla para clientes - solo pueden ver sus propios diseños en estados específicos -->
     <record id="design_design_rule_cliente" model="ir.rule">
-        <field name="name">Cliente/Portal: solo diseños visibles</field>
+        <field name="name">Cliente: acceso a sus propios diseños</field>
         <field name="model_id" search="[('model', '=', 'design.design')]" model="ir.model"/>
-        <field name="domain_force">
-            [('cliente_id', 'child_of', user.partner_id.commercial_partner_id.id), 
-             ('visible_para_cliente', '=', True),
-             ('state', 'in', ['cliente', 'correcciones_solicitadas', 'aprobado', 'rechazado', 'esperando_cliente'])]
-        </field>
-        <field name="groups" eval="[(4, ref('group_cliente')), (4, ref('base.group_portal'))]"/>
+        <field name="domain_force">[
+            '&amp;',
+                '|',
+                    ('cliente_id', '=', user.partner_id.id),
+                    ('cliente_id', 'child_of', user.partner_id.commercial_partner_id.id),
+            '&amp;',
+                ('visible_para_cliente', '=', True),
+                ('state', 'in', ['cliente', 'correcciones_solicitadas', 'aprobado', 'rechazado', 'esperando_cliente'])
+        ]</field>
+        <field name="groups" eval="[(4, ref('group_cliente'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    
+    <!-- Regla para usuarios del portal - misma regla que para clientes -->
+    <record id="design_design_rule_portal" model="ir.rule">
+        <field name="name">Portal: acceso a diseños del cliente</field>
+        <field name="model_id" search="[('model', '=', 'design.design')]" model="ir.model"/>
+        <field name="domain_force">[
+            '&amp;',
+                '|',
+                    ('cliente_id', '=', user.partner_id.id),
+                    ('cliente_id', 'child_of', user.partner_id.commercial_partner_id.id),
+            '&amp;',
+                ('visible_para_cliente', '=', True),
+                ('state', 'in', ['cliente', 'correcciones_solicitadas', 'aprobado', 'rechazado', 'esperando_cliente'])
+        ]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
         <field name="perm_read" eval="True"/>
         <field name="perm_write" eval="False"/>
         <field name="perm_create" eval="False"/>
