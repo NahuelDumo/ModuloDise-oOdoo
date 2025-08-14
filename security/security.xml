@@ -68,16 +68,8 @@
     <!-- Regla para usuarios del portal - misma regla que para clientes -->
     <record id="design_design_rule_portal" model="ir.rule">
         <field name="name">Portal: acceso a diseños del cliente</field>
-        <field name="model_id" search="[('model', '=', 'design.design')]" model="ir.model"/>
-        <field name="domain_force">[
-            '&amp;',
-                '|',
-                    ('cliente_id', '=', user.partner_id.id),
-                    ('cliente_id', 'child_of', user.partner_id.commercial_partner_id.id),
-            '&amp;',
-                ('visible_para_cliente', '=', True),
-                ('state', 'in', ['cliente', 'correcciones_solicitadas', 'aprobado', 'rechazado', 'esperando_cliente'])
-        ]</field>
+        <field name="model_id" ref="model_design_design"/>
+        <field name="domain_force">[('message_partner_ids','child_of',[user.partner_id.commercial_partner_id.id])]</field>
         <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
         <field name="perm_read" eval="True"/>
         <field name="perm_write" eval="False"/>

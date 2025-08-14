@@ -214,11 +214,15 @@ class Design(models.Model):
 
             
         # Crear el registro
-        record = super(Design, self).create(vals)
+        new_design = super(Design, self).create(vals)
+
+        # Añadir al cliente como seguidor para el acceso al portal
+        if new_design.cliente_id:
+            new_design.message_subscribe(partner_ids=new_design.cliente_id.ids)
         
         # Registrar en el historial
         self.env['design.revision_log'].create({
-            'design_id': record.id,
+            'design_id': new_design.id,
             'usuario_id': self.env.uid,
             'tipo': 'creacion',
             'observaciones': 'Diseño creado y listo para comenzar.'
