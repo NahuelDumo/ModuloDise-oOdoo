@@ -2,6 +2,7 @@
 from odoo import models, fields, api
 
 class DesignAttachment(models.Model):
+    _inherit = ['portal.mixin']
     _name = 'design.image' # Mantenemos el nombre por retrocompatibilidad
     _description = 'Adjunto de Diseño'
     _order = 'sequence, id'
