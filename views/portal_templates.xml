@@ -114,11 +114,8 @@
                                                 <div class="list-group-item">
                                                     <t t-set="file_url" t-value="'/web/content/ir.attachment/%s/datas?access_token=%s' % (attachment.id, design.access_token)"/>
                                                     <div class="d-flex w-100 justify-content-between mb-2">
-                                                        <h6 class="mb-1">
-                                                            <span t-esc="attachment.name"/>
-                                                            <small class="text-muted ms-2">(Tipo: <span t-esc="attachment.mimetype"/>)</small>
-                                                        </h6>
-                                                        <a t-att-href="file_url + '?download=true'" class="btn btn-sm btn-outline-secondary">
+                                                        <h6 class="mb-1"><span t-esc="attachment.name"/></h6>
+                                                        <a t-att-href="file_url + '&amp;download=true'" class="btn btn-sm btn-outline-secondary">
                                                             <i class="fa fa-download me-1"></i> Descargar
                                                         </a>
                                                     </div>
