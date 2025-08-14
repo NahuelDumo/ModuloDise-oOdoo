@@ -157,11 +157,11 @@
                                         </dd>
                                         
                                         <dt class="col-sm-3">Fecha de creación:</dt>
-                                        <dd class="col-sm-9" t-field="design.create_date"/>
+                                        <dd class="col-sm-9"><span t-field="design.create_date"/></dd>
                                         
                                         <t t-if="design.mensaje_cliente">
                                             <dt class="col-sm-3">Tus comentarios:</dt>
-                                            <dd class="col-sm-9" t-field="design.mensaje_cliente"/>
+                                            <dd class="col-sm-9"><span t-field="design.mensaje_cliente"/></dd>
                                         </t>
                                     </dl>
                                 </div>
@@ -279,7 +279,7 @@
                             <div class="card-body">
                                 <dl class="mb-0">
                                     <dt>Cliente:</dt>
-                                    <dd t-field="design.cliente_id"/>
+                                    <dd><span t-field="design.cliente_id"/></dd>
                                     
                                     <dt>Tarea asociada:</dt>
                                     <dd>
@@ -293,10 +293,10 @@
                                     </dd>
                                     
                                     <dt>Diseñador:</dt>
-                                    <dd t-field="design.usuario_disenador"/>
+                                    <dd><span t-field="design.usuario_disenador"/></dd>
                                     
                                     <dt>Validador:</dt>
-                                    <dd t-field="design.usuario_validador"/>
+                                    <dd><span t-field="design.usuario_validador"/></dd>
                                 </dl>
                             </div>
                         </div>
@@ -317,9 +317,9 @@
                                                 <div class="timeline-content">
                                                     <div class="d-flex justify-content-between">
                                                         <strong t-esc="log.usuario_id.name"/>
-                                                        <small class="text-muted" t-field="log.create_date"/>
+                                                        <small class="text-muted"><span t-field="log.create_date"/></small>
                                                     </div>
-                                                    <p t-field="log.mensaje" class="mb-1"/>
+                                                    <p class="mb-1"><span t-field="log.mensaje"/></p>
                                                     <t t-if="log.observaciones">
                                                         <small class="text-muted">
                                                             <i class="fa fa-comment me-1"></i>
