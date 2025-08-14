@@ -30,6 +30,7 @@ class RevisionLog(models.Model):
         ('rechazo', 'Rechazo'),
         ('aprobacion_cliente', 'Aprobación del Cliente'),
         ('cambio_estado', 'Cambio de Estado'),
+        ('actualizacion', 'Actualización'),
         ('comentario', 'Comentario')
     ], string="Tipo de acción", required=True, tracking=True)
     
