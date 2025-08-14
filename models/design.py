@@ -226,12 +226,12 @@ class Design(models.Model):
         })
         
         # Enviar notificación al diseñador si corresponde
-        if record.user_id and record.user_id.email:
+        if record.create_uid and record.create_uid.email:
             template = self.env.ref('modulo_diseno.email_template_diseno_creado', raise_if_not_found=False)
             if template:
                 template.with_context(
-                    lang=record.user_id.lang,
-                    user_name=record.user_id.name,
+                    lang=record.create_uid.lang,
+                    user_name=record.create_uid.name,
                 ).send_mail(record.id, force_send=True, email_values=None)
         
         categoria_id = vals.get('categoria_id')
