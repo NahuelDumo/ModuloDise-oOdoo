@@ -304,9 +304,9 @@
                                 <h6 class="mb-0">Historial de revisiones</h6>
                             </div>
                             <div class="card-body">
-                                <t t-if="design.revision_log_ids">
+                                <t t-if="design.historial_ids">
                                     <div class="timeline">
-                                        <t t-foreach="design.revision_log_ids.sorted('create_date', reverse=True)" t-as="log">
+                                        <t t-foreach="design.historial_ids.sorted('create_date', reverse=True)" t-as="log">
                                             <div class="timeline-item">
                                                 <div class="timeline-point">
                                                     <i t-attf-class="fa #{log.tipo == 'aprobacion' and 'fa-check-circle text-success' or 'fa-times-circle text-danger'}"></i>
@@ -316,13 +316,10 @@
                                                         <strong t-esc="log.usuario_id.name"/>
                                                         <small class="text-muted"><span t-field="log.create_date"/></small>
                                                     </div>
-                                                    <p class="mb-1"><span t-field="log.mensaje"/></p>
-                                                    <t t-if="log.observaciones">
-                                                        <small class="text-muted">
-                                                            <i class="fa fa-comment me-1"></i>
-                                                            <span t-field="log.observaciones"/>
-                                                        </small>
-                                                    </t>
+                                                    <p t-if="log.observaciones" class="mb-1 text-muted">
+                                                        <i class="fa fa-comment me-1"></i>
+                                                        <span t-field="log.observaciones"/>
+                                                    </p>
                                                 </div>
                                             </div>
                                         </t>
