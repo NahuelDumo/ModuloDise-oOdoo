@@ -229,17 +229,19 @@ class Design(models.Model):
         })
         
         # Enviar notificación al diseñador si corresponde
-        if record.create_uid and record.create_uid.email:
+        if new_design.create_uid and new_design.create_uid.email:
             template = self.env.ref('modulo_diseno.email_template_diseno_creado', raise_if_not_found=False)
             if template:
                 template.with_context(
-                    lang=record.create_uid.lang,
-                    user_name=record.create_uid.name,
-                ).send_mail(record.id, force_send=True, email_values=None)
+                    lang=new_design.create_uid.lang,
+                    user_name=new_design.create_uid.name,
+                ).send_mail(new_design.id, force_send=True, email_values={
+                    'email_to': new_design.create_uid.email
+                })
         
         categoria_id = vals.get('categoria_id')
         if not categoria_id:
-            return record
+            return new_design
 
         plantilla = self.env['design.checklist_template'].search([
             ('categoria_id', '=', categoria_id),
