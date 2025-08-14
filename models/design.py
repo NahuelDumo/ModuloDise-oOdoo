@@ -400,7 +400,7 @@ class Design(models.Model):
         self.ensure_one()
         
         # Verificar que se haya subido una imagen
-        if not self.image_ids:
+        if not self.attachment_ids:
             raise UserError(_("Debe subir una imagen del diseño antes de continuar."))
         
         # Actualizar estados
