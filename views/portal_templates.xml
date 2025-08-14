@@ -293,10 +293,7 @@
                                     </dd>
                                     
                                     <dt>Diseñador:</dt>
-                                    <dd><span t-field="design.usuario_disenador"/></dd>
-                                    
-                                    <dt>Validador:</dt>
-                                    <dd><span t-field="design.usuario_validador"/></dd>
+                                    <dd><span t-field="design.task_id.user_id"/></dd>
                                 </dl>
                             </div>
                         </div>
