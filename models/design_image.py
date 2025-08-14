@@ -7,6 +7,16 @@ class DesignAttachment(models.Model):
     _description = 'Adjunto de Diseño'
     _order = 'sequence, id'
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        # Asegurarse de que cada nuevo adjunto tenga un token de acceso
+        for vals in vals_list:
+            if 'access_token' not in vals:
+                record = self.new(vals)
+                record._portal_ensure_token()
+                vals['access_token'] = record.access_token
+        return super().create(vals_list)
+
     name = fields.Char('Nombre de archivo', required=True)
     file_data = fields.Binary('Adjunto', required=True, attachment=True)
     mimetype = fields.Char('Tipo de archivo', compute='_compute_mimetype', store=True)
