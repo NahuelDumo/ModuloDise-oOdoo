@@ -5,7 +5,7 @@ from datetime import datetime
 class Design(models.Model):
     _name = "design.design"
     _description = "Diseño"
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'portal.mixin']
     _order = "create_date desc"
     
     # Lista de campos que se pueden editar después de subir el diseño
@@ -65,6 +65,14 @@ class Design(models.Model):
     # Campos calculados para permisos
     is_designer = fields.Boolean(compute='_compute_user_roles', string='Is Designer')
     is_validator = fields.Boolean(compute='_compute_user_roles', string='Is Validator')
+
+    access_url = fields.Char(
+        'Portal URL', compute='_compute_access_url',
+        help='URL para que el usuario pueda acceder a este objeto a través del portal.')
+
+    def _compute_access_url(self):
+        for record in self:
+            record.access_url = f'/my/design/{record.id}'
     
     def _compute_user_roles(self):
         for record in self:
