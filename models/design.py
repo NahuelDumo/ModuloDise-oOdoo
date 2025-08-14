@@ -30,7 +30,7 @@ class Design(models.Model):
 
     checklist_ids = fields.One2many("design.checklist_item", "design_id", string="Checklist")
 
-    visible_para_cliente = fields.Boolean("Visible al cliente", default=False, tracking=True)
+    visible_para_cliente = fields.Boolean("Visible al cliente", default=True, tracking=True)
     aprobado_cliente = fields.Boolean("Aprobado por el cliente", default=False, tracking=True)
 
     rechazado = fields.Boolean("Rechazado", default=False, tracking=True)
