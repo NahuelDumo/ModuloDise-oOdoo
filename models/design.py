@@ -15,8 +15,7 @@ class Design(models.Model):
     ]
 
     name = fields.Char("Nombre del diseño", required=True, tracking=True)
-    image_ids = fields.One2many('design.image', 'design_id', string='Imágenes del diseño')
-    image = fields.Binary("Imagen principal", compute='_compute_main_image', store=True, tracking=True)
+    attachment_ids = fields.One2many('design.image', 'design_id', string='Adjuntos del diseño')
     cliente_id = fields.Many2one("res.partner", string="Cliente", required=True, tracking=True)
     task_id = fields.Many2one("project.task", string="Tarea asociada", tracking=True)
 
@@ -510,13 +509,24 @@ class Design(models.Model):
             },
         }
 
-    @api.depends('image_ids')
-    def _compute_main_image(self):
+    @api.constrains('attachment_ids')
+    def _check_attachments(self):
         for record in self:
-            if record.image_ids:
-                record.image = record.image_ids[0].image
-            else:
-                record.image = False
+            if record.attachment_ids:
+                image_count = 0
+                for attachment in record.attachment_ids:
+                    # Contar imágenes
+                    if attachment.mimetype and attachment.mimetype.startswith('image'):
+                        image_count += 1
+                    
+                    # Validar tamaño de PDF
+                    if attachment.mimetype == 'application/pdf':
+                        if attachment.file_size > 10 * 1024 * 1024: # 10 MB
+                            raise ValidationError(_("El archivo PDF '%s' excede el límite de 10 MB.") % attachment.name)
+
+                # Validar cantidad de imágenes
+                if image_count > 20:
+                    raise ValidationError(_("No se pueden subir más de 20 imágenes."))
 
     mensaje_cliente = fields.Text("Mensaje del cliente")
 

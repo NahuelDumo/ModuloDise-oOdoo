@@ -106,15 +106,34 @@
                             <div class="card-body">
                                 <!-- Galería de imágenes -->
                                 <div id="designCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
-                                    <div class="carousel-inner">
-                                        <t t-foreach="design.image_ids" t-as="image" t-key="image.id">
-                                            <div t-attf-class="carousel-item #{'active' if image_index == 0 else ''}">
-                                                <img t-att-src="'/web/image/design.image/' + str(image.id) + '/image/1024x1024'" 
-                                                     class="d-block w-100" alt="Imagen del diseño"/>
+                                    <div class="row">
+                                    <t t-if="design.attachment_ids">
+                                        <t t-foreach="design.attachment_ids" t-as="attachment">
+                                            <div class="col-md-4 mb-3">
+                                                <t t-if="attachment.mimetype and attachment.mimetype.startswith('image')">
+                                                    <a t-att-href="'/web/content/design.image/%s/file_data?download=true' % attachment.id" target="_blank" title="Descargar imagen">
+                                                        <img t-att-src="'/web/image/design.image/%s/file_data' % attachment.id" class="img img-fluid o_portal_attachment_img" alt="attachment.name"/>
+                                                    </a>
+                                                </t>
+                                                <t t-elif="attachment.mimetype == 'application/pdf'">
+                                                    <iframe t-att-src="'/web/content/design.image/%s/file_data' % attachment.id" class="o_portal_pdf_viewer" style="width: 100%; height: 500px; border: 1px solid #dee2e6;"></iframe>
+                                                    <a t-att-href="'/web/content/design.image/%s/file_data?download=true' % attachment.id" class="btn btn-secondary btn-sm mt-1">
+                                                        <i class="fa fa-download"/> Descargar PDF
+                                                    </a>
+                                                </t>
+                                                <t t-else="">
+                                                    <a t-att-href="'/web/content/design.image/%s/file_data?download=true' % attachment.id" class="btn btn-secondary">
+                                                        <i class="fa fa-download"/> <t t-esc="attachment.name"/>
+                                                    </a>
+                                                </t>
                                             </div>
                                         </t>
-                                    </div>
-                                    <t t-if="len(design.image_ids) > 1">
+                                    </t>
+                                    <t t-else="">
+                                        <p>No hay archivos adjuntos.</p>
+                                    </t>
+                                </div>    
+                                <t t-if="len(design.attachment_ids) > 1">
                                         <button class="carousel-control-prev" type="button" data-bs-target="#designCarousel" data-bs-slide="prev">
                                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                             <span class="visually-hidden">Anterior</span>
