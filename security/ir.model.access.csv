@@ -14,3 +14,4 @@ access_design_rechazo_wizard_validador,design.rechazo.wizard validador,model_des
 access_design_subir_diseno_wizard_disenador,design.subir.diseno.wizard disenador,model_design_subir_diseno_wizard,ModuloDisenoOdoo.group_disenador,1,1,1,1
 access_design_subir_diseno_wizard_admin,design.subir.diseno.wizard admin,model_design_subir_diseno_wizard,base.group_system,1,1,1,1
 access_design_image_user,design.image user,model_design_image,base.group_user,1,1,1,1
+access_design_image_portal,design.image portal,model_design_image,base.group_portal,1,0,0,0

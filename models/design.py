@@ -126,7 +126,7 @@ class Design(models.Model):
             raise AccessError(_("Solo los validadores pueden rechazar diseños."))
             
         # Verificar que el diseño esté en un estado que permita el rechazo
-        if self.state not in ['en_revision', 'por_validar']:
+        if self.state not in ['en_revision', 'por_validar', 'cliente']:
             raise UserError(_("No se puede rechazar un diseño en el estado actual."))
             
         return {

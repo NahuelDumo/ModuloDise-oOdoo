@@ -19,7 +19,7 @@
                                 groups="ModuloDisenoOdoo.group_disenador"/>
                         
                         <!-- Botón RECHAZAR solo visible para validadores -->
-                        <button name="abrir_wizard_rechazo" type="object" string="Rechazar diseño"
+                        <button name="action_rechazar_diseno" type="object" string="Rechazar diseño"
                                 class="btn btn-danger"
                                 attrs="{'invisible': [('can_reject', '=', False)]}" 
                                 groups="ModuloDisenoOdoo.group_validador"
