@@ -117,10 +117,6 @@
                                                     </a>
                                                 </li>
                                             </t>
-                                                        <i class="fa fa-download"/> <t t-esc="attachment.name"/>
-                                                    </a>
-                                                </t>
-                                            </div>
                                         </t>
                                     </t>
                                     <t t-else="">
@@ -159,13 +155,33 @@
                                         </t>
                                     </dl>
                                 </div>
-                                
+
                                 <!-- Comentario del Diseñador -->
-                                <div class="mb-4">
+                                <div t-if="design.comentario_disenador" class="mb-4">
                                     <h5>Comentario del Diseñador</h5>
                                     <div class="alert alert-info" role="alert">
-                                        <p class="mb-0" t-field="design.comentario_disenador"/>
+                                        <span t-field="design.comentario_disenador"/>
                                     </div>
+                                </div>
+
+                                <!-- Tus Comentarios (Cliente) -->
+                                <div t-if="design.mensaje_cliente" class="mb-4">
+                                    <h5>Tus Comentarios</h5>
+                                    <div class="alert alert-secondary" role="alert">
+                                        <span t-field="design.mensaje_cliente"/>
+                                    </div>
+                                </div>
+
+                                <!-- Formulario para que el cliente envíe un mensaje -->
+                                <div class="mb-4">
+                                    <h5>Enviar un comentario</h5>
+                                    <form t-attf-action="/my/design/#{design.id}/comment" method="post">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <div class="mb-3">
+                                            <textarea class="form-control" name="mensaje_cliente" rows="3" placeholder="Escribe tu comentario aquí..."></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Enviar comentario</button>
+                                    </form>
                                 </div>
 
                                 <!-- Formulario de aprobación/rechazo -->
