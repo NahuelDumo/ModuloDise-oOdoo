@@ -59,7 +59,7 @@
                                         <t t-name="kanban-box">
                                             <div class="oe_kanban_global_click">
                                                 <div class="o_kanban_image">
-                                                    <t t-if="record.mimetype.raw_value.startsWith('image')">
+                                                    <t t-if="record.mimetype.value &amp;&amp; record.mimetype.value.startsWith('image')">
                                                         <img t-att-src="kanban_image('design.image', 'file_data', record.id.raw_value)" alt="Adjunto"/>
                                                     </t>
                                                     <t t-else="">
