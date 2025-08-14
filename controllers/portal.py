@@ -115,33 +115,19 @@ class DesignPortal(CustomerPortal):
         return request.render("ModuloDisenoOdoo.portal_my_designs", values)
     
     @http.route(['/my/design/<int:design_id>'], type='http', auth="user", website=True, sitemap=False)
-    def portal_my_design(self, design_id, **kw):
+    def portal_my_design(self, design_id, access_token=None, **kw):
         """Muestra los detalles de un diseño específico en el portal."""
-        _logger.warning(f"[PORTAL] Solicitando diseño ID: {design_id}")
-        
         try:
-            # Buscar el diseño asegurando que el usuario tenga acceso
-            design = request.env['design.design'].browse(design_id).sudo()
-            
-            # Verificar que el usuario tenga permiso para ver este diseño
-            domain = self._get_designs_domain()
-            if not design.exists() or design.id not in request.env['design.design'].search(domain).ids:
-                _logger.warning(f"[PORTAL] Acceso denegado al diseño ID: {design_id}")
-                return request.redirect('/my')
-            
-            # Preparar valores para la plantilla
-            values = self._prepare_portal_layout_values()
-            values.update({
-                'design': design,
-                'page_name': 'design',
-            })
-            
-            _logger.warning(f"[PORTAL] Mostrando diseño ID: {design_id}")
-            return request.render("ModuloDisenoOdoo.portal_my_design", values)
-            
-        except Exception as e:
-            _logger.error(f"[PORTAL] Error al mostrar diseño {design_id}: {str(e)}")
-            return request.redirect('/my/designs')
+            design_sudo = self._document_check_access('design.design', design_id, access_token=access_token)
+        except (AccessError, MissingError):
+            return request.redirect('/my')
+
+        values = self._prepare_portal_layout_values()
+        values.update({
+            'design': design_sudo,
+            'page_name': 'design',
+        })
+        return request.render("ModuloDisenoOdoo.portal_my_design", values)
     
     def _prepare_portal_layout_values(self):
         values = super()._prepare_portal_layout_values()
