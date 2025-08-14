@@ -137,7 +137,7 @@ class DesignPortal(CustomerPortal):
             })
             
             _logger.warning(f"[PORTAL] Mostrando diseño ID: {design_id}")
-            return request.render("ModuloListasDeVerificacion.portal_my_design", values)
+            return request.render("ModuloDisenoOdoo.portal_my_design", values)
             
         except Exception as e:
             _logger.error(f"[PORTAL] Error al mostrar diseño {design_id}: {str(e)}")
