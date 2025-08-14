@@ -24,6 +24,7 @@ class RevisionLog(models.Model):
     usuario_id = fields.Many2one("res.users", string="Usuario", required=True)
     observaciones = fields.Text("Observaciones")
     tipo = fields.Selection([
+        ('creacion', 'Creación'),
         ('validacion_disenador', 'Validación Diseñador'),
         ('validacion_validador', 'Validación Validador'),
         ('rechazo', 'Rechazo'),
