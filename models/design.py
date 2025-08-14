@@ -206,6 +206,12 @@ class Design(models.Model):
 
     @api.model
     def create(self, vals):
+        # Asignar cliente desde la tarea si existe
+        if 'task_id' in vals and vals.get('task_id'):
+            task = self.env['project.task'].browse(vals['task_id'])
+            if task.exists() and task.partner_id:
+                if not vals.get('cliente_id'):
+                    vals['cliente_id'] = task.partner_id.id
         # Asegurar que se establezca el usuario creador si no se proporciona
         if 'user_id' not in vals and 'user_id' not in self._context and self.env.uid:
             vals['user_id'] = self.env.uid
@@ -316,6 +322,7 @@ class Design(models.Model):
         
         # Registrar cambios en el historial si es necesario
         if 'state' in vals:
+            
             for record in self:
                 self.env['design.revision_log'].create({
                     'design_id': record.id,
