@@ -122,10 +122,18 @@ class DesignPortal(CustomerPortal):
         except (AccessError, MissingError):
             return request.redirect('/my')
 
+        # Generar tokens de acceso para los adjuntos si no existen
+        for attachment in design_sudo.attachment_ids:
+            if not attachment.access_token:
+                attachment.sudo()._portal_ensure_token()
+
         values = self._prepare_portal_layout_values()
         values.update({
             'design': design_sudo,
             'page_name': 'design',
+            'message': kw.get('message'),
+            'report_type': 'html',
+            'access_token': design_sudo.access_token,
         })
         return request.render("ModuloDisenoOdoo.portal_my_design", values)
     

@@ -126,8 +126,8 @@ class Design(models.Model):
             raise AccessError(_("Solo los validadores pueden rechazar diseños."))
             
         # Verificar que el diseño esté en un estado que permita el rechazo
-        if self.state not in ['en_revision', 'por_validar', 'cliente']:
-            raise UserError(_("No se puede rechazar un diseño en el estado actual."))
+        if self.state not in ['validacion', 'cliente']:
+            raise UserError(_("No se puede rechazar un diseño en el estado actual (solo en validación o cliente)."))
             
         return {
             'name': _('Rechazar Diseño'),
@@ -142,30 +142,56 @@ class Design(models.Model):
         }
         
     def marcar_como_rechazado(self, motivo):
-        """Marca el diseño como rechazado con el motivo proporcionado."""
-        for record in self:
-            # Guardar la información del diseño anterior
-            record.observaciones_rechazo = f"Motivo del rechazo: {motivo}"
-            
-            # Borrar la imagen adjunta
-            record.image_ids = False
-            
-            # Restablecer estados
-            record.rechazado = True  # Campo booleano requerido
-            record.visible_para_cliente = False
-            record.aprobado_cliente = False
-            record.etapa = 'etapa1'  # Volver a la etapa 1 para permitir correcciones
-            record.state = 'rechazado'
-            record.diseño_subido = False  # Permitir subir un nuevo diseño
-            record.fecha_subida_diseno = False  # Limpiar la fecha de subida
-            record.fecha_rechazo = fields.Datetime.now()  # Registrar fecha de rechazo
-            
-            # Registrar en el historial
-            self.env['design.revision_log'].create({
-                'design_id': record.id,
-                'tipo': 'rechazo',
-                'observaciones': f'Diseño rechazado. Motivo: {motivo}'
+        """Marca el diseño como rechazado, limpia los campos y notifica."""
+        self.ensure_one()
+
+        # 1. Registrar en el historial antes de cambiar el estado
+        self.env['design.revision_log'].create({
+            'design_id': self.id,
+            'estado_anterior': self.state,
+            'estado_nuevo': 'rechazado',
+            'observaciones': motivo,
+            'usuario_id': self.env.user.id,
+        })
+
+        # 2. Eliminar todos los adjuntos (ir.attachment)
+        attachments = self.env['ir.attachment'].search([
+            ('res_model', '=', 'design.design'),
+            ('res_id', '=', self.id)
+        ])
+        if attachments:
+            attachments.unlink()
+
+        # 3. Resetear los checklist items
+        for item in self.checklist_ids:
+            item.write({
+                'validado_disenador': False,
+                'validado_validador': False,
+                'fecha_validacion_disenador': None,
+                'fecha_validacion_validador': None,
             })
+
+        # 4. Limpiar campos, excepto los especificados
+        vals_to_clear = {
+            'etapa': 'etapa1',
+            'state': 'rechazado',
+            'rechazado': True,
+            'observaciones_rechazo': motivo,
+            'fecha_rechazo': fields.Datetime.now(),
+            'comentario_validador': '',
+            'comentario_disenador': '',
+            'mensaje_cliente': '',
+            'aprobado_cliente': False,
+            'fecha_aprobacion_cliente': None,
+            'diseño_subido': False, # Permite volver a subir
+            'fecha_subida_diseno': None,
+        }
+        self.write(vals_to_clear)
+
+        # 5. Enviar notificación por correo al diseñador
+        template = self.env.ref('ModuloDisenoOdoo.email_template_diseno_rechazado', raise_if_not_found=False)
+        if template:
+            template.send_mail(self.id, force_send=True)
             
             # Notificar al diseñador
             record.message_post(
