@@ -252,11 +252,11 @@ class Design(models.Model):
             for item in plantilla.item_ids.sorted(key=lambda x: x.orden):
                 self.env['design.checklist_item'].create({
                     'name': item.name,
-                    'design_id': record.id,
+                    'design_id': new_design.id,
                     'comentario': item.comentario_default or '',
                 })
 
-        return record
+        return new_design
 
     @api.depends('state', 'diseño_subido')
     def _compute_can_reject(self):
