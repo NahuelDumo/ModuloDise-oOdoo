@@ -112,28 +112,18 @@
                                             <t t-foreach="design.attachment_ids" t-as="attachment">
                                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                                     <span t-esc="attachment.name"/>
-                                                    <a t-att-href="'/web/content/design.image/%s/datas?download=true' % attachment.id" class="btn btn-sm btn-outline-primary">
+                                                    <a t-att-href="'/web/content/ir.attachment/%s/datas?download=true' % attachment.id" class="btn btn-sm btn-outline-primary">
                                                         <i class="fa fa-download me-1"></i> Descargar
                                                     </a>
                                                 </li>
                                             </t>
                                         </t>
-                                    </t>
-                                    <t t-else="">
-                                        <p>No hay archivos adjuntos.</p>
-                                    </t>
-                                </div>    
-                                <t t-if="len(design.attachment_ids) > 1">
-                                        <button class="carousel-control-prev" type="button" data-bs-target="#designCarousel" data-bs-slide="prev">
-                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                            <span class="visually-hidden">Anterior</span>
-                                        </button>
-                                        <button class="carousel-control-next" type="button" data-bs-target="#designCarousel" data-bs-slide="next">
-                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                            <span class="visually-hidden">Siguiente</span>
-                                        </button>
-                                    </t>
+                                        <t t-else="">
+                                            <li class="list-group-item text-muted">No hay archivos adjuntos.</li>
+                                        </t>
+                                    </ul>
                                 </div>
+                            </div>
                                 
                                 <!-- Información del diseño -->
                                 <div class="mb-4">
