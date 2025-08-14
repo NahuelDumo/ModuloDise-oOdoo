@@ -48,7 +48,9 @@ class DesignPortal(CustomerPortal):
         
         # Dominio final con todos los filtros
         domain = [
-            ('cliente_id', 'child_of', partner.commercial_partner_id.id),
+            '|',
+                ('cliente_id', '=', partner.id),
+                ('cliente_id', 'child_of', partner.commercial_partner_id.id),
             ('visible_para_cliente', '=', True),
             ('state', 'in', ['cliente', 'correcciones_solicitadas', 'aprobado', 'rechazado', 'esperando_cliente'])
         ]

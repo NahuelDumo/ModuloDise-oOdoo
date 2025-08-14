@@ -212,9 +212,7 @@ class Design(models.Model):
             if task.exists() and task.partner_id:
                 if not vals.get('cliente_id'):
                     vals['cliente_id'] = task.partner_id.id
-        # Asegurar que se establezca el usuario creador si no se proporciona
-        if 'user_id' not in vals and 'user_id' not in self._context and self.env.uid:
-            vals['user_id'] = self.env.uid
+
             
         # Crear el registro
         record = super(Design, self).create(vals)
