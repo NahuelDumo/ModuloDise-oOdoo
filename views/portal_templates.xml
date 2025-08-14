@@ -104,25 +104,19 @@
                                 </h5>
                             </div>
                             <div class="card-body">
-                                <!-- Galería de imágenes -->
-                                <div id="designCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
-                                    <div class="row">
-                                    <t t-if="design.attachment_ids">
-                                        <t t-foreach="design.attachment_ids" t-as="attachment">
-                                            <div class="col-md-4 mb-3">
-                                                <t t-if="attachment.mimetype and attachment.mimetype.startswith('image')">
-                                                    <a t-att-href="'/web/content/design.image/%s/file_data?download=true' % attachment.id" target="_blank" title="Descargar imagen">
-                                                        <img t-att-src="'/web/image/design.image/%s/file_data' % attachment.id" class="img img-fluid o_portal_attachment_img" alt="attachment.name"/>
+                                <!-- Archivos adjuntos -->
+                                <div class="mb-4">
+                                    <h5>Archivos Adjuntos</h5>
+                                    <ul class="list-group">
+                                        <t t-if="design.attachment_ids">
+                                            <t t-foreach="design.attachment_ids" t-as="attachment">
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <span t-esc="attachment.name"/>
+                                                    <a t-att-href="'/web/content/design.image/%s/datas?download=true' % attachment.id" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fa fa-download me-1"></i> Descargar
                                                     </a>
-                                                </t>
-                                                <t t-elif="attachment.mimetype == 'application/pdf'">
-                                                    <iframe t-att-src="'/web/content/design.image/%s/file_data' % attachment.id" class="o_portal_pdf_viewer" style="width: 100%; height: 500px; border: 1px solid #dee2e6;"></iframe>
-                                                    <a t-att-href="'/web/content/design.image/%s/file_data?download=true' % attachment.id" class="btn btn-secondary btn-sm mt-1">
-                                                        <i class="fa fa-download"/> Descargar PDF
-                                                    </a>
-                                                </t>
-                                                <t t-else="">
-                                                    <a t-att-href="'/web/content/design.image/%s/file_data?download=true' % attachment.id" class="btn btn-secondary">
+                                                </li>
+                                            </t>
                                                         <i class="fa fa-download"/> <t t-esc="attachment.name"/>
                                                     </a>
                                                 </t>
@@ -298,38 +292,7 @@
                             </div>
                         </div>
                         
-                        <!-- Historial de revisiones -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h6 class="mb-0">Historial de revisiones</h6>
-                            </div>
-                            <div class="card-body">
-                                <t t-if="design.historial_ids">
-                                    <div class="timeline">
-                                        <t t-foreach="design.historial_ids.sorted('create_date', reverse=True)" t-as="log">
-                                            <div class="timeline-item">
-                                                <div class="timeline-point">
-                                                    <i t-attf-class="fa #{log.tipo == 'aprobacion' and 'fa-check-circle text-success' or 'fa-times-circle text-danger'}"></i>
-                                                </div>
-                                                <div class="timeline-content">
-                                                    <div class="d-flex justify-content-between">
-                                                        <strong t-esc="log.usuario_id.name"/>
-                                                        <small class="text-muted"><span t-field="log.create_date"/></small>
-                                                    </div>
-                                                    <p t-if="log.observaciones" class="mb-1 text-muted">
-                                                        <i class="fa fa-comment me-1"></i>
-                                                        <span t-field="log.observaciones"/>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </t>
-                                    </div>
-                                </t>
-                                <t t-else="">
-                                    <p class="text-muted mb-0">No hay historial de revisiones</p>
-                                </t>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
                 
