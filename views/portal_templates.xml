@@ -293,7 +293,7 @@
                                     </dd>
                                     
                                     <dt>Diseñador:</dt>
-                                    <dd><span t-field="design.task_id.user_id"/></dd>
+                                    <dd><span t-if="design.task_id.user_ids" t-esc="design.task_id.user_ids[0].name"/></dd>
                                 </dl>
                             </div>
                         </div>
