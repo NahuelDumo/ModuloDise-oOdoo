@@ -50,27 +50,56 @@
                             <field name="is_validator" invisible="1"/>
                         </group>
 
-                        <group string="Adjuntos">
-                            <field name="attachment_ids" nolabel="1">
-                                <kanban>
+                        <group string="Adjuntos" colspan="2">
+                            <field name="attachment_ids" nolabel="1" widget="many2many_kanban">
+                                <kanban class="o_kanban_mobile">
                                     <field name="mimetype"/>
                                     <field name="name"/>
                                     <field name="id"/>
+                                    <field name="file_size"/>
                                     <templates>
                                         <t t-name="kanban-box">
-                                            <div class="oe_kanban_global_click">
-                                                <div class="o_kanban_image">
-                                                    <t t-if="record.mimetype.raw_value and record.mimetype.raw_value.indexOf('image') === 0">
-                                                        <img t-att-src="kanban_image('design.image', 'file_data', record.id.raw_value)" alt="Adjunto"/>
-                                                    </t>
-                                                    <t t-else="">
-                                                        <i class="fa fa-file-o fa-3x text-muted"/>
-                                                    </t>
-                                                </div>
-                                                <div class="oe_kanban_details">
-                                                    <strong class="o_kanban_record_title">
-                                                        <t t-esc="record.name.raw_value"/>
-                                                    </strong>
+                                            <div class="oe_kanban_global_click" style="width: 200px; height: 250px; margin: 10px;">
+                                                <div class="card h-100">
+                                                    <div class="card-body p-2">
+                                                        <!-- Icono y nombre del archivo -->
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <t t-if="record.mimetype.raw_value and record.mimetype.raw_value.indexOf('image') === 0">
+                                                                <i class="fa fa-file-image-o fa-2x text-success me-2"/>
+                                                            </t>
+                                                            <t t-elif="record.mimetype.raw_value === 'application/pdf'">
+                                                                <i class="fa fa-file-pdf-o fa-2x text-danger me-2"/>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <i class="fa fa-file-o fa-2x text-secondary me-2"/>
+                                                            </t>
+                                                            <div class="flex-grow-1">
+                                                                <h6 class="mb-0 text-truncate" style="font-size: 12px;">
+                                                                    <t t-esc="record.name.raw_value"/>
+                                                                </h6>
+                                                                <small class="text-muted">
+                                                                    <t t-esc="Math.round(record.file_size.raw_value / 1024)"/> KB
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Previsualización de imagen -->
+                                                        <t t-if="record.mimetype.raw_value and record.mimetype.raw_value.indexOf('image') === 0">
+                                                            <div class="text-center mb-2">
+                                                                <img t-att-src="kanban_image('design.image', 'file_data', record.id.raw_value)" 
+                                                                     class="img-fluid rounded" 
+                                                                     style="max-height: 120px; cursor: pointer;"
+                                                                     alt="Adjunto"/>
+                                                            </div>
+                                                        </t>
+                                                        
+                                                        <!-- Botones de acción -->
+                                                        <div class="d-flex gap-1 mt-auto">
+                                                            <button class="btn btn-sm btn-outline-primary flex-fill" type="button">
+                                                                <i class="fa fa-download"/> Ver
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </t>
