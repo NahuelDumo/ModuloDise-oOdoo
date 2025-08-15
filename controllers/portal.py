@@ -135,6 +135,7 @@ class DesignPortal(CustomerPortal):
                 'name': attachment.name,
                 'mimetype': attachment.mimetype,
                 'file_size': attachment.file_size,
+                'access_token': attachment.access_token,
                 'download_url': f'/my/design/attachment/{attachment.id}/download?access_token={attachment.access_token}'
             })
 
