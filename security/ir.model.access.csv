@@ -15,3 +15,5 @@ access_design_subir_diseno_wizard_disenador,design.subir.diseno.wizard disenador
 access_design_subir_diseno_wizard_admin,design.subir.diseno.wizard admin,model_design_subir_diseno_wizard,base.group_system,1,1,1,1
 access_design_image_user,design.image user,model_design_image,base.group_user,1,1,1,1
 access_design_image_portal,design.image portal,model_design_image,base.group_portal,1,0,0,0
+access_mail_message_portal,mail.message portal,mail.model_mail_message,base.group_portal,1,1,1,0
+access_mail_thread_portal,mail.thread portal,mail.model_mail_thread,base.group_portal,1,0,0,0
