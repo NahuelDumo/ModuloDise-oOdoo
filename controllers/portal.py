@@ -146,16 +146,29 @@ class DesignPortal(CustomerPortal):
                     'file_extension': attachment.name.split('.')[-1].lower() if '.' in attachment.name else ''
                 })
 
-        # Obtener mensajes del chatter
+        # Obtener mensajes del chatter - incluir todos los tipos para debug
         messages = []
-        for message in design_sudo.message_ids.filtered(lambda m: m.message_type in ['comment', 'notification']).sorted('create_date', reverse=True):
+        for message in design_sudo.message_ids.sorted('create_date', reverse=False):
+            # Solo mostrar mensajes que no sean internos y tengan contenido
+            if not message.is_internal and message.body:
+                messages.append({
+                    'id': message.id,
+                    'body': message.body,
+                    'author_name': message.author_id.name or 'Sistema',
+                    'date': message.create_date.strftime('%d/%m/%Y %H:%M'),
+                    'message_type': message.message_type,
+                    'is_internal': message.is_internal,
+                })
+        
+        # Agregar mensaje de prueba si no hay mensajes
+        if not messages:
             messages.append({
-                'id': message.id,
-                'body': message.body,
-                'author_name': message.author_id.name or 'Sistema',
-                'date': message.create_date.strftime('%d/%m/%Y %H:%M'),
-                'message_type': message.message_type,
-                'is_internal': message.is_internal,
+                'id': 0,
+                'body': '<p>¡Bienvenido al sistema de mensajería! Aquí aparecerán todos los mensajes entre el cliente y el equipo de diseño.</p>',
+                'author_name': 'Sistema',
+                'date': '15/08/2025 00:40',
+                'message_type': 'notification',
+                'is_internal': False,
             })
 
         values = self._prepare_portal_layout_values()
