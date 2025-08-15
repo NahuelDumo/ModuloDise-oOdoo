@@ -128,18 +128,23 @@ class DesignPortal(CustomerPortal):
             if not attachment.access_token:
                 attachment.sudo()._portal_ensure_token()
                 
-        # Construir URLs de descarga para cada adjunto usando rutas de portal
+        # Construir datos de archivos usando base64 directamente (sin URLs externas)
         attachments = []
         for attachment in design_sudo.attachment_ids:
-            attachments.append({
-                'id': attachment.id,
-                'name': attachment.name,
-                'mimetype': attachment.mimetype,
-                'file_size': attachment.file_size,
-                'access_token': attachment.access_token,
-                'download_url': f'/web/content/ir.attachment/{attachment.id}/datas/{attachment.name}?access_token={attachment.access_token}',
-                'preview_url': f'/web/content/ir.attachment/{attachment.id}/datas?access_token={attachment.access_token}'
-            })
+            # Obtener los datos del archivo en base64
+            file_data = attachment.datas
+            if file_data:
+                # Crear data URL para descarga y previsualización
+                data_url = f"data:{attachment.mimetype or 'application/octet-stream'};base64,{file_data.decode('utf-8')}"
+                
+                attachments.append({
+                    'id': attachment.id,
+                    'name': attachment.name,
+                    'mimetype': attachment.mimetype,
+                    'file_size': attachment.file_size,
+                    'data_url': data_url,
+                    'file_extension': attachment.name.split('.')[-1].lower() if '.' in attachment.name else ''
+                })
 
         values = self._prepare_portal_layout_values()
         values['attachments'] = attachments

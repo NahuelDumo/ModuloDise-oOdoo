@@ -114,24 +114,24 @@
                                             <div class="list-group-item">
                                                 <div class="d-flex w-100 justify-content-between mb-2">
                                                     <h6 class="mb-1"><span t-esc="attachment['name']"/></h6>
-                                                    <a t-att-href="attachment['download_url']" class="btn btn-sm btn-outline-secondary">
+                                                    <a t-att-href="attachment['data_url']" t-att-download="attachment['name']" class="btn btn-sm btn-outline-secondary">
                                                         <i class="fa fa-download"/> Descargar
                                                     </a>
                                                 </div>
 
                                                 <!-- Mostrar previsualización para imágenes y PDFs -->
                                                 <div class="mt-2">
-                                                    <t t-if="'image' in attachment['name'].lower() or (attachment['mimetype'] and 'image' in attachment['mimetype'])">
+                                                    <t t-if="attachment['file_extension'] in ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'] or (attachment['mimetype'] and 'image' in attachment['mimetype'])">
                                                         <!-- Previsualización de imagen -->
                                                         <div class="text-center">
-                                                            <img t-att-src="attachment['preview_url']" 
+                                                            <img t-att-src="attachment['data_url']" 
                                                                  class="img-fluid rounded border" 
                                                                  style="max-height: 300px; cursor: pointer;"
                                                                  t-att-alt="attachment['name']"
                                                                  onclick="window.open(this.src, '_blank')"/>
                                                         </div>
                                                     </t>
-                                                    <t t-elif="attachment['mimetype'] == 'application/pdf' or attachment['name'].lower().endswith('.pdf')">
+                                                    <t t-elif="attachment['file_extension'] == 'pdf' or attachment['mimetype'] == 'application/pdf'">
                                                         <!-- Previsualización de PDF -->
                                                         <div class="text-center">
                                                             <div class="border rounded p-3" style="background-color: #f8f9fa;">
@@ -139,7 +139,7 @@
                                                                 <br/>
                                                                 <small class="text-muted">Vista previa de PDF</small>
                                                                 <br/>
-                                                                <a t-att-href="attachment['preview_url']" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                                                                <a t-att-href="attachment['data_url']" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
                                                                     <i class="fa fa-eye"></i> Ver PDF
                                                                 </a>
                                                             </div>
