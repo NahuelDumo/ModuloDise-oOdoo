@@ -161,8 +161,11 @@ class DesignPortal(CustomerPortal):
         # Obtener mensajes del chatter - incluir todos los tipos para debug
         messages = []
         for message in design_sudo.message_ids.sorted('create_date', reverse=False):
-            # Solo mostrar mensajes que no sean internos y tengan contenido
-            if not message.is_internal and message.body:
+            # Solo mostrar notas del chatter (subtype_id es mail.mt_note)
+            if (message.message_type == 'comment' and 
+                message.subtype_id and 
+                message.subtype_id.xml_id == 'mail.mt_note' and 
+                message.body):
                 messages.append({
                     'id': message.id,
                     'body': message.body,
@@ -309,6 +312,7 @@ class DesignPortal(CustomerPortal):
             _logger.error(f"Error en _document_check_access: {str(e)}", exc_info=True)
             raise
     
+    
     @route(['/my/design/<int:design_id>/message'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
     def portal_design_message(self, design_id, access_token=None, **kw):
         try:
@@ -324,11 +328,11 @@ class DesignPortal(CustomerPortal):
         
         message_body = kw.get('message_body', '').strip()
         if message_body:
-            # Publicar mensaje en el chatter nativo de Odoo
+            # CAMBIO IMPORTANTE: Usar mail.mt_note para que sea visible en el portal
             design_sudo.sudo().message_post(
                 body=message_body,
                 message_type='comment',
-                subtype_xmlid='mail.mt_comment',
+                subtype_xmlid='mail.mt_note',  # ← CAMBIO AQUÍ: Era 'mail.mt_comment'
                 author_id=request.env.user.partner_id.id
             )
         
@@ -354,11 +358,11 @@ class DesignPortal(CustomerPortal):
                 'mensaje_cliente': mensaje_cliente
             })
             
-            # Publicar mensaje en el chatter
+            # CAMBIO IMPORTANTE: Usar mail.mt_note para que sea visible en el portal
             design_sudo.sudo().message_post(
                 body=f"<p><strong>Comentario del cliente:</strong></p><p>{mensaje_cliente}</p>",
                 message_type='comment',
-                subtype_xmlid='mail.mt_comment'
+                subtype_xmlid='mail.mt_note'  # ← CAMBIO AQUÍ: Era 'mail.mt_comment'
             )
         
         return request.redirect(f'/my/design/{design_id}?access_token={access_token or design_sudo.access_token}')
