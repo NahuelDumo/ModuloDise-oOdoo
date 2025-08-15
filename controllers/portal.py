@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import base64
 from odoo import http, _
 
 _logger = logging.getLogger(__name__)
@@ -264,3 +265,70 @@ class DesignPortal(CustomerPortal):
         except Exception as e:
             _logger.error(f"Error en _document_check_access: {str(e)}", exc_info=True)
             raise
+    
+    @route(['/my/design/attachment/<int:attachment_id>/download'], type='http', auth="user", methods=['GET'], website=True)
+    def download_attachment(self, attachment_id, access_token=None, **kw):
+        """Descargar un archivo adjunto de un diseño"""
+        try:
+            # Obtener el attachment
+            attachment = request.env['ir.attachment'].sudo().browse(attachment_id)
+            
+            if not attachment.exists():
+                return request.not_found()
+            
+            # Verificar el access_token si se proporciona
+            if access_token and attachment.access_token != access_token:
+                return request.not_found()
+            
+            # Verificar que el usuario tenga acceso al diseño asociado
+            design = request.env['design.design'].search([('attachment_ids', 'in', attachment_id)], limit=1)
+            if design:
+                try:
+                    self._document_check_access('design.design', design.id)
+                except (AccessError, MissingError):
+                    return request.not_found()
+            
+            # Preparar la respuesta de descarga
+            if attachment.datas:
+                content = base64.b64decode(attachment.datas)
+                headers = [
+                    ('Content-Type', attachment.mimetype or 'application/octet-stream'),
+                    ('Content-Length', len(content)),
+                    ('Content-Disposition', f'attachment; filename="{attachment.name}"')
+                ]
+                return request.make_response(content, headers)
+            else:
+                return request.not_found()
+                
+        except Exception as e:
+            _logger.error(f"Error descargando attachment {attachment_id}: {str(e)}", exc_info=True)
+            return request.not_found()
+    
+    @route(['/my/design/<int:design_id>/comment'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
+    def submit_comment(self, design_id, mensaje_cliente='', **post):
+        """Enviar un comentario del cliente sobre el diseño"""
+        try:
+            design_sudo = self._document_check_access('design.design', design_id)
+        except (AccessError, MissingError):
+            return request.redirect('/my')
+            
+        # Verificar que el usuario tenga acceso a este diseño
+        partner = request.env.user.partner_id
+        if design_sudo.cliente_id not in partner | partner.commercial_partner_id:
+            return request.redirect('/my')
+            
+        # Guardar el comentario
+        if mensaje_cliente.strip():
+            design_sudo.sudo().write({
+                'mensaje_cliente': mensaje_cliente.strip(),
+            })
+            
+            # Crear un mensaje en el chatter
+            design_sudo.sudo().message_post(
+                body=f"Comentario del cliente: {mensaje_cliente.strip()}",
+                message_type='comment',
+                author_id=request.env.user.partner_id.id
+            )
+        
+        # Redirigir de vuelta al diseño con mensaje de éxito
+        return request.redirect(f"/my/design/{design_id}?message=comment_sent")
