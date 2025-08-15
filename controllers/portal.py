@@ -131,8 +131,8 @@ class DesignPortal(CustomerPortal):
         # Construir datos de archivos usando base64 directamente (sin URLs externas)
         attachments = []
         for attachment in design_sudo.attachment_ids:
-            # Obtener los datos del archivo en base64
-            file_data = attachment.datas
+            # Obtener los datos del archivo en base64 (usando file_data del modelo design.image)
+            file_data = attachment.file_data
             if file_data:
                 # Crear data URL para descarga y previsualización
                 data_url = f"data:{attachment.mimetype or 'application/octet-stream'};base64,{file_data.decode('utf-8')}"
