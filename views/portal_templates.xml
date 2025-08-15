@@ -131,7 +131,7 @@
                                             </div>
                                             </t>
                                         </t>
-                                        <t t-else>
+                                        <t t-else="">
                                             <div class="alert alert-info">No hay archivos adjuntos.</div>
                                         </t>
                                     </div>
