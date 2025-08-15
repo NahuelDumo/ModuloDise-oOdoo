@@ -93,11 +93,11 @@
                                                             </div>
                                                         </t>
                                                         
-                                                        <!-- Botones de acción -->
-                                                        <div class="d-flex gap-1 mt-auto">
-                                                            <button class="btn btn-sm btn-outline-primary flex-fill" type="button">
-                                                                <i class="fa fa-download"/> Ver
-                                                            </button>
+                                                        <!-- Información adicional -->
+                                                        <div class="text-center mt-auto">
+                                                            <small class="text-muted">
+                                                                <i class="fa fa-eye"/> Clic para ver
+                                                            </small>
                                                         </div>
                                                     </div>
                                                 </div>
