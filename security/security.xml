@@ -155,17 +155,33 @@
     </record>
 
     <!-- Regla para mensajes del portal - solo comentarios desde estado cliente -->
+    <!-- Regla corregida para mensajes del portal - Versión simplificada -->
     <record id="mail_message_rule_portal" model="ir.rule">
-        <field name="name">Portal: mensajes desde estado cliente</field>
+        <field name="name">Portal: acceso a mensajes de diseños</field>
         <field name="model_id" ref="mail.model_mail_message"/>
         <field name="domain_force">[
-            ('model', '=', 'design.design'),
-            ('message_type', '=', 'comment')
+            ('model', '=', 'design.design')
         ]</field>
         <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
         <field name="perm_read" eval="True"/>
         <field name="perm_write" eval="True"/>
         <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- IMPORTANTE: También necesitas agregar esta regla adicional para ir.attachment -->
+    <record id="ir_attachment_rule_portal" model="ir.rule">
+        <field name="name">Portal: acceso a adjuntos de diseños</field>
+        <field name="model_id" ref="base.model_ir_attachment"/>
+        <field name="domain_force">[
+            '|',
+                ('res_model', '=', 'design.design'),
+                ('res_model', '=', 'mail.message')
+        ]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
         <field name="perm_unlink" eval="False"/>
     </record>
 </odoo>
