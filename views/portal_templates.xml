@@ -107,37 +107,32 @@
                             <div class="card-body">
                                 <!-- Archivos adjuntos con previsualización -->
                                 <div class="mb-4">
-                                    <h5>Archivos Adjuntos</h5>
-                                    <div class="list-group">
-                                        <t t-if="design.attachment_ids">
-                                            <t t-foreach="design.attachment_ids" t-as="attachment">
-                                                <div class="list-group-item">
-                                                    <div class="d-flex w-100 justify-content-between mb-2">
-                                                        <h6 class="mb-1"><span t-esc="attachment.name"/></h6>
-                                                        <a t-att-href="attachment.download_url" class="btn btn-sm btn-outline-secondary">
-                                                            <i class="fa fa-download"/> Descargar
-                                                        </a>
-                                                    </div>
-
-                                                    <!-- Previsualización de Imagen -->
-                                                    <t t-if="'image' in attachment.mimetype and attachment.mimetype != 'image/svg+xml'">
-                                                        <img t-att-src="file_url" class="img-fluid rounded border" alt="Vista previa" style="max-height: 400px;"/>
-                                                    </t>
-
-                                                    <!-- Previsualización de PDF -->
-                                                    <t t-elif="attachment.mimetype == 'application/pdf'">
-                                                        <iframe t-att-src="file_url" style="width:100%; height:600px;" frameborder="0"></iframe>
-                                                    </t>
-
-                                                    <!-- Mensaje para otros tipos de archivo -->
-                                                    <t t-else="">
-                                                        <p class="text-muted"><i class="fa fa-file-o me-2"></i>No hay previsualización disponible para este tipo de archivo.</p>
-                                                    </t>
+                                    <h5 class="mt-3">Archivos Adjuntos</h5>
+                                    <div class="list-group mb-4">
+                                        <t t-if="attachments_info">
+                                            <t t-foreach="attachments_info" t-as="attachment">
+                                            <div class="list-group-item">
+                                                <div class="d-flex w-100 justify-content-between mb-2">
+                                                    <h6 class="mb-1"><span t-esc="attachment.name"/></h6>
+                                                    <a t-att-href="attachment.download_url" class="btn btn-sm btn-outline-secondary">
+                                                        <i class="fa fa-download"/> Descargar
+                                                    </a>
                                                 </div>
+
+                                                <!-- Mostrar previsualización para imágenes -->
+                                                <t t-if="'image' in attachment.name.lower() or (attachment.mimetype and 'image' in attachment.mimetype)">
+                                                    <div class="mt-2 text-center">
+                                                        <img t-att-src="'/my/design/attachment/' + str(attachment.id) + '/download?access_token=' + attachment.access_token" 
+                                                             class="img-fluid rounded border" 
+                                                             style="max-height: 200px;"
+                                                             t-att-alt="attachment.name"/>
+                                                    </div>
+                                                </t>
+                                            </div>
                                             </t>
                                         </t>
-                                        <t t-else="">
-                                            <div class="list-group-item text-muted">No hay archivos adjuntos.</div>
+                                        <t t-else>
+                                            <div class="alert alert-info">No hay archivos adjuntos.</div>
                                         </t>
                                     </div>
                                 </div>
