@@ -17,3 +17,4 @@ access_design_image_user,design.image user,model_design_image,base.group_user,1,
 access_design_image_portal,design.image portal,model_design_image,base.group_portal,1,0,0,0
 access_mail_message_portal,mail.message portal,mail.model_mail_message,base.group_portal,1,1,1,0
 access_mail_thread_portal,mail.thread portal,mail.model_mail_thread,base.group_portal,1,0,0,0
+access_res_partner_portal,res.partner portal,base.model_res_partner,base.group_portal,1,0,0,0
