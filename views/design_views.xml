@@ -51,7 +51,7 @@
                         </group>
 
                         <group string="Adjuntos" colspan="2">
-                            <field name="attachment_ids" nolabel="1" widget="many2many_kanban" options="{'create': false, 'delete': false}">
+                            <field name="attachment_ids" nolabel="1" widget="many2many_kanban">
                                 <kanban class="o_kanban_mobile o_kanban_ungrouped" default_order="name" style="display: flex !important; flex-direction: row !important; flex-wrap: wrap !important;">
                                     <field name="mimetype"/>
                                     <field name="name"/>
