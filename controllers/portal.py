@@ -169,7 +169,7 @@ class DesignPortal(CustomerPortal):
                 messages.append({
                     'id': message.id,
                     'body': message.body,
-                    'author_name': message.author_id.name or 'Sistema',
+                    'author_name': (message.sudo().author_id.name) or 'Sistema',
                     'date': message.create_date.strftime('%d/%m/%Y %H:%M'),
                     'message_type': message.message_type,
                     'is_internal': message.is_internal,
@@ -187,6 +187,13 @@ class DesignPortal(CustomerPortal):
             # No bloquear el portal por errores de acceso a project.task
             task_display_name = ''
             designer_display_name = ''
+
+        # Nombre seguro del cliente
+        cliente_display_name = ''
+        try:
+            cliente_display_name = design_sudo.sudo().cliente_id.display_name or ''
+        except Exception:
+            cliente_display_name = ''
         
         # Agregar mensaje de prueba si no hay mensajes
         if not messages:
@@ -210,6 +217,7 @@ class DesignPortal(CustomerPortal):
             'messages': messages,
             'task_display_name': task_display_name,
             'designer_display_name': designer_display_name,
+            'cliente_display_name': cliente_display_name,
         })
         return request.render("ModuloDisenoOdoo.portal_my_design", values)
     

@@ -295,7 +295,7 @@
                             <div class="card-body">
                                 <dl class="mb-0">
                                     <dt>Cliente:</dt>
-                                    <dd><span t-field="design.cliente_id"/></dd>
+                                    <dd><span t-esc="cliente_display_name"/></dd>
                                     <dt>Tarea asociada:</dt>
                                     <dd>
                                         <t t-if="task_display_name">
