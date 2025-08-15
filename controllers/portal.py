@@ -119,7 +119,13 @@ class DesignPortal(CustomerPortal):
     def portal_my_design(self, design_id, access_token=None, **kw):
         """Muestra los detalles de un diseño específico en el portal."""
         try:
-            design_sudo = self._document_check_access('design.design', design_id, access_token=access_token)
+                     
+            if request.env.user.has_group('base.group_user'):
+                design_sudo = request.env['design.design'].sudo().browse(design_id)
+                if not design_sudo.exists():
+                    return request.redirect('/my')
+            else:
+                design_sudo = self._document_check_access('design.design', design_id, access_token=access_token)
         except (AccessError, MissingError):
             return request.redirect('/my')
 
@@ -300,7 +306,13 @@ class DesignPortal(CustomerPortal):
     @route(['/my/design/<int:design_id>/message'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
     def portal_design_message(self, design_id, access_token=None, **kw):
         try:
-            design_sudo = self._document_check_access('design.design', design_id, access_token=access_token)
+            # Para usuarios internos, usar sudo directamente
+            if request.env.user.has_group('base.group_user'):
+                design_sudo = request.env['design.design'].sudo().browse(design_id)
+                if not design_sudo.exists():
+                    return request.redirect('/my')
+            else:
+                design_sudo = self._document_check_access('design.design', design_id, access_token=access_token)
         except (AccessError, MissingError):
             return request.redirect('/my')
         
@@ -319,7 +331,13 @@ class DesignPortal(CustomerPortal):
     @route(['/my/design/<int:design_id>/comment'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
     def portal_design_comment(self, design_id, access_token=None, **kw):
         try:
-            design_sudo = self._document_check_access('design.design', design_id, access_token=access_token)
+            # Para usuarios internos, usar sudo directamente
+            if request.env.user.has_group('base.group_user'):
+                design_sudo = request.env['design.design'].sudo().browse(design_id)
+                if not design_sudo.exists():
+                    return request.redirect('/my')
+            else:
+                design_sudo = self._document_check_access('design.design', design_id, access_token=access_token)
         except (AccessError, MissingError):
             return request.redirect('/my')
         
