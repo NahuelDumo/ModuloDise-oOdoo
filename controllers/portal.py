@@ -146,8 +146,19 @@ class DesignPortal(CustomerPortal):
                     'file_extension': attachment.name.split('.')[-1].lower() if '.' in attachment.name else ''
                 })
 
+        # Obtener mensajes del chatter
+        messages = []
+        for message in design_sudo.message_ids.filtered(lambda m: m.message_type in ['comment', 'notification']).sorted('create_date', reverse=True):
+            messages.append({
+                'id': message.id,
+                'body': message.body,
+                'author_name': message.author_id.name or 'Sistema',
+                'date': message.create_date.strftime('%d/%m/%Y %H:%M'),
+                'message_type': message.message_type,
+                'is_internal': message.is_internal,
+            })
+
         values = self._prepare_portal_layout_values()
-        values['attachments'] = attachments
         values.update({
             'design': design_sudo,
             'page_name': 'design',
@@ -155,6 +166,7 @@ class DesignPortal(CustomerPortal):
             'report_type': 'html',
             'access_token': design_sudo.access_token,
             'attachments': attachments,
+            'messages': messages,
         })
         return request.render("ModuloDisenoOdoo.portal_my_design", values)
     
@@ -272,31 +284,44 @@ class DesignPortal(CustomerPortal):
             _logger.error(f"Error en _document_check_access: {str(e)}", exc_info=True)
             raise
     
-    @route(['/my/design/<int:design_id>/comment'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
-    def submit_comment(self, design_id, mensaje_cliente='', **post):
-        """Enviar un comentario del cliente sobre el diseño"""
+    @route(['/my/design/<int:design_id>/message'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
+    def portal_design_message(self, design_id, access_token=None, **kw):
         try:
-            design_sudo = self._document_check_access('design.design', design_id)
+            design_sudo = self._document_check_access('design.design', design_id, access_token=access_token)
         except (AccessError, MissingError):
             return request.redirect('/my')
-            
-        # Verificar que el usuario tenga acceso a este diseño
-        partner = request.env.user.partner_id
-        if design_sudo.cliente_id not in partner | partner.commercial_partner_id:
-            return request.redirect('/my')
-            
-        # Guardar el comentario
-        if mensaje_cliente.strip():
-            design_sudo.sudo().write({
-                'mensaje_cliente': mensaje_cliente.strip(),
-            })
-            
-            # Crear un mensaje en el chatter
+        
+        message_body = kw.get('message_body', '').strip()
+        if message_body:
+            # Publicar mensaje en el chatter nativo de Odoo
             design_sudo.sudo().message_post(
-                body=f"Comentario del cliente: {mensaje_cliente.strip()}",
+                body=message_body,
                 message_type='comment',
+                subtype_xmlid='mail.mt_comment',
                 author_id=request.env.user.partner_id.id
             )
         
-        # Redirigir de vuelta al diseño con mensaje de éxito
-        return request.redirect(f"/my/design/{design_id}?message=comment_sent")
+        return request.redirect(f'/my/design/{design_id}?access_token={access_token or design_sudo.access_token}')
+
+    @route(['/my/design/<int:design_id>/comment'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
+    def portal_design_comment(self, design_id, access_token=None, **kw):
+        try:
+            design_sudo = self._document_check_access('design.design', design_id, access_token=access_token)
+        except (AccessError, MissingError):
+            return request.redirect('/my')
+        
+        mensaje_cliente = kw.get('mensaje_cliente', '').strip()
+        if mensaje_cliente:
+            # Actualizar el campo mensaje_cliente
+            design_sudo.sudo().write({
+                'mensaje_cliente': mensaje_cliente
+            })
+            
+            # Publicar mensaje en el chatter
+            design_sudo.sudo().message_post(
+                body=f"<p><strong>Comentario del cliente:</strong></p><p>{mensaje_cliente}</p>",
+                message_type='comment',
+                subtype_xmlid='mail.mt_comment'
+            )
+        
+        return request.redirect(f'/my/design/{design_id}?access_token={access_token or design_sudo.access_token}')
