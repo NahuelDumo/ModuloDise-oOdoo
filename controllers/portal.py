@@ -177,6 +177,19 @@ class DesignPortal(CustomerPortal):
                     'message_type': message.message_type,
                     'is_internal': message.is_internal,
                 })
+
+        # Valores seguros para portal: nombres de tarea y diseñador sin acceder al modelo desde QWeb
+        task_display_name = ''
+        designer_display_name = ''
+        try:
+            task = design_sudo.sudo().task_id
+            if task:
+                task_display_name = task.name or ''
+                designer_display_name = (task.user_ids[:1].name) or ''
+        except Exception:
+            # No bloquear el portal por errores de acceso a project.task
+            task_display_name = ''
+            designer_display_name = ''
         
         # Agregar mensaje de prueba si no hay mensajes
         if not messages:
@@ -198,6 +211,8 @@ class DesignPortal(CustomerPortal):
             'access_token': design_sudo.access_token,
             'attachments': attachments,
             'messages': messages,
+            'task_display_name': task_display_name,
+            'designer_display_name': designer_display_name,
         })
         return request.render("ModuloDisenoOdoo.portal_my_design", values)
     

@@ -298,16 +298,16 @@
                                     <dd><span t-field="design.cliente_id"/></dd>
                                     <dt>Tarea asociada:</dt>
                                     <dd>
-                                        <t t-if="design.task_id">
-                                            <a t-att-href="'/web#id=' + str(design.task_id.id) + '&amp;model=project.task&amp;view_type=form'" target="_blank">
+                                        <t t-if="task_display_name">
+                                            <span>
                                                 <i class="fa fa-tasks me-1"></i>
-                                                <span t-field="design.task_id.name"/>
-                                            </a>
+                                                <t t-esc="task_display_name"/>
+                                            </span>
                                         </t>
                                         <t t-else="">No hay tarea asociada</t>
                                     </dd>
                                     <dt>Diseñador:</dt>
-                                    <dd><span t-if="design.task_id.user_ids" t-esc="design.task_id.user_ids[0].name"/></dd>
+                                    <dd><span t-esc="designer_display_name or ''"/></dd>
                                 </dl>
                             </div>
                         </div>
