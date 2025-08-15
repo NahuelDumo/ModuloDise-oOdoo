@@ -52,32 +52,32 @@
 
                         <group string="Adjuntos" colspan="2">
                             <field name="attachment_ids" nolabel="1" widget="many2many_kanban">
-                                <kanban class="o_kanban_mobile">
+                                <kanban class="o_kanban_mobile" style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px;">
                                     <field name="mimetype"/>
                                     <field name="name"/>
                                     <field name="id"/>
                                     <field name="file_size"/>
                                     <templates>
                                         <t t-name="kanban-box">
-                                            <div class="oe_kanban_global_click" style="width: 200px; height: 250px; margin: 10px;">
+                                            <div class="oe_kanban_global_click" style="width: 180px; height: 200px; margin: 5px; display: inline-block;">
                                                 <div class="card h-100">
-                                                    <div class="card-body p-2">
+                                                    <div class="card-body p-2 d-flex flex-column">
                                                         <!-- Icono y nombre del archivo -->
                                                         <div class="d-flex align-items-center mb-2">
                                                             <t t-if="record.mimetype.raw_value and record.mimetype.raw_value.indexOf('image') === 0">
-                                                                <i class="fa fa-file-image-o fa-2x text-success me-2"/>
+                                                                <i class="fa fa-file-image-o fa-lg text-success me-2"/>
                                                             </t>
                                                             <t t-elif="record.mimetype.raw_value === 'application/pdf'">
-                                                                <i class="fa fa-file-pdf-o fa-2x text-danger me-2"/>
+                                                                <i class="fa fa-file-pdf-o fa-lg text-danger me-2"/>
                                                             </t>
                                                             <t t-else="">
-                                                                <i class="fa fa-file-o fa-2x text-secondary me-2"/>
+                                                                <i class="fa fa-file-o fa-lg text-secondary me-2"/>
                                                             </t>
                                                             <div class="flex-grow-1">
-                                                                <h6 class="mb-0 text-truncate" style="font-size: 12px;">
+                                                                <h6 class="mb-0 text-truncate" style="font-size: 11px;">
                                                                     <t t-esc="record.name.raw_value"/>
                                                                 </h6>
-                                                                <small class="text-muted">
+                                                                <small class="text-muted" style="font-size: 10px;">
                                                                     <t t-esc="Math.round(record.file_size.raw_value / 1024)"/> KB
                                                                 </small>
                                                             </div>
@@ -85,17 +85,17 @@
                                                         
                                                         <!-- Previsualización de imagen -->
                                                         <t t-if="record.mimetype.raw_value and record.mimetype.raw_value.indexOf('image') === 0">
-                                                            <div class="text-center mb-2">
+                                                            <div class="text-center mb-2 flex-grow-1">
                                                                 <img t-att-src="kanban_image('design.image', 'file_data', record.id.raw_value)" 
                                                                      class="img-fluid rounded" 
-                                                                     style="max-height: 120px; cursor: pointer;"
+                                                                     style="max-height: 100px; cursor: pointer;"
                                                                      alt="Adjunto"/>
                                                             </div>
                                                         </t>
                                                         
                                                         <!-- Información adicional -->
                                                         <div class="text-center mt-auto">
-                                                            <small class="text-muted">
+                                                            <small class="text-muted" style="font-size: 9px;">
                                                                 <i class="fa fa-eye"/> Clic para ver
                                                             </small>
                                                         </div>
