@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import logging
-import base64
 from odoo import http, _
-from odoo.http import request, content_disposition, route
-from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
-from odoo.exceptions import AccessError, MissingError, UserError
 
 _logger = logging.getLogger(__name__)
+
+from odoo.http import request, route
+from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
+from odoo.exceptions import AccessError, MissingError
 
 class DesignPortal(CustomerPortal):
     
@@ -114,29 +114,6 @@ class DesignPortal(CustomerPortal):
         _logger.warning(f"[PORTAL] Mostrando {len(designs)} diseños de un total de {design_count}")
         return request.render("ModuloDisenoOdoo.portal_my_designs", values)
     
-    @http.route(['/my/design/attachment/<int:attachment_id>/download'], type='http', auth="public", website=True, sitemap=False)
-    def download_attachment(self, attachment_id, access_token=None, **kw):
-        """Descargar un archivo adjunto."""
-        try:
-            attachment_sudo = self._document_check_access('design.image', attachment_id, access_token=access_token)
-        except (AccessError, MissingError):
-            return request.redirect('/my')
-            
-        if not attachment_sudo.file_data:
-            return request.not_found()
-            
-        file_content = base64.b64decode(attachment_sudo.file_data)
-        file_name = attachment_sudo.name
-        
-        return request.make_response(
-            file_content,
-            [
-                ('Content-Type', 'application/octet-stream'),
-                ('Content-Disposition', content_disposition(file_name)),
-                ('Content-Length', len(file_content)),
-            ]
-        )
-
     @http.route(['/my/design/<int:design_id>'], type='http', auth="user", website=True, sitemap=False)
     def portal_my_design(self, design_id, access_token=None, **kw):
         """Muestra los detalles de un diseño específico en el portal."""
@@ -145,25 +122,31 @@ class DesignPortal(CustomerPortal):
         except (AccessError, MissingError):
             return request.redirect('/my')
 
-        # Preparar información de adjuntos
-        attachments_info = []
+        # Generar tokens de acceso para los adjuntos si no existen
         for attachment in design_sudo.attachment_ids:
             if not attachment.access_token:
                 attachment.sudo()._portal_ensure_token()
-            attachments_info.append({
+                
+        # Construir URLs de descarga para cada adjunto
+        attachments = []
+        for attachment in design_sudo.attachment_ids:
+            attachments.append({
                 'id': attachment.id,
                 'name': attachment.name,
+                'mimetype': attachment.mimetype,
+                'file_size': attachment.file_size,
                 'download_url': f'/my/design/attachment/{attachment.id}/download?access_token={attachment.access_token}'
             })
 
         values = self._prepare_portal_layout_values()
+        values['attachments'] = attachments
         values.update({
             'design': design_sudo,
             'page_name': 'design',
             'message': kw.get('message'),
             'report_type': 'html',
             'access_token': design_sudo.access_token,
-            'attachments_info': attachments_info
+            'attachments': attachments,
         })
         return request.render("ModuloDisenoOdoo.portal_my_design", values)
     
