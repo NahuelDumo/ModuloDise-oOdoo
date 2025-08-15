@@ -119,15 +119,43 @@
                                                     </a>
                                                 </div>
 
-                                                <!-- Mostrar previsualización para imágenes -->
-                                                <t t-if="'image' in attachment['name'].lower() or (attachment['mimetype'] and 'image' in attachment['mimetype'])">
-                                                    <div class="mt-2 text-center">
-                                                        <img t-att-src="'/web/content/' + str(attachment['id']) + '?access_token=' + attachment['access_token']" 
-                                                             class="img-fluid rounded border" 
-                                                             style="max-height: 200px;"
-                                                             t-att-alt="attachment['name']"/>
-                                                    </div>
-                                                </t>
+                                                <!-- Mostrar previsualización para imágenes y PDFs -->
+                                                <div class="mt-2">
+                                                    <t t-if="'image' in attachment['name'].lower() or (attachment['mimetype'] and 'image' in attachment['mimetype'])">
+                                                        <!-- Previsualización de imagen -->
+                                                        <div class="text-center">
+                                                            <img t-att-src="attachment['preview_url']" 
+                                                                 class="img-fluid rounded border" 
+                                                                 style="max-height: 300px; cursor: pointer;"
+                                                                 t-att-alt="attachment['name']"
+                                                                 onclick="window.open(this.src, '_blank')"/>
+                                                        </div>
+                                                    </t>
+                                                    <t t-elif="attachment['mimetype'] == 'application/pdf' or attachment['name'].lower().endswith('.pdf')">
+                                                        <!-- Previsualización de PDF -->
+                                                        <div class="text-center">
+                                                            <div class="border rounded p-3" style="background-color: #f8f9fa;">
+                                                                <i class="fa fa-file-pdf-o fa-3x text-danger mb-2"></i>
+                                                                <br/>
+                                                                <small class="text-muted">Vista previa de PDF</small>
+                                                                <br/>
+                                                                <a t-att-href="attachment['preview_url']" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                                                                    <i class="fa fa-eye"></i> Ver PDF
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <!-- Otros tipos de archivo -->
+                                                        <div class="text-center">
+                                                            <div class="border rounded p-3" style="background-color: #f8f9fa;">
+                                                                <i class="fa fa-file-o fa-2x text-secondary mb-2"></i>
+                                                                <br/>
+                                                                <small class="text-muted">Archivo adjunto</small>
+                                                            </div>
+                                                        </div>
+                                                    </t>
+                                                </div>
                                             </div>
                                             </t>
                                         </t>

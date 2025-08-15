@@ -128,7 +128,7 @@ class DesignPortal(CustomerPortal):
             if not attachment.access_token:
                 attachment.sudo()._portal_ensure_token()
                 
-        # Construir URLs de descarga para cada adjunto usando rutas estándar de Odoo
+        # Construir URLs de descarga para cada adjunto usando rutas de portal
         attachments = []
         for attachment in design_sudo.attachment_ids:
             attachments.append({
@@ -137,7 +137,8 @@ class DesignPortal(CustomerPortal):
                 'mimetype': attachment.mimetype,
                 'file_size': attachment.file_size,
                 'access_token': attachment.access_token,
-                'download_url': f'/web/content/{attachment.id}?download=true&access_token={attachment.access_token}'
+                'download_url': f'/web/content/ir.attachment/{attachment.id}/datas/{attachment.name}?access_token={attachment.access_token}',
+                'preview_url': f'/web/content/ir.attachment/{attachment.id}/datas?access_token={attachment.access_token}'
             })
 
         values = self._prepare_portal_layout_values()
