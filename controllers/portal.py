@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import logging
+import base64
 from odoo import http, _
-from odoo.http import request, content_disposition
+from odoo.http import request, content_disposition, route
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
 from odoo.exceptions import AccessError, MissingError, UserError
-import base64
+
+_logger = logging.getLogger(__name__)
 
 class DesignPortal(CustomerPortal):
     
