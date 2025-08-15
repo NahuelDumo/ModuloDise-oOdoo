@@ -154,14 +154,22 @@
         <field name="perm_unlink" eval="False"/>
     </record>
 
-    <!-- Regla para mensajes del portal - acceso simplificado -->
+    <!-- Regla para mensajes del portal - solo comentarios desde estado cliente -->
     <record id="mail_message_rule_portal" model="ir.rule">
-        <field name="name">Portal: acceso a mensajes de diseños</field>
+        <field name="name">Portal: mensajes desde estado cliente</field>
         <field name="model_id" ref="mail.model_mail_message"/>
         <field name="domain_force">[
             '&amp;',
                 ('model', '=', 'design.design'),
-                ('partner_ids', 'in', [user.partner_id.id])
+            '&amp;',
+                ('message_type', '=', 'comment'),
+            '&amp;',
+                ('subtype_id', '=', False),
+                ('date', '>=', 
+                    (SELECT COALESCE(MIN(fecha_estado_cliente), '1900-01-01') 
+                     FROM design_design 
+                     WHERE id = mail_message.res_id)
+                )
         ]</field>
         <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
         <field name="perm_read" eval="True"/>

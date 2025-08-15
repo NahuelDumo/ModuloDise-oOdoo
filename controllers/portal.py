@@ -140,8 +140,13 @@ class DesignPortal(CustomerPortal):
             # Obtener los datos del archivo en base64 (usando file_data del modelo design.image)
             file_data = attachment.file_data
             if file_data:
-                # Crear data URL para descarga y previsualización
+                # Crear data URL para descarga
                 data_url = f"data:{attachment.mimetype or 'application/octet-stream'};base64,{file_data.decode('utf-8')}"
+                
+                # Usar image_preview para la previsualización si está disponible
+                preview_url = None
+                if attachment.image_preview:
+                    preview_url = f"data:{attachment.mimetype or 'image/jpeg'};base64,{attachment.image_preview.decode('utf-8')}"
                 
                 attachments.append({
                     'id': attachment.id,
@@ -149,6 +154,7 @@ class DesignPortal(CustomerPortal):
                     'mimetype': attachment.mimetype,
                     'file_size': attachment.file_size,
                     'data_url': data_url,
+                    'preview_url': preview_url or data_url,  # Usar preview si existe, sino usar data_url
                     'file_extension': attachment.name.split('.')[-1].lower() if '.' in attachment.name else ''
                 })
 

@@ -39,6 +39,7 @@ class Design(models.Model):
 
     fecha_aprobacion_cliente = fields.Datetime("Fecha de aprobación del cliente", readonly=True)
     fecha_rechazo = fields.Datetime("Fecha de rechazo", readonly=True)
+    fecha_estado_cliente = fields.Datetime("Fecha cuando pasó a estado cliente", readonly=True)
 
     state = fields.Selection([
         ('borrador', 'Borrador'),
@@ -361,6 +362,10 @@ class Design(models.Model):
         if 'state' in vals:
             
             for record in self:
+                # Registrar fecha cuando pasa a estado cliente
+                if vals["state"] == 'cliente' and record.state != 'cliente':
+                    vals['fecha_estado_cliente'] = fields.Datetime.now()
+                    
                 self.env['design.revision_log'].create({
                     'design_id': record.id,
                     'tipo': 'cambio_estado',

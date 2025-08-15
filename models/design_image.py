@@ -23,6 +23,11 @@ class DesignAttachment(models.Model):
     file_size = fields.Integer('Tamaño (bytes)', compute='_compute_file_size', store=True, help='Tamaño del archivo en bytes')
     design_id = fields.Many2one('design.design', string='Diseño', ondelete='cascade', required=True, help='Diseño relacionado')
     sequence = fields.Integer('Secuencia', default=10, help='Orden de visualización')
+    
+    # Campo para previsualización usando Data
+    image_preview = fields.Image('Vista Previa', max_width=300, max_height=300, 
+                                compute='_compute_image_preview', store=True,
+                                help='Vista previa de la imagen para mostrar en las vistas')
 
     @api.depends('file_data')
     def _compute_mimetype(self):
@@ -41,3 +46,12 @@ class DesignAttachment(models.Model):
                 record.file_size = len(record.file_data)
             else:
                 record.file_size = 0
+
+    @api.depends('file_data', 'mimetype')
+    def _compute_image_preview(self):
+        """Genera la vista previa de la imagen si es un archivo de imagen."""
+        for record in self:
+            if record.file_data and record.mimetype and record.mimetype.startswith('image/'):
+                record.image_preview = record.file_data
+            else:
+                record.image_preview = False
