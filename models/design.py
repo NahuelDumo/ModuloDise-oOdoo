@@ -581,30 +581,8 @@ class Design(models.Model):
         self.state = 'aprobado'
         self.aprobado_cliente = True
         self.fecha_aprobacion_cliente = fields.Datetime.now()
-        
         # Notificar a diseñador y validador
         self.notificar_aprobacion_cliente()
-        
-    def action_rechazado_por_cliente(self, mensaje):
-        """Acción cuando el cliente rechaza el diseño"""
-        self.ensure_one()
-        self.state = 'rechazado'
-        self.rechazado = True
-        self.mensaje_cliente = mensaje
-        self.fecha_rechazo = fields.Datetime.now()
-        
-        # Notificar a diseñador y validador
-        self.notificar_rechazo_cliente()
-        
-    def action_aprobado_con_correcciones(self, mensaje):
-        """Acción cuando el cliente aprueba con correcciones"""
-        self.ensure_one()
-        self.state = 'correcciones_solicitadas'
-        self.mensaje_cliente = mensaje
-        self.fecha_aprobacion_cliente = fields.Datetime.now()
-        
-        # Notificar a diseñador y validador
-        self.notificar_correcciones_solicitadas()
     
     def notificar_aprobacion_cliente(self):
         """Notificar aprobación del cliente"""

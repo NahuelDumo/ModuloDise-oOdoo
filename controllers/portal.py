@@ -160,12 +160,15 @@ class DesignPortal(CustomerPortal):
 
         # Obtener mensajes del chatter - incluir todos los tipos para debug
         messages = []
+        mt_note = request.env.ref('mail.mt_note', raise_if_not_found=False)
         for message in design_sudo.message_ids.sorted('create_date', reverse=False):
             # Solo mostrar notas del chatter (subtype_id es mail.mt_note)
-            if (message.message_type == 'comment' and 
-                message.subtype_id and 
-                message.subtype_id.xml_id == 'mail.mt_note' and 
-                message.body):
+            if (
+                message.message_type == 'comment'
+                and message.subtype_id
+                and mt_note and message.subtype_id.id == mt_note.id
+                and message.body
+            ):
                 messages.append({
                     'id': message.id,
                     'body': message.body,
