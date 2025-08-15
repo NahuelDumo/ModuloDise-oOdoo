@@ -161,8 +161,7 @@
         <field name="model_id" ref="mail.model_mail_message"/>
         <field name="domain_force">[
             ('model', '=', 'design.design'),
-            ('message_type', '=', 'comment'),
-            ('subtype_id', '=', ref('mail.mt_note'))
+            ('message_type', '=', 'comment')
         ]</field>
         <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
         <field name="perm_read" eval="True"/>
@@ -176,17 +175,8 @@
         <field name="name">Portal: adjuntos de notas</field>
         <field name="model_id" ref="base.model_ir_attachment"/>
         <field name="domain_force">[
-            '|',
-                '&amp;',
-                    ('res_model', '=', 'design.design'),
-                    ('res_field', '=', 'attachment_ids'),
-                '&amp;',
-                    ('res_model', '=', 'mail.message'),
-                    ('res_id', 'in', [msg.id for msg in env['mail.message'].search([
-                        ('model', '=', 'design.design'),
-                        ('message_type', '=', 'comment'),
-                        ('subtype_id', '=', ref('mail.mt_note'))
-                    ])])
+            ('res_model', '=', 'design.design'),
+            ('res_field', '=', 'attachment_ids')
         ]</field>
         <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
         <field name="perm_read" eval="True"/>
