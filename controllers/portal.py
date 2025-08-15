@@ -128,7 +128,7 @@ class DesignPortal(CustomerPortal):
             if not attachment.access_token:
                 attachment.sudo()._portal_ensure_token()
                 
-        # Construir URLs de descarga para cada adjunto
+        # Construir URLs de descarga para cada adjunto usando rutas estándar de Odoo
         attachments = []
         for attachment in design_sudo.attachment_ids:
             attachments.append({
@@ -137,7 +137,7 @@ class DesignPortal(CustomerPortal):
                 'mimetype': attachment.mimetype,
                 'file_size': attachment.file_size,
                 'access_token': attachment.access_token,
-                'download_url': f'/my/design/attachment/{attachment.id}/download?access_token={attachment.access_token}'
+                'download_url': f'/web/content/{attachment.id}?download=true&access_token={attachment.access_token}'
             })
 
         values = self._prepare_portal_layout_values()
@@ -265,44 +265,6 @@ class DesignPortal(CustomerPortal):
         except Exception as e:
             _logger.error(f"Error en _document_check_access: {str(e)}", exc_info=True)
             raise
-    
-    @route(['/my/design/attachment/<int:attachment_id>/download'], type='http', auth="user", methods=['GET'], website=True)
-    def download_attachment(self, attachment_id, access_token=None, **kw):
-        """Descargar un archivo adjunto de un diseño"""
-        try:
-            # Obtener el attachment
-            attachment = request.env['ir.attachment'].sudo().browse(attachment_id)
-            
-            if not attachment.exists():
-                return request.not_found()
-            
-            # Verificar el access_token si se proporciona
-            if access_token and attachment.access_token != access_token:
-                return request.not_found()
-            
-            # Verificar que el usuario tenga acceso al diseño asociado
-            design = request.env['design.design'].search([('attachment_ids', 'in', attachment_id)], limit=1)
-            if design:
-                try:
-                    self._document_check_access('design.design', design.id)
-                except (AccessError, MissingError):
-                    return request.not_found()
-            
-            # Preparar la respuesta de descarga
-            if attachment.datas:
-                content = base64.b64decode(attachment.datas)
-                headers = [
-                    ('Content-Type', attachment.mimetype or 'application/octet-stream'),
-                    ('Content-Length', len(content)),
-                    ('Content-Disposition', f'attachment; filename="{attachment.name}"')
-                ]
-                return request.make_response(content, headers)
-            else:
-                return request.not_found()
-                
-        except Exception as e:
-            _logger.error(f"Error descargando attachment {attachment_id}: {str(e)}", exc_info=True)
-            return request.not_found()
     
     @route(['/my/design/<int:design_id>/comment'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
     def submit_comment(self, design_id, mensaje_cliente='', **post):

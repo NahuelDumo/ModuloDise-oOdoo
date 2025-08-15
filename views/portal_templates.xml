@@ -122,7 +122,7 @@
                                                 <!-- Mostrar previsualización para imágenes -->
                                                 <t t-if="'image' in attachment['name'].lower() or (attachment['mimetype'] and 'image' in attachment['mimetype'])">
                                                     <div class="mt-2 text-center">
-                                                        <img t-att-src="'/my/design/attachment/' + str(attachment['id']) + '/download?access_token=' + attachment['access_token']" 
+                                                        <img t-att-src="'/web/content/' + str(attachment['id']) + '?access_token=' + attachment['access_token']" 
                                                              class="img-fluid rounded border" 
                                                              style="max-height: 200px;"
                                                              t-att-alt="attachment['name']"/>
