@@ -154,17 +154,11 @@
         <field name="perm_unlink" eval="False"/>
     </record>
 
-    <!-- Regla para mensajes del portal - acceso a mensajes donde es seguidor -->
+    <!-- Regla para mensajes del portal - acceso a todos los mensajes de diseños accesibles -->
     <record id="mail_message_rule_portal" model="ir.rule">
         <field name="name">Portal: acceso a mensajes de diseños</field>
         <field name="model_id" ref="mail.model_mail_message"/>
-        <field name="domain_force">[
-            '&amp;',
-                ('model', '=', 'design.design'),
-            '|',
-                ('partner_ids', 'in', [user.partner_id.id]),
-                ('author_id', '=', user.partner_id.id)
-        ]</field>
+        <field name="domain_force">[('model', '=', 'design.design')]</field>
         <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
         <field name="perm_read" eval="True"/>
         <field name="perm_write" eval="True"/>
