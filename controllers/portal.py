@@ -305,6 +305,10 @@ class DesignPortal(CustomerPortal):
     def _document_check_access(self, model_name, document_id, access_token=None):
         """Verificar acceso a un documento de manera segura para usuarios del portal"""
         try:
+            # Si no es nuestro modelo personalizado, delegar al comportamiento estándar del portal
+            if model_name != 'design.design':
+                return super()._document_check_access(model_name, document_id, access_token=access_token)
+
             # Obtener el registro con el usuario actual
             document = request.env[model_name].browse(document_id)
             
@@ -314,10 +318,10 @@ class DesignPortal(CustomerPortal):
                 raise MissingError(_("El documento no existe o fue eliminado"))
                 
             # Verificar que el usuario sea el cliente asignado al diseño
-            if document.cliente_id.id != request.env.user.partner_id.id:
+            if not hasattr(document, 'cliente_id') or document.cliente_id.id != request.env.user.partner_id.id:
                 _logger.warning(
                     f"Acceso denegado: Usuario {request.env.user.id} intentó acceder "
-                    f"al diseño {document_id} que pertenece al cliente {document.cliente_id.id}"
+                    f"al diseño {document_id} que pertenece al cliente {getattr(document, 'cliente_id', False) and document.cliente_id.id}"
                 )
                 raise AccessError(_("No tiene permiso para acceder a este diseño"))
                 
