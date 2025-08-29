@@ -606,3 +606,45 @@ class Design(models.Model):
         template = self.env.ref('ModuloDisenoOdoo.email_template_correcciones_solicitadas', raise_if_not_found=False)
         if template:
             template.send_mail(self.id, force_send=True)
+        def action_solicitar_correcciones(self, mensaje_cliente):
+        """Acción cuando el cliente aprueba con correcciones"""
+        self.ensure_one()
+
+        # Incrementar contador de modificaciones
+        self.contador_modificaciones += 1
+        self.ultimo_mensaje_cliente = mensaje_cliente
+        self.state = 'correcciones_solicitadas'
+
+        # Registrar en historial
+        self.env['design.revision_log'].create({
+            'design_id': self.id,
+            'usuario_id': self.env.user.id,
+            'tipo': 'correcciones_cliente',
+            'observaciones': mensaje_cliente or 'Cliente solicitó correcciones'
+        })
+
+        # Notificar al diseñador/validador
+        self.notificar_correcciones_solicitadas()
+        return True
+
+    def action_rechazado_por_cliente(self, motivo):
+        """Acción cuando el cliente rechaza el diseño desde el portal"""
+        self.ensure_one()
+
+        self.rechazado = True
+        self.state = 'rechazado'
+        self.observaciones_rechazo = motivo
+        self.fecha_rechazo = fields.Datetime.now()
+
+        # Registrar en historial
+        self.env['design.revision_log'].create({
+            'design_id': self.id,
+            'usuario_id': self.env.user.id,
+            'tipo': 'rechazo_cliente',
+            'observaciones': motivo or 'Cliente rechazó el diseño'
+        })
+
+        # Notificar al diseñador/validador
+        self.notificar_rechazo_cliente()
+        return True
+

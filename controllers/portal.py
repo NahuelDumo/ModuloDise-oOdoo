@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import base64
-from odoo import http, _
+from odoo import http, fields, _
 
 _logger = logging.getLogger(__name__)
 
@@ -54,7 +54,8 @@ class DesignPortal(CustomerPortal):
                 ('cliente_id', '=', partner.id),
                 ('cliente_id', 'child_of', partner.commercial_partner_id.id),
             ('visible_para_cliente', '=', True),
-            ('state', 'in', ['cliente', 'correcciones_solicitadas', 'aprobado', 'rechazado', 'esperando_cliente'])
+            ('state', 'in', ['cliente', 'correcciones_solicitadas', 'aprobado', 'rechazado'])
+
         ]
         
         _logger.info(f"[PORTAL] Dominio de búsqueda: {domain}")
@@ -211,6 +212,7 @@ class DesignPortal(CustomerPortal):
             'design': design_sudo,
             'page_name': 'design',
             'message': kw.get('message'),
+            'error': kw.get('error'),  # Agregado para manejar errores
             'report_type': 'html',
             'access_token': design_sudo.access_token,
             'attachments': attachments,
@@ -229,6 +231,7 @@ class DesignPortal(CustomerPortal):
     
     @route(['/my/design/approve'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
     def approve_design(self, design_id, message='', **post):
+        """Aprobar diseño por parte del cliente"""
         try:
             design_sudo = self._document_check_access('design.design', int(design_id))
         except (AccessError, MissingError):
@@ -236,24 +239,32 @@ class DesignPortal(CustomerPortal):
             
         # Verificar que el usuario tenga acceso a este diseño
         partner = request.env.user.partner_id
-        if design_sudo.cliente_id not in partner | partner.commercial_partner_id:
+        if not self._check_design_access(design_sudo, partner):
             return request.redirect('/my')
             
-        # Aprobar el diseño
-        if hasattr(design_sudo, 'action_aprobado_por_cliente'):
+        try:
+            # Aprobar el diseño usando el método del modelo
             design_sudo.sudo().action_aprobado_por_cliente()
-        else:
-            # Fallback manual si no existe el método
-            design_sudo.sudo().write({
-                'state': 'aprobado',
-                'fecha_aprobacion_cliente': request.env.cr.now(),
-            })
-        
-        # Redirigir con mensaje de éxito
-        return request.redirect(f"/my/design/{design_id}?message=design_approved")
+            
+            # Agregar mensaje del cliente si existe
+            if message and message.strip():
+                design_sudo.sudo().message_post(
+                    body=f"<p><strong>Comentario del cliente al aprobar:</strong></p><p>{message}</p>",
+                    message_type='comment',
+                    subtype_xmlid='mail.mt_comment',
+                    author_id=request.env.user.partner_id.id
+                )
+            
+            # Redirigir con mensaje de éxito
+            return request.redirect(f"/my/design/{design_id}?message=design_approved")
+            
+        except Exception as e:
+            _logger.error(f"Error al aprobar diseño: {str(e)}")
+            return request.redirect(f"/my/design/{design_id}?error=approval_error")
     
     @route(['/my/design/approve-with-changes'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
     def approve_with_changes_design(self, design_id, message='', **post):
+        """Aprobar diseño con correcciones por parte del cliente"""
         try:
             design_sudo = self._document_check_access('design.design', int(design_id))
         except (AccessError, MissingError):
@@ -261,7 +272,7 @@ class DesignPortal(CustomerPortal):
             
         # Verificar que el usuario tenga acceso a este diseño
         partner = request.env.user.partner_id
-        if design_sudo.cliente_id not in partner | partner.commercial_partner_id:
+        if not self._check_design_access(design_sudo, partner):
             return request.redirect('/my')
             
         # Verificar límite de modificaciones (máximo 3)
@@ -269,38 +280,19 @@ class DesignPortal(CustomerPortal):
             return request.redirect(f"/my/design/{design_id}?error=max_modifications_reached")
             
         try:
-            # Aprobar con correcciones
-            if hasattr(design_sudo, 'action_aprobado_con_correcciones'):
-                design_sudo.sudo().action_aprobado_con_correcciones(message)
-            else:
-                # Fallback manual
-                design_sudo.sudo().write({
-                    'state': 'correcciones_solicitadas',
-                    'ultimo_mensaje_cliente': message,
-                    'contador_modificaciones': design_sudo.contador_modificaciones + 1,
-                    'aprobado_cliente': False,
-                    'fecha_aprobacion_cliente': False,
-                    'diseño_subido': False  # Permite volver a subir el diseño
-                })
-                
-                # Registrar en el historial
-                self.env['design.revision_log'].create({
-                    'design_id': design_sudo.id,
-                    'usuario_id': self.env.user.id,
-                    'tipo': 'correcciones_solicitadas',
-                    'observaciones': f'Correcciones solicitadas por el cliente. Modificación #{design_sudo.contador_modificaciones}'
-                })
+            # Solicitar correcciones usando el método del modelo
+            design_sudo.sudo().action_solicitar_correcciones(message or "Cliente solicita correcciones")
             
             # Redirigir con mensaje de éxito
-            return request.redirect(f"/my/design/{design_id}?message=design_approved_with_changes")
+            return request.redirect(f"/my/design/{design_id}?message=design_corrections_requested")
             
         except Exception as e:
-            # Registrar el error y redirigir con mensaje de error
-            _logger.error(f"Error al procesar las correcciones solicitadas: {str(e)}")
+            _logger.error(f"Error al solicitar correcciones: {str(e)}")
             return request.redirect(f"/my/design/{design_id}?error=error_processing_changes")
     
     @route(['/my/design/reject'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
     def reject_design(self, design_id, message='', **post):
+        """Rechazar diseño por parte del cliente"""
         try:
             design_sudo = self._document_check_access('design.design', int(design_id))
         except (AccessError, MissingError):
@@ -308,21 +300,25 @@ class DesignPortal(CustomerPortal):
             
         # Verificar que el usuario tenga acceso a este diseño
         partner = request.env.user.partner_id
-        if design_sudo.cliente_id not in partner | partner.commercial_partner_id:
+        if not self._check_design_access(design_sudo, partner):
             return request.redirect('/my')
             
-        # Rechazar el diseño
-        if hasattr(design_sudo, 'action_rechazado_por_cliente'):
-            design_sudo.sudo().action_rechazado_por_cliente(message)
-        else:
-            # Fallback manual
-            design_sudo.sudo().write({
-                'state': 'rechazado',
-                'ultimo_mensaje_cliente': message,
-            })
-        
-        # Redirigir con mensaje de éxito
-        return request.redirect(f"/my/design/{design_id}?message=design_rejected")
+        try:
+            # Rechazar el diseño usando el método del modelo
+            design_sudo.sudo().action_rechazado_por_cliente(message or "Cliente rechaza el diseño")
+            
+            # Redirigir con mensaje de éxito
+            return request.redirect(f"/my/design/{design_id}?message=design_rejected")
+            
+        except Exception as e:
+            _logger.error(f"Error al rechazar diseño: {str(e)}")
+            return request.redirect(f"/my/design/{design_id}?error=rejection_error")
+    
+    def _check_design_access(self, design, partner):
+        """Verificar que el partner tiene acceso al diseño"""
+        return (design.cliente_id.id == partner.id or 
+                design.cliente_id.id in partner.commercial_partner_id.child_ids.ids or
+                design.cliente_id.id == partner.commercial_partner_id.id)
     
     def _document_check_access(self, model_name, document_id, access_token=None):
         """Verificar acceso a un documento de manera segura para usuarios del portal"""
@@ -339,11 +335,12 @@ class DesignPortal(CustomerPortal):
                 _logger.warning(f"Documento {model_name} ID {document_id} no encontrado")
                 raise MissingError(_("El documento no existe o fue eliminado"))
                 
-            # Verificar que el usuario sea el cliente asignado al diseño
-            if not hasattr(document, 'cliente_id') or document.cliente_id.id != request.env.user.partner_id.id:
+            # Verificar que el usuario sea el cliente asignado al diseño usando el método auxiliar
+            partner = request.env.user.partner_id
+            if not self._check_design_access(document, partner):
                 _logger.warning(
                     f"Acceso denegado: Usuario {request.env.user.id} intentó acceder "
-                    f"al diseño {document_id} que pertenece al cliente {getattr(document, 'cliente_id', False) and document.cliente_id.id}"
+                    f"al diseño {document_id} que pertenece al cliente {document.cliente_id.id}"
                 )
                 raise AccessError(_("No tiene permiso para acceder a este diseño"))
                 
@@ -361,9 +358,9 @@ class DesignPortal(CustomerPortal):
             _logger.error(f"Error en _document_check_access: {str(e)}", exc_info=True)
             raise
     
-    
     @route(['/my/design/<int:design_id>/message'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
     def portal_design_message(self, design_id, access_token=None, **kw):
+        """Enviar mensaje desde el portal"""
         try:
             # Para usuarios internos, usar sudo directamente
             if request.env.user.has_group('base.group_user'):
@@ -389,6 +386,7 @@ class DesignPortal(CustomerPortal):
 
     @route(['/my/design/<int:design_id>/comment'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
     def portal_design_comment(self, design_id, access_token=None, **kw):
+        """Agregar comentario desde el portal"""
         try:
             # Para usuarios internos, usar sudo directamente
             if request.env.user.has_group('base.group_user'):
