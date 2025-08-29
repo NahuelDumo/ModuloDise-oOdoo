@@ -606,7 +606,7 @@ class Design(models.Model):
         template = self.env.ref('ModuloDisenoOdoo.email_template_correcciones_solicitadas', raise_if_not_found=False)
         if template:
             template.send_mail(self.id, force_send=True)
-        def action_solicitar_correcciones(self, mensaje_cliente):
+    def action_solicitar_correcciones(self, mensaje_cliente):
         """Acción cuando el cliente aprueba con correcciones"""
         self.ensure_one()
 
