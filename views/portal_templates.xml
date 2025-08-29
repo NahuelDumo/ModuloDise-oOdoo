@@ -330,7 +330,7 @@
                                                     <i class="fa fa-edit me-2"></i>
                                                     Solicitar correcciones
                                                     <span t-if="design.contador_modificaciones &gt;= 0">
-                                                        ({{3 - design.contador_modificaciones}} restantes)
+                                                        (<t t-esc="3 - design.contador_modificaciones"/> restantes)
                                                     </span>
                                                 </button>
                                             </t>
