@@ -244,7 +244,7 @@ class DesignPortal(CustomerPortal):
             
         try:
             # Aprobar el diseño usando el método del modelo
-            design_sudo.sudo().action_aprobado_por_cliente()
+            design_sudo.sudo().marcar_como_aprobado_por_cliente()
             
             # Agregar mensaje del cliente si existe
             if message and message.strip():
@@ -304,8 +304,7 @@ class DesignPortal(CustomerPortal):
             return request.redirect('/my')
             
         try:
-            # Rechazar el diseño usando el método del modelo
-            design_sudo.sudo().action_rechazado_por_cliente(message or "Cliente rechaza el diseño")
+            design_sudo.sudo().marcar_como_rechazado(message or "Cliente rechaza el diseño")
             
             # Redirigir con mensaje de éxito
             return request.redirect(f"/my/design/{design_id}?message=design_rejected")

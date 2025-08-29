@@ -186,6 +186,16 @@
                                     <field name="fecha_rechazo" readonly="1"/>
                                 </group>
                             </page>
+
+                            <!-- NUEVA pestaña para correcciones del cliente -->
+                            <page string="Correcciones del Cliente">
+                                <group>
+                                    <separator string="Última solicitud de corrección"/>
+                                    <field name="ultimo_mensaje_cliente" nolabel="1" readonly="1"
+                                           placeholder="Sin correcciones solicitadas aún"/>
+                                </group>
+                            </page>
+                            
                         </notebook>
                     </sheet>
                     
