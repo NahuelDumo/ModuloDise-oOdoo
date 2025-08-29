@@ -12,7 +12,8 @@ class Design(models.Model):
     _fields_editables_after_upload = [
         'checklist_ids', 'comentario_validador', 'comentario_disenador',
         'visible_para_cliente', 'aprobado_cliente', 'rechazado', 'observaciones_rechazo',
-        'contador_modificaciones', 'ultimo_mensaje_cliente'
+        'contador_modificaciones', 'ultimo_mensaje_cliente', 'state',
+        'fecha_aprobacion_cliente', 'fecha_rechazo'
     ]
 
     name = fields.Char("Nombre del diseño", required=True, tracking=True)

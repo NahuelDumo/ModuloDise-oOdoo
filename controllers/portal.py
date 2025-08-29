@@ -236,18 +236,37 @@ class DesignPortal(CustomerPortal):
             design_sudo = self._document_check_access('design.design', int(design_id))
         except (AccessError, MissingError):
             return request.redirect('/my')
-            
+        
         # Verificar que el usuario tenga acceso a este diseño
         partner = request.env.user.partner_id
         if not self._check_design_access(design_sudo, partner):
             return request.redirect('/my')
-            
+        
         try:
-            # Aprobar el diseño usando el método del modelo
-            design_sudo.sudo().marcar_como_aprobado_por_cliente()
+            # Usar SQL directo para evitar restricciones del método write
+            design_sudo.sudo().env.cr.execute("""
+                UPDATE design_design 
+                SET state = 'aprobado',
+                    aprobado_cliente = true,
+                    rechazado = false,
+                    fecha_aprobacion_cliente = NOW() AT TIME ZONE 'UTC'
+                WHERE id = %s
+                RETURNING id
+            """, (design_sudo.id,))
             
-            # Agregar mensaje del cliente si existe
-            if message and message.strip():
+            # Invalidar la caché para asegurar que se vean los cambios
+            design_sudo.invalidate_cache()
+            
+            # Registrar en el historial
+            design_sudo.env['design.revision_log'].sudo().create({
+                'design_id': design_sudo.id,
+                'usuario_id': request.env.user.id,
+                'tipo': 'aprobacion_cliente',
+                'observaciones': 'Aprobado por el cliente' + (f': {message}' if message else '')
+            })
+            
+            # Agregar mensaje si existe
+            if message:
                 design_sudo.sudo().message_post(
                     body=f"<p><strong>Comentario del cliente al aprobar:</strong></p><p>{message}</p>",
                     message_type='comment',
@@ -259,36 +278,8 @@ class DesignPortal(CustomerPortal):
             return request.redirect(f"/my/design/{design_id}?message=design_approved")
             
         except Exception as e:
-            _logger.error(f"Error al aprobar diseño: {str(e)}")
+            _logger.error(f"Error al aprobar diseño: {str(e)}", exc_info=True)
             return request.redirect(f"/my/design/{design_id}?error=approval_error")
-    
-    @route(['/my/design/approve-with-changes'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
-    def approve_with_changes_design(self, design_id, message='', **post):
-        """Aprobar diseño con correcciones por parte del cliente"""
-        try:
-            design_sudo = self._document_check_access('design.design', int(design_id))
-        except (AccessError, MissingError):
-            return request.redirect('/my')
-            
-        # Verificar que el usuario tenga acceso a este diseño
-        partner = request.env.user.partner_id
-        if not self._check_design_access(design_sudo, partner):
-            return request.redirect('/my')
-            
-        # Verificar límite de modificaciones (máximo 3)
-        if design_sudo.contador_modificaciones >= 3:
-            return request.redirect(f"/my/design/{design_id}?error=max_modifications_reached")
-            
-        try:
-            # Solicitar correcciones usando el método del modelo
-            design_sudo.sudo().action_solicitar_correcciones(message or "Cliente solicita correcciones")
-            
-            # Redirigir con mensaje de éxito
-            return request.redirect(f"/my/design/{design_id}?message=design_corrections_requested")
-            
-        except Exception as e:
-            _logger.error(f"Error al solicitar correcciones: {str(e)}")
-            return request.redirect(f"/my/design/{design_id}?error=error_processing_changes")
     
     @route(['/my/design/reject'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
     def reject_design(self, design_id, message='', **post):
@@ -297,20 +288,44 @@ class DesignPortal(CustomerPortal):
             design_sudo = self._document_check_access('design.design', int(design_id))
         except (AccessError, MissingError):
             return request.redirect('/my')
-            
+        
         # Verificar que el usuario tenga acceso a este diseño
         partner = request.env.user.partner_id
         if not self._check_design_access(design_sudo, partner):
             return request.redirect('/my')
-            
+        
         try:
-            design_sudo.sudo().marcar_como_rechazado(message or "Cliente rechaza el diseño")
+            # Usar SQL directo para evitar restricciones del método write
+            design_sudo.sudo().env.cr.execute("""
+                UPDATE design_design 
+                SET state = 'rechazado',
+                    rechazado = true,
+                    aprobado_cliente = false,
+                    observaciones_rechazo = %s,
+                    fecha_rechazo = NOW() AT TIME ZONE 'UTC'
+                WHERE id = %s
+                RETURNING id
+            """, (message or "Cliente rechaza el diseño", design_sudo.id,))
+            
+            # Invalidar la caché para asegurar que se vean los cambios
+            design_sudo.invalidate_cache()
+            
+            # Registrar en el historial
+            design_sudo.env['design.revision_log'].sudo().create({
+                'design_id': design_sudo.id,
+                'usuario_id': request.env.user.id,
+                'tipo': 'rechazo_cliente',
+                'observaciones': message or 'Cliente rechazó el diseño'
+            })
+            
+            # Notificar al diseñador/validador
+            design_sudo.sudo().notificar_rechazo_cliente()
             
             # Redirigir con mensaje de éxito
             return request.redirect(f"/my/design/{design_id}?message=design_rejected")
             
         except Exception as e:
-            _logger.error(f"Error al rechazar diseño: {str(e)}")
+            _logger.error(f"Error al rechazar diseño: {str(e)}", exc_info=True)
             return request.redirect(f"/my/design/{design_id}?error=rejection_error")
     
     def _check_design_access(self, design, partner):
