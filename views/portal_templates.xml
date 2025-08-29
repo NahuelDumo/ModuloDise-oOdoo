@@ -386,7 +386,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                <form t-att-action="'/my/design/approve'" method="post" class="d-inline">
+                                <form t-attf-action="/my/design/approve?design_id=#{design.id}" method="post" class="d-inline">
                                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                     <input type="hidden" name="design_id" t-att-value="design.id"/>
                                     <button type="submit" class="btn btn-success">Sí, aprobar</button>
@@ -423,7 +423,7 @@
                                     <h5 class="modal-title">Aprobar con correcciones</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                                 </div>
-                                <form t-att-action="'/my/design/approve-with-changes'" method="post">
+                                <form t-attf-action="/my/design/approve-with-changes?design_id=#{design.id}" method="post">
                                     <div class="modal-body">
                                         <p>Por favor, describe las correcciones necesarias:</p>
                                         <textarea name="message" class="form-control" rows="4" required="required"></textarea>
@@ -467,7 +467,7 @@
                                 <h5 class="modal-title">Rechazar diseño</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                             </div>
-                            <form t-att-action="'/my/design/reject'" method="post">
+                            <form t-attf-action="/my/design/reject?design_id=#{design.id}" method="post">
                                 <div class="modal-body">
                                     <p>Por favor, indica el motivo del rechazo:</p>
                                     <textarea name="message" class="form-control" rows="4" required="required"></textarea>
