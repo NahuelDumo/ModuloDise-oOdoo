@@ -281,11 +281,37 @@
                                 <t t-if="design.state in ['cliente', 'correcciones_solicitadas']">
                                     <div class="mt-4 pt-3 border-top">
                                         <h5>Acciones</h5>
+                                        
+                                        <!-- Mensaje de última modificación -->
+                                        <t t-if="design.contador_modificaciones == 2">
+                                            <div class="alert alert-warning mb-3">
+                                                <i class="fa fa-exclamation-triangle me-2"></i>
+                                                <strong>¡Atención!</strong> Esta es tu última modificación disponible. 
+                                                Por favor, revisa cuidadosamente antes de enviar.
+                                            </div>
+                                        </t>
+                                        
                                         <p>Por favor, revisa el diseño y selecciona una opción:</p>
                                         <div class="d-flex gap-2">
-                                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveModal"><i class="fa fa-check me-2"></i>Aprobar</button>
-                                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#approveWithChangesModal"><i class="fa fa-edit me-2"></i>Aprobar con correcciones</button>
-                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal"><i class="fa fa-times me-2"></i>Rechazar</button>
+                                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveModal">
+                                                <i class="fa fa-check me-2"></i>Aprobar
+                                            </button>
+                                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#approveWithChangesModal" 
+                                                    t-att-disabled="design.contador_modificaciones >= 3">
+                                                <i class="fa fa-edit me-2"></i>
+                                                <t t-if="design.contador_modificaciones < 3">
+                                                    Solicitar correcciones 
+                                                    <t t-if="design.contador_modificaciones > 0">
+                                                        ({{3 - design.contador_modificaciones}} restantes)
+                                                    </t>
+                                                </t>
+                                                <t t-else="">
+                                                    Límite de modificaciones alcanzado
+                                                </t>
+                                            </button>
+                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                                                <i class="fa fa-times me-2"></i>Rechazar
+                                            </button>
                                         </div>
                                     </div>
                                 </t>
@@ -348,24 +374,63 @@
                 <!-- Modal de Aprobar con correcciones -->
                 <div class="modal fade" id="approveWithChangesModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Aprobar con correcciones</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                            </div>
-                            <form t-att-action="'/my/design/approve-with-changes'" method="post">
+                        <t t-if="design.contador_modificaciones >= 3">
+                            <div class="modal-content">
+                                <div class="modal-header bg-warning text-white">
+                                    <h5 class="modal-title">Límite de modificaciones alcanzado</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
                                 <div class="modal-body">
-                                    <p>Por favor, describe las correcciones necesarias:</p>
-                                    <textarea name="message" class="form-control" rows="4" required="required"></textarea>
+                                    <div class="alert alert-warning">
+                                        <i class="fa fa-exclamation-triangle me-2"></i>
+                                        Has alcanzado el número máximo de modificaciones permitidas (3).
+                                        Por favor, contacta al equipo de soporte si necesitas asistencia adicional.
+                                    </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                    <input type="hidden" name="design_id" t-att-value="design.id"/>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="submit" class="btn btn-warning">Aprobar con correcciones</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Aprobar con correcciones</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <form t-att-action="'/my/design/approve-with-changes'" method="post">
+                                    <div class="modal-body">
+                                        <p>Por favor, describe las correcciones necesarias:</p>
+                                        <textarea name="message" class="form-control" rows="4" required="required"></textarea>
+                                        <div class="mt-2 text-muted">
+                                            <small>
+                                                <i class="fa fa-info-circle me-1"></i>
+                                                <t t-if="design.contador_modificaciones == 2">
+                                                    <strong>¡Atención!</strong> Esta es tu última modificación disponible.
+                                                </t>
+                                                <t t-else="">
+                                                    Modificaciones restantes: {{3 - design.contador_modificaciones}}
+                                                </t>
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="design_id" t-att-value="design.id"/>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn btn-warning">
+                                            <i class="fa fa-edit me-1"></i>
+                                            <t t-if="design.contador_modificaciones == 2">
+                                                Enviar última modificación
+                                            </t>
+                                            <t t-else="">
+                                                Enviar correcciones
+                                            </t>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </t>
                     </div>
                 </div>
                 

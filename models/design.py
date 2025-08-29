@@ -11,7 +11,8 @@ class Design(models.Model):
     # Lista de campos que se pueden editar después de subir el diseño
     _fields_editables_after_upload = [
         'checklist_ids', 'comentario_validador', 'comentario_disenador',
-        'visible_para_cliente', 'aprobado_cliente', 'rechazado', 'observaciones_rechazo'
+        'visible_para_cliente', 'aprobado_cliente', 'rechazado', 'observaciones_rechazo',
+        'contador_modificaciones', 'ultimo_mensaje_cliente'
     ]
 
     name = fields.Char("Nombre del diseño", required=True, tracking=True)
@@ -62,6 +63,12 @@ class Design(models.Model):
     comentario_disenador = fields.Text("Comentarios del diseñador", 
                                       help="Comentarios del diseñador sobre el diseño",
                                       tracking=True)
+                                      
+    # Campos para control de modificaciones del cliente
+    contador_modificaciones = fields.Integer("Modificaciones solicitadas", default=0, 
+                                           help="Número de veces que el cliente ha solicitado modificaciones")
+    ultimo_mensaje_cliente = fields.Text("Último mensaje del cliente", 
+                                       help="Último mensaje del cliente solicitando correcciones")
                                       
     # Campos calculados para permisos
     is_designer = fields.Boolean(compute='_compute_user_roles', string='Is Designer')

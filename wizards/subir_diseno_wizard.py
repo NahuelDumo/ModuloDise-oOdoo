@@ -14,9 +14,15 @@ class SubirDisenoWizard(models.TransientModel):
         if not self.image:
             raise ValidationError(_("Debe seleccionar una imagen para continuar."))
             
-        # Actualizar el diseño con la nueva imagen
+        # Crear un nuevo registro de adjunto
+        attachment = self.env['design.image'].create({
+            'name': f'Nuevo diseño - {fields.Datetime.now()}',
+            'file_data': self.image,
+            'design_id': self.design_id.id,
+        })
+            
+        # Actualizar el diseño
         self.design_id.write({
-            'image': self.image,
             'diseño_subido': True,
             'fecha_subida_diseno': fields.Datetime.now(),
             'state': 'validacion',

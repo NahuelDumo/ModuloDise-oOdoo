@@ -264,6 +264,13 @@ class DesignPortal(CustomerPortal):
         if design_sudo.cliente_id not in partner | partner.commercial_partner_id:
             return request.redirect('/my')
             
+        # Verificar límite de modificaciones (máximo 3)
+        if design_sudo.contador_modificaciones >= 3:
+            return request.redirect(f"/my/design/{design_id}?error=max_modifications_reached")
+            
+        # Incrementar contador de modificaciones
+        nueva_cuenta = design_sudo.contador_modificaciones + 1
+        
         # Aprobar con correcciones
         if hasattr(design_sudo, 'action_aprobado_con_correcciones'):
             design_sudo.sudo().action_aprobado_con_correcciones(message)
@@ -271,7 +278,8 @@ class DesignPortal(CustomerPortal):
             # Fallback manual
             design_sudo.sudo().write({
                 'state': 'correcciones_solicitadas',
-                'mensaje_cliente': message,
+                'ultimo_mensaje_cliente': message,
+                'contador_modificaciones': nueva_cuenta,
             })
         
         # Redirigir con mensaje de éxito
