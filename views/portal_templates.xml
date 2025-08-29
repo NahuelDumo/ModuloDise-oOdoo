@@ -296,19 +296,21 @@
                                             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveModal">
                                                 <i class="fa fa-check me-2"></i>Aprobar
                                             </button>
-                                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#approveWithChangesModal" 
-                                                    t-att-disabled="design.contador_modificaciones >= 3">
-                                                <i class="fa fa-edit me-2"></i>
-                                                <t t-if="design.contador_modificaciones &lt; 3">
-                                                    Solicitar correcciones 
+                                            <t t-if="design.contador_modificaciones >= 3">
+                                                <button type="button" class="btn btn-warning" disabled="True">
+                                                    <i class="fa fa-edit me-2"></i>
+                                                    Límite de modificaciones alcanzado
+                                                </button>
+                                            </t>
+                                            <t t-else="">
+                                                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#approveWithChangesModal">
+                                                    <i class="fa fa-edit me-2"></i>
+                                                    Solicitar correcciones
                                                     <t t-if="design.contador_modificaciones &gt; 0">
                                                         ({{3 - design.contador_modificaciones}} restantes)
                                                     </t>
-                                                </t>
-                                                <t t-else="">
-                                                    Límite de modificaciones alcanzado
-                                                </t>
-                                            </button>
+                                                </button>
+                                            </t>
                                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
                                                 <i class="fa fa-times me-2"></i>Rechazar
                                             </button>
