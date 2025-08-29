@@ -329,9 +329,9 @@
                                                 <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#approveWithChangesModal">
                                                     <i class="fa fa-edit me-2"></i>
                                                     Solicitar correcciones
-                                                    <t t-if="design.contador_modificaciones &gt; 0">
+                                                    <span t-if="design.contador_modificaciones &gt;= 0">
                                                         ({{3 - design.contador_modificaciones}} restantes)
-                                                    </t>
+                                                    </span>
                                                 </button>
                                             </t>
                                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
