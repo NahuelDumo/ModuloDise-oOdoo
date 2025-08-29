@@ -209,6 +209,29 @@
                                         <span t-field="design.comentario_disenador"/>
                                     </div>
                                 </div>
+                                
+                                <!-- Último mensaje de correcciones del cliente -->
+                                <div t-if="design.ultimo_mensaje_cliente and design.state == 'correcciones_solicitadas'" class="mb-4">
+                                    <h5><i class="fa fa-comment-dots me-2"></i>Última solicitud de correcciones</h5>
+                                    <div class="alert alert-warning" role="alert">
+                                        <div class="d-flex align-items-start">
+                                            <i class="fa fa-exclamation-circle me-2 mt-1"></i>
+                                            <div>
+                                                <p class="mb-2">Has solicitado correcciones para este diseño:</p>
+                                                <div class="border-start border-3 ps-3 ms-2">
+                                                    <p class="mb-0 fst-italic" t-field="design.ultimo_mensaje_cliente"/>
+                                                </div>
+                                                <p class="text-muted small mt-2 mb-0">
+                                                    <i class="fa fa-clock me-1"></i>
+                                                    <span t-esc="design.write_date" t-options='{"widget": "datetime"}'/>
+                                                    <span t-if="design.contador_modificaciones > 0">
+                                                        - Modificación #<span t-esc="design.contador_modificaciones"/>/3
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <!-- Sistema de mensajería nativo -->
                                 <div class="mb-4">
