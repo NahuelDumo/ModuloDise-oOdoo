@@ -299,9 +299,9 @@
                                             <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#approveWithChangesModal" 
                                                     t-att-disabled="design.contador_modificaciones >= 3">
                                                 <i class="fa fa-edit me-2"></i>
-                                                <t t-if="design.contador_modificaciones < 3">
+                                                <t t-if="design.contador_modificaciones &lt; 3">
                                                     Solicitar correcciones 
-                                                    <t t-if="design.contador_modificaciones > 0">
+                                                    <t t-if="design.contador_modificaciones &gt; 0">
                                                         ({{3 - design.contador_modificaciones}} restantes)
                                                     </t>
                                                 </t>
