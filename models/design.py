@@ -580,8 +580,6 @@ class Design(models.Model):
                 if image_count > 20:
                     raise ValidationError(_("No se pueden subir más de 20 imágenes."))
 
-    mensaje_cliente = fields.Text("Mensaje del cliente")
-
     def action_aprobado_por_cliente(self):
         """Acción cuando el cliente aprueba el diseño"""
         self.ensure_one()

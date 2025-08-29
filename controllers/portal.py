@@ -304,7 +304,7 @@ class DesignPortal(CustomerPortal):
             # Fallback manual
             design_sudo.sudo().write({
                 'state': 'rechazado',
-                'mensaje_cliente': message,
+                'ultimo_mensaje_cliente': message,
             })
         
         # Redirigir con mensaje de éxito
@@ -388,9 +388,9 @@ class DesignPortal(CustomerPortal):
         
         mensaje_cliente = kw.get('mensaje_cliente', '').strip()
         if mensaje_cliente:
-            # Actualizar el campo mensaje_cliente
+            # Actualizar el campo ultimo_mensaje_cliente
             design_sudo.sudo().write({
-                'mensaje_cliente': mensaje_cliente
+                'ultimo_mensaje_cliente': mensaje_cliente
             })
             
             # Usar mail.mt_comment para que sea visible en el portal
