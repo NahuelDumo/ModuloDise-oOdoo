@@ -268,22 +268,36 @@ class DesignPortal(CustomerPortal):
         if design_sudo.contador_modificaciones >= 3:
             return request.redirect(f"/my/design/{design_id}?error=max_modifications_reached")
             
-        # Incrementar contador de modificaciones
-        nueva_cuenta = design_sudo.contador_modificaciones + 1
-        
-        # Aprobar con correcciones
-        if hasattr(design_sudo, 'action_aprobado_con_correcciones'):
-            design_sudo.sudo().action_aprobado_con_correcciones(message)
-        else:
-            # Fallback manual
-            design_sudo.sudo().write({
-                'state': 'correcciones_solicitadas',
-                'ultimo_mensaje_cliente': message,
-                'contador_modificaciones': nueva_cuenta,
-            })
-        
-        # Redirigir con mensaje de éxito
-        return request.redirect(f"/my/design/{design_id}?message=design_approved_with_changes")
+        try:
+            # Aprobar con correcciones
+            if hasattr(design_sudo, 'action_aprobado_con_correcciones'):
+                design_sudo.sudo().action_aprobado_con_correcciones(message)
+            else:
+                # Fallback manual
+                design_sudo.sudo().write({
+                    'state': 'correcciones_solicitadas',
+                    'ultimo_mensaje_cliente': message,
+                    'contador_modificaciones': design_sudo.contador_modificaciones + 1,
+                    'aprobado_cliente': False,
+                    'fecha_aprobacion_cliente': False,
+                    'diseño_subido': False  # Permite volver a subir el diseño
+                })
+                
+                # Registrar en el historial
+                self.env['design.revision_log'].create({
+                    'design_id': design_sudo.id,
+                    'usuario_id': self.env.user.id,
+                    'tipo': 'correcciones_solicitadas',
+                    'observaciones': f'Correcciones solicitadas por el cliente. Modificación #{design_sudo.contador_modificaciones}'
+                })
+            
+            # Redirigir con mensaje de éxito
+            return request.redirect(f"/my/design/{design_id}?message=design_approved_with_changes")
+            
+        except Exception as e:
+            # Registrar el error y redirigir con mensaje de error
+            _logger.error(f"Error al procesar las correcciones solicitadas: {str(e)}")
+            return request.redirect(f"/my/design/{design_id}?error=error_processing_changes")
     
     @route(['/my/design/reject'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
     def reject_design(self, design_id, message='', **post):
