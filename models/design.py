@@ -20,7 +20,7 @@ class Design(models.Model):
                 'design_id': record.id,
                 'usuario_id': self.env.user.id,
                 'observaciones': "Diseño eliminado",
-                'tipo': 'eliminacion',
+                'tipo': 'rechazo',
             })
             
         return super(Design, self).unlink()
