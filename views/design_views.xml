@@ -50,8 +50,8 @@
                             <field name="is_validator" invisible="1"/>
                         </group>
 
-                        <group string="Adjuntos" colspan="2">
-                            <field name="attachment_ids" nolabel="1" widget="many2many_kanban">
+                        <group string="Adjuntos" colspan="2" attrs="{'invisible': [('etapa1_completa', '=', False)]}">
+                            <field name="attachment_ids" nolabel="1" widget="many2many_kanban" options="{'no_create': True}">
                                 <kanban class="o_kanban_mobile o_kanban_ungrouped" default_order="name" style="display: flex !important; flex-direction: row !important; flex-wrap: wrap !important;">
                                     <field name="mimetype"/>
                                     <field name="name"/>
@@ -106,6 +106,14 @@
                                     </templates>
                                 </kanban>
                             </field>
+                        </group>
+
+                        <!-- Mensaje cuando la etapa 1 no está completa -->
+                        <group string="Adjuntos" colspan="2" attrs="{'invisible': [('etapa1_completa', '=', True)]}">
+                            <div class="alert alert-warning" role="alert">
+                                <i class="fa fa-exclamation-triangle me-2"></i>
+                                Para poder subir archivos, primero debe completar todos los ítems de la Etapa 1 en la pestaña "Checklist".
+                            </div>
                         </group>
 
                         <notebook>

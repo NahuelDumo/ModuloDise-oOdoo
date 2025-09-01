@@ -44,12 +44,28 @@ class Design(models.Model):
             'context': {'default_design_ids': self.ids, 'default_count': len(self)},
         }
     
+    # Campo calculado para verificar si la etapa 1 está completa
+    etapa1_completa = fields.Boolean(
+        'Etapa 1 Completa',
+        compute='_compute_etapa1_completa',
+        store=True
+    )
+
+    @api.depends('checklist_ids.validado_por_disenador', 'checklist_ids.etapa')
+    def _compute_etapa1_completa(self):
+        for record in self:
+            items_etapa1 = record.checklist_ids.filtered(lambda x: x.etapa == 'etapa1')
+            if not items_etapa1:
+                record.etapa1_completa = False
+            else:
+                record.etapa1_completa = all(item.validado_por_disenador for item in items_etapa1)
+
     # Lista de campos que se pueden editar después de subir el diseño
     _fields_editables_after_upload = [
         'checklist_ids', 'comentario_validador', 'comentario_disenador',
         'visible_para_cliente', 'aprobado_cliente', 'rechazado', 'observaciones_rechazo',
         'contador_modificaciones', 'ultimo_mensaje_cliente', 'state',
-        'fecha_aprobacion_cliente', 'fecha_rechazo'
+        'fecha_aprobacion_cliente', 'fecha_rechazo', 'etapa1_completa'
     ]
 
     name = fields.Char("Nombre del diseño", required=True, tracking=True)
