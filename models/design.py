@@ -546,12 +546,10 @@ class Design(models.Model):
         
         # Verificar que se haya subido una imagen
         if not self.attachment_ids:
-                """.format(self.observaciones_rechazo or 'No se especificó un motivo.')),
-                subject=_("Nueva versión de diseño subida para revisión"),
-                partner_ids=[user.partner_id.id for user in self.env.ref('ModuloDisenoOdoo.group_validador').users]
-            )
+            raise UserError(_("Debe subir al menos un archivo adjunto antes de continuar."))
             
-            # Limpiar observaciones de rechazo después de usarlas
+        # Limpiar observaciones de rechazo después de usarlas
+        if self.observaciones_rechazo:
             self.observaciones_rechazo = False
             
         # Si es la primera vez que se sube el diseño
