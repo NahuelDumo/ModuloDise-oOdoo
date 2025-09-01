@@ -213,7 +213,7 @@
             <field name="name">design.design.tree</field>
             <field name="model">design.design</field>
             <field name="arch" type="xml">
-                <tree string="Diseños" create="false">
+                <tree string="Diseños">
                     <field name="name"/>
                     <field name="cliente_id"/>
                     <field name="categoria_id"/>
