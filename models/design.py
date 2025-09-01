@@ -1,4 +1,5 @@
 from odoo import models, fields, api, _
+from odoo.exceptions import AccessError, UserError
 from odoo.exceptions import ValidationError, UserError
 from datetime import datetime
 
@@ -7,6 +8,41 @@ class Design(models.Model):
     _description = "Diseño"
     _inherit = ['mail.thread', 'mail.activity.mixin', 'portal.mixin']
     _order = "create_date desc"
+    
+    def unlink(self):
+        """Sobrescribir para controlar la eliminación de diseños"""
+        for record in self:
+            if not self.env.user.has_group('base.group_system'):
+                raise AccessError(_("Solo los administradores pueden eliminar diseños."))
+            
+            # Registrar en el historial
+            self.env['design.revision_log'].create({
+                'design_id': record.id,
+                'usuario_id': self.env.user.id,
+                'observaciones': "Diseño eliminado",
+                'tipo': 'eliminacion',
+            })
+            
+        return super(Design, self).unlink()
+        
+    def action_delete_designs(self):
+        """Acción para eliminar múltiples diseños desde la vista de lista"""
+        if not self.env.user.has_group('base.group_system'):
+            raise AccessError(_("Solo los administradores pueden eliminar diseños."))
+            
+        # Verificar si hay algún registro seleccionado
+        if not self:
+            raise UserError(_("No hay registros seleccionados para eliminar."))
+            
+        # Confirmar antes de eliminar
+        return {
+            'name': _('Confirmar eliminación'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'design.delete.confirm',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_design_ids': self.ids, 'default_count': len(self)},
+        }
     
     # Lista de campos que se pueden editar después de subir el diseño
     _fields_editables_after_upload = [
@@ -510,31 +546,6 @@ class Design(models.Model):
         
         # Verificar que se haya subido una imagen
         if not self.attachment_ids:
-            raise UserError(_("Debe subir una imagen del diseño antes de continuar."))
-        
-        # Actualizar estados
-        self.diseño_subido = True
-        self.fecha_subida_diseno = fields.Datetime.now()
-        
-        # Si veníamos de un rechazo, reiniciamos el estado
-        if self.rechazado:
-            self.state = 'validacion'
-            self.etapa = 'etapa1'
-            self.rechazado = False
-            
-            # Registrar en el historial
-            self.env['design.revision_log'].create({
-                'design_id': self.id,
-                'tipo': 'resubida',
-                'observaciones': 'Nueva versión del diseño subida después de rechazo.'
-            })
-            
-            # Notificar al validador
-            self.message_post(
-                body=_("""
-                <p>Se ha subido una nueva versión del diseño después de un rechazo.</p>
-                <p><strong>Motivo del rechazo anterior:</strong> {}</p>
-                <p>Por favor, revise el nuevo diseño.</p>
                 """.format(self.observaciones_rechazo or 'No se especificó un motivo.')),
                 subject=_("Nueva versión de diseño subida para revisión"),
                 partner_ids=[user.partner_id.id for user in self.env.ref('ModuloDisenoOdoo.group_validador').users]

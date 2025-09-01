@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_design_delete_confirm" model="ir.ui.view">
+        <field name="name">design.delete.confirm.view</field>
+        <field name="model">design.delete.confirm</field>
+        <field name="arch" type="xml">
+            <form string="Confirmar eliminación">
+                <sheet>
+                    <group>
+                        <div class="alert alert-warning" role="alert">
+                            <strong>¡Atención!</strong> Estás a punto de eliminar 
+                            <strong><field name="count" widget="integer"/> diseños</strong>.
+                            <p>Esta acción no se puede deshacer.</p>
+                        </div>
+                        <p>¿Estás seguro de que deseas continuar con la eliminación?</p>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm" string="Eliminar" type="object" class="btn-danger" icon="fa-trash"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <act_window id="action_design_delete_confirm"
+                name="Confirmar eliminación de diseños"
+                res_model="design.delete.confirm"
+                view_mode="form"
+                target="new"
+                context="{'default_design_ids': active_ids}"/>
+</odoo>

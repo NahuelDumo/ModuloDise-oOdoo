@@ -208,5 +208,53 @@
                 </form>
             </field>
         </record>
+        <!-- Vista de lista de diseños -->
+        <record id="view_tree_design" model="ir.ui.view">
+            <field name="name">design.design.tree</field>
+            <field name="model">design.design</field>
+            <field name="arch" type="xml">
+                <tree string="Diseños" create="false">
+                    <field name="name"/>
+                    <field name="cliente_id"/>
+                    <field name="categoria_id"/>
+                    <field name="etapa"/>
+                    <field name="state"/>
+                    <field name="fecha_subida_diseno"/>
+                </tree>
+            </field>
+        </record>
+        
+        <!-- Acción para la lista de diseños -->
+        <record id="action_diseno_design" model="ir.actions.act_window">
+            <field name="name">Diseños</field>
+            <field name="res_model">design.design</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Crea tu primer diseño
+                </p>
+            </field>
+        </record>
+        
+        <!-- Acción para eliminar diseños (solo administradores) -->
+        <record id="action_delete_designs" model="ir.actions.server">
+            <field name="name">Eliminar diseños</field>
+            <field name="model_id" ref="model_design_design"/>
+            <field name="binding_model_id" ref="model_design_design"/>
+            <field name="binding_view_types">list,form</field>
+            <field name="groups_id" eval="[(4, ref('base.group_system'))]"/>
+            <field name="state">code</field>
+            <field name="code">
+                if records:
+                    action = records.action_delete_designs()
+            </field>
+        </record>
+        
+        <!-- Actualizar la acción de menú principal para usar la vista de árbol -->
+        <menuitem id="menu_diseno_diseno" 
+                  name="Diseños" 
+                  parent="menu_diseno_operaciones"
+                  action="action_diseno_design"
+                  sequence="10"/>
     </data>
 </odoo>

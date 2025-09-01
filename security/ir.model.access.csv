@@ -1,5 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_design_design_disenador,design.design disenador,model_design_design,ModuloDisenoOdoo.group_disenador,1,1,1,0
+access_design_design_admin,design.design admin,model_design_design,base.group_system,1,1,1,1
 access_design_design_validador,design.design validador,model_design_design,ModuloDisenoOdoo.group_validador,1,1,0,0
 access_design_design_cliente,design.design cliente,model_design_design,ModuloDisenoOdoo.group_cliente,1,0,0,0
 access_design_design_portal,design.design portal,model_design_design,base.group_portal,1,0,0,0
