@@ -123,15 +123,21 @@
                                         
                                         <!-- Campo validado_por_disenador - solo editable por diseñador -->
                                         <field name="validado_por_disenador"
+                                               widget="boolean_toggle"
+                                               options='{"type": "bool"}'
                                                attrs="{
                                                    'readonly': [('current_user_is_designer', '=', False)]
-                                               }"/>
+                                               }"
+                                               on_change="1"/>
                                         
                                         <!-- Campo validado_por_validador - solo editable por validador -->
                                         <field name="validado_por_validador"
+                                               widget="boolean_toggle"
+                                               options='{"type": "bool"}'
                                                attrs="{
                                                    'readonly': [('current_user_is_validator', '=', False)]
-                                               }"/>
+                                               }"
+                                               on_change="1"/>
                                                
                                         <!-- Comentario - editable por ambos -->
                                         <field name="comentario" 
