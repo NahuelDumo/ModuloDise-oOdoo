@@ -1,6 +1,6 @@
 {
     "name": "Módulo de Diseños",
-    "version": "1.0",
+    "version": "1.1",  # Updated for checklist stage loading fix
     "category": "Project",
     "summary": "Gestión de diseños con listas de verificación por etapas y validación",
     "author": "Nahuel Dumo",

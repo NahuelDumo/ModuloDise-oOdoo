@@ -96,10 +96,51 @@ class Design(models.Model):
             record.is_designer = self.env.user.has_group('ModuloDisenoOdoo.group_disenador')
             record.is_validator = self.env.user.has_group('ModuloDisenoOdoo.group_validador')
 
+    def _cargar_checklist_etapa(self):
+        """
+        Carga automáticamente los items de checklist para la etapa actual del diseño.
+        Solo carga la plantilla si existe para la etapa actual.
+        
+        Returns:
+            bool: True si se cargó la plantilla, False si no se encontró
+        """
+        self.ensure_one()
+        
+        # Buscar plantilla para la categoría y etapa actual
+        template = self.env['design.checklist_template'].search([
+            ('categoria_id', '=', self.categoria_id.id),
+            ('etapa', '=', self.etapa)
+        ], limit=1)
+        
+        if not template:
+            _logger.info(f"No se encontró plantilla de checklist para la categoría {self.categoria_id.name} y etapa {self.etapa}")
+            return False
+            
+        try:
+            # Eliminar items de checklist existentes para esta etapa
+            self.checklist_ids.filtered(lambda x: x.etapa == self.etapa).unlink()
+            
+            # Crear nuevos items basados en la plantilla
+            for item_template in template.item_ids:
+                self.env['design.checklist_item'].create({
+                    'name': item_template.name,
+                    'design_id': self.id,
+                    'etapa': self.etapa,
+                    'orden': item_template.orden,
+                })
+                
+            _logger.info(f"Se cargó la plantilla de checklist para la etapa {self.etapa}")
+            return True
+            
+        except Exception as e:
+            _logger.error(f"Error al cargar la plantilla de checklist: {str(e)}")
+            self.message_post(body=f"Error al cargar la plantilla de checklist: {str(e)}", message_type="comment", subtype="mt_comment")
+            return False
+
     @api.depends('checklist_ids.validado_por_disenador', 'checklist_ids.validado_por_validador')
     def _compute_estado_checklist(self):
         for record in self:
-            checklist = record.checklist_ids
+            checklist = record.checklist_ids.filtered(lambda x: x.etapa == record.etapa)
             completo_disenador = checklist and all(item.validado_por_disenador for item in checklist)
             completo_validador = checklist and all(item.validado_por_validador for item in checklist)
 
@@ -109,10 +150,25 @@ class Design(models.Model):
                 record._notificar_a_validadores()
 
             if completo_disenador and completo_validador and record.etapa == 'etapa1':
+                # Guardar el estado actual antes de cambiar a etapa 2
                 record.state = 'cliente'
                 record.etapa = 'etapa2'
                 record.visible_para_cliente = True
-                record.message_post(body="Checklist validado por el validador. Avanzando a Etapa 2.")
+                
+                # Verificar si existe una plantilla para la etapa 2
+                template = self.env['design.checklist_template'].search([
+                    ('categoria_id', '=', record.categoria_id.id),
+                    ('etapa', '=', 'etapa2')
+                ], limit=1)
+                
+                if template:
+                    # Cargar checklist para etapa 2 si existe la plantilla
+                    record._cargar_checklist_etapa()
+                    record.message_post(body="Checklist validado por el validador. Avanzando a Etapa 2 con nueva lista de verificación.")
+                else:
+                    # Mantener la lista actual si no hay plantilla para etapa 2
+                    record.message_post(body="Checklist validado por el validador. Avanzando a Etapa 2 sin cambios en la lista de verificación.")
+                
                 record._notificar_a_disenador()
 
     def _notificar_a_validadores(self):

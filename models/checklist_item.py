@@ -10,6 +10,10 @@ class ChecklistItem(models.Model):
     name = fields.Char("Descripción", required=True)
     orden = fields.Integer("Orden", default=1)
     design_id = fields.Many2one("design.design", string="Diseño relacionado", ondelete="cascade")
+    etapa = fields.Selection([
+        ('etapa1', 'Etapa 1'),
+        ('etapa2', 'Etapa 2')
+    ], string="Etapa", required=True, default='etapa1')
 
     comentario = fields.Text("Comentario")
 
