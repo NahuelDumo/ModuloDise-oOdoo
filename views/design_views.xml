@@ -48,6 +48,7 @@
                             <field name="visible_para_cliente" invisible="1"/>
                             <field name="is_designer" invisible="1"/>
                             <field name="is_validator" invisible="1"/>
+                            <field name="etapa1_completa" invisible="1"/>
                         </group>
 
                         <group string="Adjuntos" colspan="2" attrs="{'invisible': [('etapa1_completa', '=', False)]}">
