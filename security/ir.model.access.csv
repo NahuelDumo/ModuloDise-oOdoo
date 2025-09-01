@@ -14,6 +14,7 @@ access_checklist_template_item_admin,design.checklist_template_item admin,model_
 access_design_rechazo_wizard_validador,design.rechazo.wizard validador,model_design_rechazo_wizard,ModuloDisenoOdoo.group_validador,1,1,1,1
 access_design_subir_diseno_wizard_disenador,design.subir.diseno.wizard disenador,model_design_subir_diseno_wizard,ModuloDisenoOdoo.group_disenador,1,1,1,1
 access_design_subir_diseno_wizard_admin,design.subir.diseno.wizard admin,model_design_subir_diseno_wizard,base.group_system,1,1,1,1
+access_design_delete_confirm_admin,design.delete.confirm admin,model_design_delete_confirm,base.group_system,1,1,1,1
 access_design_image_user,design.image user,model_design_image,base.group_user,1,1,1,1
 access_design_image_portal,design.image portal,model_design_image,base.group_portal,1,0,0,0
 access_mail_message_portal,mail.message portal,mail.model_mail_message,base.group_portal,1,1,1,0
