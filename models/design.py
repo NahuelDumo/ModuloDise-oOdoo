@@ -338,14 +338,14 @@ class Design(models.Model):
             template.send_mail(self.id, force_send=True)
             
             # Notificar al diseñador
-            record.message_post(
+            self.message_post(
                 body=_(f"""
                 <p>El diseño ha sido rechazado por el validador.</p>
                 <p><strong>Motivo del rechazo:</strong> {motivo}</p>
                 <p>Por favor, suba un nuevo diseño con las correcciones solicitadas.</p>
                 """),
                 subject=_("Diseño Rechazado - Se requiere nueva versión"),
-                partner_ids=[record.create_uid.partner_id.id] if record.create_uid.partner_id else []
+                partner_ids=[self.create_uid.partner_id.id] if self.create_uid.partner_id else []
             )
             
             # Enviar notificación por correo
@@ -355,8 +355,8 @@ class Design(models.Model):
                     lang=self.env.user.lang,
                     user_name=self.env.user.name,
                     motivo_rechazo=motivo
-                ).send_mail(record.id, force_send=True, email_values={
-                    'email_to': record.create_uid.email if record.create_uid else False
+                ).send_mail(self.id, force_send=True, email_values={
+                    'email_to': self.create_uid.email if self.create_uid else False
                 })
         return True
 
