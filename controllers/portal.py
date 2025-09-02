@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# UwU
 import logging
 import base64
 from odoo import http, fields, _
