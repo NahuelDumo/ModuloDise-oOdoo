@@ -311,8 +311,8 @@ class Design(models.Model):
             item.write({
                 'validado_por_disenador': False,
                 'validado_por_validador': False,
-                'fecha_validacion_disenador': None,
-                'fecha_validacion_validador': None,
+                'fecha_disenador': None,
+                'fecha_validador': None,
             })
 
         # 4. Limpiar campos, excepto los especificados
