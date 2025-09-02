@@ -309,8 +309,8 @@ class Design(models.Model):
         # 3. Resetear los checklist items
         for item in self.checklist_ids:
             item.write({
-                'validado_disenador': False,
-                'validado_validador': False,
+                'validado_por_disenador': False,
+                'validado_por_validador': False,
                 'fecha_validacion_disenador': None,
                 'fecha_validacion_validador': None,
             })
