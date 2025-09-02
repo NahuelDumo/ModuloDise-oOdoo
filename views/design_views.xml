@@ -110,7 +110,7 @@
                         </group>
 
                         <!-- Mensaje cuando la etapa 1 no está completa -->
-                        <group string="Adjuntos" colspan="2" attrs="{'invisible': [('etapa1_completa', '=', True)]}">
+                        <group string="Adjuntos" colspan="2" attrs="{'invisible': ['|', ('etapa1_completa', '=', True), ('etapa', '=', 'etapa2')]}">
                             <div class="alert alert-warning" role="alert">
                                 <i class="fa fa-exclamation-triangle me-2"></i>
                                 Para poder subir archivos, primero debe completar todos los ítems de la Etapa 1 en la pestaña "Checklist".
