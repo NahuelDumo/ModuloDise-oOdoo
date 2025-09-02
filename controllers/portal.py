@@ -427,3 +427,27 @@ class DesignPortal(CustomerPortal):
             )
         
         return request.redirect(f'/my/design/{design_id}?access_token={access_token or design_sudo.access_token}')
+
+    @route(['/my/design/approve-with-changes'], type='http', auth="user", methods=['POST'], website=True, csrf=True)
+    def approve_with_changes(self, design_id, message='', **post):
+        """Aprobar diseño con correcciones por parte del cliente"""
+        try:
+            design_sudo = self._document_check_access('design.design', int(design_id))
+        except (AccessError, MissingError):
+            return request.redirect('/my')
+        
+        # Verificar que el usuario tenga acceso a este diseño
+        partner = request.env.user.partner_id
+        if not self._check_design_access(design_sudo, partner):
+            return request.redirect('/my')
+        
+        try:
+            # Llamar al método del modelo para manejar las correcciones
+            design_sudo.sudo().action_solicitar_correcciones(message)
+            
+            # Redirigir con mensaje de éxito
+            return request.redirect(f"/my/design/{design_id}?message=corrections_requested")
+            
+        except Exception as e:
+            _logger.error(f"Error al solicitar correcciones: {str(e)}", exc_info=True)
+            return request.redirect(f"/my/design/{design_id}?error=corrections_error")

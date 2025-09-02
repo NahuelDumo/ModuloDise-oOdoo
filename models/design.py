@@ -192,6 +192,48 @@ class Design(models.Model):
             self.message_post(body=f"Error al cargar la plantilla de checklist: {str(e)}", message_type="comment", subtype="mt_comment")
             return False
 
+    def _transicion_a_etapa2_aprobado(self):
+        """
+        Maneja la transición a etapa 2 cuando el diseño es aprobado por el cliente.
+        Si existe plantilla de etapa 2: elimina items de etapa 1 y carga los de etapa 2.
+        Si NO existe plantilla de etapa 2: mantiene los items de etapa 1.
+        """
+        self.ensure_one()
+        
+        # Buscar plantilla de etapa 2 primero
+        template = self.env['design.checklist_template'].search([
+            ('categoria_id', '=', self.categoria_id.id),
+            ('etapa', '=', 'etapa2')
+        ], limit=1)
+        
+        if template:
+            # Si existe plantilla de etapa 2: eliminar items de etapa 1 y cargar etapa 2
+            items_etapa1 = self.checklist_ids.filtered(lambda x: x.etapa == 'etapa1')
+            if items_etapa1:
+                items_etapa1.unlink()
+                _logger.info(f"Eliminados {len(items_etapa1)} items de checklist de etapa 1")
+            
+            # Crear items de etapa 2
+            for item_template in template.item_ids.sorted(lambda x: x.orden):
+                self.env['design.checklist_item'].create({
+                    'name': item_template.name,
+                    'design_id': self.id,
+                    'etapa': 'etapa2',
+                    'orden': item_template.orden,
+                    'comentario': item_template.comentario_default or '',
+                })
+            
+            _logger.info(f"Cargados {len(template.item_ids)} items de checklist para etapa 2")
+            self.message_post(body="Diseño aprobado por cliente. Se ha cargado el checklist de Etapa 2.")
+        else:
+            # Si NO existe plantilla de etapa 2: mantener items de etapa 1
+            _logger.info(f"No se encontró plantilla de etapa 2 para categoría {self.categoria_id.name}. Manteniendo items de etapa 1.")
+            self.message_post(body="Diseño aprobado por cliente. Se mantiene el checklist de Etapa 1 (no hay plantilla para Etapa 2).")
+        
+        # Cambiar a etapa 2 en ambos casos
+        self.etapa = 'etapa2'
+        return True
+
     @api.depends('checklist_ids.validado_por_disenador', 'checklist_ids.validado_por_validador')
     def _compute_estado_checklist(self):
         for record in self:
@@ -694,12 +736,25 @@ class Design(models.Model):
     def marcar_como_aprobado_por_cliente(self):
         """Marca el diseño como aprobado por el cliente"""
         self.ensure_one()
+        
+        # Realizar la transición a etapa 2 con checklist limpio
+        self._transicion_a_etapa2_aprobado()
+        
         self.write({
             'state': 'aprobado',
             'fecha_aprobacion_cliente': fields.Datetime.now(),
             'aprobado_cliente': True,
             'rechazado': False
         })
+        
+        # Registrar en el historial
+        self.env['design.revision_log'].create({
+            'design_id': self.id,
+            'usuario_id': self.env.user.id,
+            'tipo': 'aprobacion_cliente',
+            'observaciones': 'Diseño aprobado por cliente. Transición a Etapa 2 con nuevo checklist.'
+        })
+        
         return True
         
     def marcar_como_rechazado(self, motivo):
