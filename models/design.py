@@ -293,9 +293,8 @@ class Design(models.Model):
         # 1. Registrar en el historial antes de cambiar el estado
         self.env['design.revision_log'].create({
             'design_id': self.id,
-            'estado_anterior': self.state,
-            'estado_nuevo': 'rechazado',
-            'observaciones': motivo,
+            'tipo': 'rechazo',
+            'observaciones': f'Diseño rechazado. Estado anterior: {self.state}. Motivo: {motivo}',
             'usuario_id': self.env.user.id,
         })
 
@@ -360,13 +359,6 @@ class Design(models.Model):
                     'email_to': record.create_uid.email if record.create_uid else False
                 })
         return True
-
-        self.env['design.revision_log'].create({
-            'design_id': self.id,
-            'usuario_id': self.env.user.id,
-            'observaciones': observacion,
-            'tipo': 'rechazo',
-        })
 
 
     @api.model
