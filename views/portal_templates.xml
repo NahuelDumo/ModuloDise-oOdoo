@@ -2,8 +2,8 @@
 <odoo>
     <!-- Heredar la vista principal del portal para agregar el botón de Diseños -->
     <template id="portal_my_home" inherit_id="portal.portal_my_home" name="Portal Home - Diseños">
-        <xpath expr="//div[hasclass('o_portal_my_home')]" position="inside">
-            <div class="list-group">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="after">
+            <div class="list-group" t-if="not is_design_user">
                 <a href="/my/designs" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
                     <div class="d-flex">
                         <i class="fa fa-paint-brush me-2"></i>

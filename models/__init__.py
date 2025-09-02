@@ -5,3 +5,4 @@ from . import checklist_template
 from . import checklist_template_item
 from . import revision_log
 from . import design_image
+from . import res_partner

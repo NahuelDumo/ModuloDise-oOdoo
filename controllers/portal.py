@@ -12,6 +12,20 @@ from odoo.exceptions import AccessError, MissingError
 
 class DesignPortal(CustomerPortal):
     
+    @http.route(['/my', '/my/home'], type='http', auth="user", website=True)
+    def home(self, **kw):
+        """Override del portal home para redireccionar usuarios de diseño"""
+        # Verificar si el usuario actual es un usuario de diseño
+        user = request.env.user
+        partner = user.partner_id
+        
+        if partner.is_design_user:
+            _logger.info(f"[PORTAL] Usuario {user.name} es Usuario Diseño, redirigiendo a /my/designs")
+            return request.redirect('/my/designs')
+        
+        # Si no es usuario de diseño, comportamiento normal
+        return super().home(**kw)
+    
     def _prepare_home_portal_values(self, counters):
         values = super()._prepare_home_portal_values(counters)
         if 'design_count' in counters:
