@@ -9,6 +9,14 @@ class DesignRechazoWizard(models.TransientModel):
     motivo = fields.Text('Motivo del rechazo', required=True, 
                         help='Explique las razones por las que rechaza este diseño')
     
+    @api.model
+    def default_get(self, fields):
+        """Establecer valores por defecto del contexto"""
+        res = super().default_get(fields)
+        if self._context.get('default_design_id'):
+            res['design_id'] = self._context.get('default_design_id')
+        return res
+    
     def action_confirmar_rechazo(self):  # Cambiado para coincidir con la vista
         """Ejecuta el rechazo del diseño"""
         self.ensure_one()
@@ -20,6 +28,10 @@ class DesignRechazoWizard(models.TransientModel):
         # Verificar que el diseño existe y está en estado válido
         if not self.design_id:
             raise UserError(_("No se ha seleccionado un diseño válido."))
+        
+        # Verificar que el motivo no esté vacío
+        if not self.motivo or not self.motivo.strip():
+            raise UserError(_("Debe proporcionar un motivo para el rechazo."))
             
         if self.design_id.state not in ['validacion', 'cliente']:
             raise UserError(_("El diseño no está en un estado que permita el rechazo."))
