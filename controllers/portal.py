@@ -243,27 +243,8 @@ class DesignPortal(CustomerPortal):
             return request.redirect('/my')
         
         try:
-            # Usar SQL directo para evitar restricciones del método write
-            design_sudo.sudo().env.cr.execute("""
-                UPDATE design_design 
-                SET state = 'aprobado',
-                    aprobado_cliente = true,
-                    rechazado = false,
-                    fecha_aprobacion_cliente = NOW() AT TIME ZONE 'UTC'
-                WHERE id = %s
-                RETURNING id
-            """, (design_sudo.id,))
-            
-            # Invalidar la caché para asegurar que se vean los cambios
-            design_sudo.invalidate_cache()
-            
-            # Registrar en el historial
-            design_sudo.env['design.revision_log'].sudo().create({
-                'design_id': design_sudo.id,
-                'usuario_id': request.env.user.id,
-                'tipo': 'aprobacion_cliente',
-                'observaciones': 'Aprobado por el cliente' + (f': {message}' if message else '')
-            })
+            # Llamar al método que maneja la transición completa a etapa2
+            design_sudo.sudo().marcar_como_aprobado_por_cliente()
             
             # Agregar mensaje si existe
             if message:
