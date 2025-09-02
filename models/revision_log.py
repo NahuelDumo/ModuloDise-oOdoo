@@ -31,7 +31,10 @@ class RevisionLog(models.Model):
         ('aprobacion_cliente', 'Aprobación del Cliente'),
         ('cambio_estado', 'Cambio de Estado'),
         ('actualizacion', 'Actualización'),
-        ('comentario', 'Comentario')
+        ('comentario', 'Comentario'),
+        ('eliminacion', 'Eliminación'),
+        ('correcciones_cliente', 'Correcciones del Cliente'),
+        ('rechazo_cliente', 'Rechazo del Cliente')
     ], string="Tipo de acción", required=True, tracking=True)
     
     # Campos de solo lectura
