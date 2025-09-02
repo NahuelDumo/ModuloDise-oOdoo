@@ -13,8 +13,15 @@ class DesignRechazoWizard(models.TransientModel):
     def default_get(self, fields):
         """Establecer valores por defecto del contexto"""
         res = super().default_get(fields)
-        if self._context.get('default_design_id'):
-            res['design_id'] = self._context.get('default_design_id')
+        # Obtener design_id del contexto activo
+        active_id = self._context.get('active_id')
+        default_design_id = self._context.get('default_design_id')
+        
+        if default_design_id:
+            res['design_id'] = default_design_id
+        elif active_id and self._context.get('active_model') == 'design.design':
+            res['design_id'] = active_id
+            
         return res
     
     def action_confirmar_rechazo(self):  # Cambiado para coincidir con la vista

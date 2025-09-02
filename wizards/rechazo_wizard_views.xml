@@ -13,7 +13,7 @@
                         </div>
                         
                         <group>
-                            <field name="design_id" invisible="1"/>
+                            <field name="design_id" invisible="1" force_save="1"/>
                             <field name="motivo" nolabel="1" placeholder="Describa el motivo del rechazo..." class="mt16" style="min-height: 100px;"/>
                         </group>
                         
