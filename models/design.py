@@ -324,7 +324,7 @@ class Design(models.Model):
             'fecha_rechazo': fields.Datetime.now(),
             'comentario_validador': '',
             'comentario_disenador': '',
-            'mensaje_cliente': '',
+            'ultimo_mensaje_cliente': '',
             'aprobado_cliente': False,
             'fecha_aprobacion_cliente': None,
             'diseño_subido': False, # Permite volver a subir
