@@ -51,7 +51,7 @@
                             <field name="etapa1_completa" invisible="1"/>
                         </group>
 
-                        <group string="Adjuntos" colspan="2" attrs="{'invisible': [('etapa1_completa', '=', False)]}">
+                        <group string="Adjuntos" colspan="2" attrs="{'invisible': [('etapa1_completa', '=', False), ('etapa', '=', 'etapa1')]}">
                             <field name="attachment_ids" nolabel="1" widget="many2many_kanban" options="{'no_create': True}">
                                 <kanban class="o_kanban_mobile o_kanban_ungrouped" default_order="name" style="display: flex !important; flex-direction: row !important; flex-wrap: wrap !important;">
                                     <field name="mimetype"/>
