@@ -17,11 +17,20 @@ class DesignRechazoWizard(models.TransientModel):
         active_id = self._context.get('active_id')
         default_design_id = self._context.get('default_design_id')
         
+        # Debugging
+        import logging
+        _logger = logging.getLogger(__name__)
+        _logger.info(f"Wizard context: active_id={active_id}, default_design_id={default_design_id}, active_model={self._context.get('active_model')}")
+        
         if default_design_id:
             res['design_id'] = default_design_id
         elif active_id and self._context.get('active_model') == 'design.design':
             res['design_id'] = active_id
+        elif active_id:
+            # Fallback: usar active_id directamente
+            res['design_id'] = active_id
             
+        _logger.info(f"Setting design_id to: {res.get('design_id')}")
         return res
     
     def action_confirmar_rechazo(self):  # Cambiado para coincidir con la vista
