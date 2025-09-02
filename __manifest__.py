@@ -28,7 +28,7 @@
         "views/design_views.xml",
         "views/checklist_template_views.xml",
         "views/checklist_item_views.xml",
-        "views/res_partner_views.xml",
+        #"views/res_partner_views.xml",
         
         # Vistas de wizards
         "wizards/delete_confirm_wizard_views.xml",
