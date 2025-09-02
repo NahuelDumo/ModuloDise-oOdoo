@@ -243,29 +243,12 @@ class Design(models.Model):
 
             if completo_disenador and record.state == 'borrador':
                 record.state = 'validacion'
-                record.message_post(body="Checklist completado por el diseñador. Esperando validación del validador.")
-                record._notificar_a_validadores()
 
-            if completo_disenador and completo_validador and record.etapa == 'etapa1':
-                # Guardar el estado actual antes de cambiar a etapa 2
+            if completo_validador and record.state == 'validacion':
                 record.state = 'cliente'
-                record.etapa = 'etapa2'
-                record.visible_para_cliente = True
-                
-                # Verificar si existe una plantilla para la etapa 2
-                template = self.env['design.checklist_template'].search([
-                    ('categoria_id', '=', record.categoria_id.id),
-                    ('etapa', '=', 'etapa2')
-                ], limit=1)
-                
-                if template:
-                    # Cargar checklist para etapa 2 si existe la plantilla
-                    record._cargar_checklist_etapa()
-                    record.message_post(body="Checklist validado por el validador. Avanzando a Etapa 2 con nueva lista de verificación.")
-                else:
-                    # Mantener la lista actual si no hay plantilla para etapa 2
-                    record.message_post(body="Checklist validado por el validador. Avanzando a Etapa 2 sin cambios en la lista de verificación.")
-                
+                # NO cambiar etapa ni cargar checklist aquí
+                # La transición a etapa2 solo debe ocurrir cuando el cliente aprueba
+                record.message_post(body="Checklist validado por el validador. Diseño enviado al cliente para aprobación.")
                 record._notificar_a_disenador()
 
     def _notificar_a_validadores(self):
@@ -385,19 +368,6 @@ class Design(models.Model):
             'tipo': 'rechazo',
         })
 
-    def marcar_como_aprobado_por_cliente(self):
-        self.aprobado_cliente = True
-        self.fecha_aprobacion_cliente = fields.Datetime.now()
-        self.etapa = 'etapa2'
-        self.state = 'aprobado'
-
-        # Registrar en el historial
-        self.env['design.revision_log'].create({
-            'design_id': self.id,
-            'usuario_id': self.env.user.id,
-            'observaciones': 'Aprobado por cliente',
-            'tipo': 'aprobacion_cliente',
-        })
 
     @api.model
     def create(self, vals):
@@ -558,24 +528,6 @@ class Design(models.Model):
                 if record._check_checklist_completo() and not record.diseño_subido:
                     record._enviar_notificacion_checklist_completo()
         
-        return result
-
-        for record in self:
-            if 'etapa' in vals and vals['etapa'] == 'etapa2':
-                if not any(item for item in record.checklist_ids if item.name and 'etapa2' in item.name.lower()):
-                    plantilla = self.env['design.checklist_template'].search([
-                        ('categoria_id', '=', record.categoria_id.id),
-                        ('etapa', '=', 'etapa2')
-                    ], limit=1)
-
-                    if plantilla:
-                        for item in plantilla.item_ids.sorted(key=lambda x: x.orden):
-                            self.env['design.checklist_item'].create({
-                                'name': item.name,
-                                'design_id': record.id,
-                                'comentario': item.comentario_default or '',
-                            })
-
         return result
 
     def abrir_wizard_rechazo(self):
