@@ -9,6 +9,11 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='category_id']" position="after">
                     <field name="is_design_user" widget="boolean_toggle"/>
+                    <button name="toggle_design_user" 
+                            string="Alternar Usuario Diseño" 
+                            type="object" 
+                            class="btn-secondary"
+                            attrs="{'invisible': [('is_company', '=', True)]}"/>
                 </xpath>
             </field>
         </record>
