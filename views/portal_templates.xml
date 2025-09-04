@@ -202,14 +202,14 @@
                                     </dl>
                                 </div>
 
-                                <!-- Comentario del Diseñador -->
+                                <!-- Comentario del Diseñador
                                 <div t-if="design.comentario_disenador" class="mb-4">
                                     <h5>Comentario del Diseñador</h5>
                                     <div class="alert alert-info" role="alert">
                                         <span t-field="design.comentario_disenador"/>
                                     </div>
                                 </div>
-                                
+                                 -->
                                 <!-- Último mensaje de correcciones del cliente -->
                                 <div t-if="design.ultimo_mensaje_cliente and design.state == 'correcciones_solicitadas'" class="mb-4">
                                     <h5><i class="fa fa-comment-dots me-2"></i>Última solicitud de correcciones</h5>
@@ -364,8 +364,7 @@
                                         </t>
                                         <t t-else="">No hay tarea asociada</t>
                                     </dd>
-                                    <dt>Diseñador:</dt>
-                                    <dd><span t-esc="designer_display_name or ''"/></dd>
+                                    
                                 </dl>
                             </div>
                         </div>
