@@ -403,7 +403,7 @@
                                             
                                             <a t-att-href="attachment['data_url']" 
                                                t-att-download="attachment['name']"
-                                               class="btn btn-primary">
+                                               class="btn btn-primary w-100 me-2">
                                                 <i class="fa fa-download me-1"></i> Descargar
                                             </a>
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
