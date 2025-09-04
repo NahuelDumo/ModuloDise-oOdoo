@@ -180,11 +180,7 @@
                                                             
                                                             <!-- Botones de acción mejorados -->
                                                             <div class="d-flex gap-1 mt-2">
-                                                                <a t-att-href="attachment['data_url']" 
-                                                                   target="_blank"
-                                                                   class="btn btn-sm btn-outline-primary flex-fill">
-                                                                    <i class="fa fa-eye me-1"></i> Ver
-                                                                </a>
+                                                                
                                                                 <a t-att-href="attachment['data_url']" 
                                                                    t-att-download="attachment['name']"
                                                                    class="btn btn-sm btn-outline-secondary"
@@ -404,11 +400,7 @@
                                             </div>
                                         </div>
                                         <div class="modal-footer">
-                                            <a t-att-href="attachment['data_url']" 
-                                               target="_blank" 
-                                               class="btn btn-outline-primary">
-                                                <i class="fa fa-external-link me-1"></i> Abrir en nueva pestaña
-                                            </a>
+                                            
                                             <a t-att-href="attachment['data_url']" 
                                                t-att-download="attachment['name']"
                                                class="btn btn-primary">
