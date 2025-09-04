@@ -183,7 +183,7 @@
                                                                 
                                                                 <a t-att-href="attachment['data_url']" 
                                                                    t-att-download="attachment['name']"
-                                                                   class="btn btn-sm"
+                                                                   class="btn btn-sm btn-outline-secondary"
                                                                    t-att-title="'Descargar ' + attachment['name']">
                                                                     <i class="fa fa-download"></i>
                                                                     <span class="d-none d-lg-inline ms-1">Descargar</span>
