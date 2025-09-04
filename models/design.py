@@ -644,8 +644,8 @@ class Design(models.Model):
                     
                     # Validar tamaño de PDF
                     if attachment.mimetype == 'application/pdf':
-                        if attachment.file_size > 10 * 1024 * 1024: # 10 MB
-                            raise ValidationError(_("El archivo PDF '%s' excede el límite de 10 MB.") % attachment.name)
+                        if attachment.file_size > 18 * 1024 * 1024: # 18 MB
+                            raise ValidationError(_("El archivo PDF '%s' excede el límite de 18 MB.") % attachment.name)
 
                 # Validar cantidad de imágenes
                 if image_count > 20:

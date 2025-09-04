@@ -105,7 +105,7 @@
                                 </h5>
                             </div>
                             <div class="card-body">
-                                <!-- Archivos adjuntos estilo backend -->
+                                <!-- Archivos adjuntos mejorados -->
                                 <div class="mb-4">
                                     <h5 class="mt-3">
                                         <i class="fa fa-paperclip me-2"></i>Adjuntos
@@ -140,36 +140,58 @@
                                                                 </div>
                                                             </div>
                                                             
-                                                            <!-- Previsualización -->
+                                                            <!-- Previsualización mejorada -->
                                                             <t t-if="(attachment['mimetype'] and attachment['mimetype'].startswith('image/')) or (attachment['file_extension'] in ['jpg','jpeg','png','gif','bmp','webp','svg'])">
                                                                 <div class="text-center mb-2">
+                                                                    <!-- Modal trigger for image preview -->
                                                                     <img t-att-src="attachment['preview_url']" 
-                                                                         class="img-fluid rounded" 
-                                                                         style="max-height: 140px; cursor: pointer;"
+                                                                         class="img-fluid rounded shadow-sm" 
+                                                                         style="max-height: 140px; cursor: pointer; transition: transform 0.2s;"
                                                                          t-att-alt="attachment['name']"
-                                                                         onclick="window.open(this.src, '_blank')"/>
-                                                                    <div class="text-center mt-1"><small class="text-muted">Clic para ver</small></div>
+                                                                         t-att-data-bs-toggle="'modal'"
+                                                                         t-att-data-bs-target="'#imageModal_' + str(attachment_index)"
+                                                                         onmouseover="this.style.transform='scale(1.05)'"
+                                                                         onmouseout="this.style.transform='scale(1)'"/>
+                                                                    <div class="text-center mt-1">
+                                                                        <small class="text-muted">
+                                                                            <i class="fa fa-expand me-1"></i>Clic para ampliar
+                                                                        </small>
+                                                                    </div>
                                                                 </div>
                                                             </t>
                                                             <t t-elif="attachment['mimetype'] == 'application/pdf' or attachment['file_extension'] == 'pdf'">
-                                                                <div class="mb-2" style="height: 160px; border: 1px solid #eee; border-radius: 4px; overflow: hidden;">
-                                                                    <iframe t-att-src="attachment['data_url']" style="width: 100%; height: 100%; border: 0;" title="Vista previa PDF"></iframe>
+                                                                <div class="mb-2 position-relative" style="height: 160px; border: 1px solid #eee; border-radius: 4px; overflow: hidden;">
+                                                                    <iframe t-att-src="attachment['data_url']" 
+                                                                            style="width: 100%; height: 100%; border: 0;" 
+                                                                            title="Vista previa PDF"
+                                                                            loading="lazy"></iframe>
+                                                                    <!-- Overlay para clic -->
+                                                                    <div class="position-absolute top-0 start-0 w-100 h-100" 
+                                                                         style="background: rgba(0,0,0,0); cursor: pointer;"
+                                                                         t-att-onclick="'window.open(&quot;' + attachment['data_url'] + '&quot;, &quot;_blank&quot;)'">
+                                                                    </div>
                                                                 </div>
-                                                                <div class="text-center"><small class="text-muted">Clic para ver</small></div>
+                                                                <div class="text-center">
+                                                                    <small class="text-muted">
+                                                                        <i class="fa fa-external-link me-1"></i>Clic para ver completo
+                                                                    </small>
+                                                                </div>
                                                             </t>
                                                             
-                                                            <!-- Botones de acción -->
-                                                            <div class="d-flex gap-1">
-                                                                <a t-att-href="attachment['data_url']" t-att-download="attachment['name']" 
+                                                            <!-- Botones de acción mejorados -->
+                                                            <div class="d-flex gap-1 mt-2">
+                                                                <a t-att-href="attachment['data_url']" 
+                                                                   target="_blank"
                                                                    class="btn btn-sm btn-outline-primary flex-fill">
-                                                                    <i class="fa fa-download"></i> Descargar
+                                                                    <i class="fa fa-eye me-1"></i> Ver
                                                                 </a>
-                                                                <t t-if="attachment['file_extension'] == 'pdf'">
-                                                                    <a t-att-href="attachment['data_url']" target="_blank" 
-                                                                       class="btn btn-sm btn-outline-secondary">
-                                                                        <i class="fa fa-eye"></i>
-                                                                    </a>
-                                                                </t>
+                                                                <a t-att-href="attachment['data_url']" 
+                                                                   t-att-download="attachment['name']"
+                                                                   class="btn btn-sm btn-outline-secondary"
+                                                                   t-att-title="'Descargar ' + attachment['name']">
+                                                                    <i class="fa fa-download"></i>
+                                                                    <span class="d-none d-lg-inline ms-1">Descargar</span>
+                                                                </a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -202,14 +224,6 @@
                                     </dl>
                                 </div>
 
-                                <!-- Comentario del Diseñador
-                                <div t-if="design.comentario_disenador" class="mb-4">
-                                    <h5>Comentario del Diseñador</h5>
-                                    <div class="alert alert-info" role="alert">
-                                        <span t-field="design.comentario_disenador"/>
-                                    </div>
-                                </div>
-                                 -->
                                 <!-- Último mensaje de correcciones del cliente -->
                                 <div t-if="design.ultimo_mensaje_cliente and design.state == 'correcciones_solicitadas'" class="mb-4">
                                     <h5><i class="fa fa-comment-dots me-2"></i>Última solicitud de correcciones</h5>
@@ -315,7 +329,7 @@
                                         </t>
                                         
                                         <p>Por favor, revisa el diseño y selecciona una opción:</p>
-                                        <div class="d-flex gap-2">
+                                        <div class="d-flex gap-2 flex-wrap">
                                             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveModal">
                                                 <i class="fa fa-check me-2"></i>Aprobar
                                             </button>
@@ -364,14 +378,52 @@
                                         </t>
                                         <t t-else="">No hay tarea asociada</t>
                                     </dd>
-                                    
                                 </dl>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Modales (fuera de las columnas para evitar problemas de renderizado) -->
+                <!-- Modales para vista previa de imágenes -->
+                <t t-if="attachments">
+                    <t t-foreach="attachments" t-as="attachment">
+                        <t t-if="(attachment['mimetype'] and attachment['mimetype'].startswith('image/')) or (attachment['file_extension'] in ['jpg','jpeg','png','gif','bmp','webp','svg'])">
+                            <div class="modal fade" t-att-id="'imageModal_' + str(attachment_index)" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-xl modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" t-esc="attachment['name']"/>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                        </div>
+                                        <div class="modal-body p-1">
+                                            <div class="text-center">
+                                                <img t-att-src="attachment['data_url']" 
+                                                     class="img-fluid" 
+                                                     style="max-height: 80vh; max-width: 100%;"
+                                                     t-att-alt="attachment['name']"/>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a t-att-href="attachment['data_url']" 
+                                               target="_blank" 
+                                               class="btn btn-outline-primary">
+                                                <i class="fa fa-external-link me-1"></i> Abrir en nueva pestaña
+                                            </a>
+                                            <a t-att-href="attachment['data_url']" 
+                                               t-att-download="attachment['name']"
+                                               class="btn btn-primary">
+                                                <i class="fa fa-download me-1"></i> Descargar
+                                            </a>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+                </t>
+                
+                <!-- Modales de acciones -->
                 <!-- Modal de Aprobar -->
                 <div class="modal fade" id="approveModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
