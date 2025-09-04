@@ -216,17 +216,9 @@
                     
                     <!-- Chatter nativo de Odoo -->
                     <div class="oe_chatter">
-                        <field name="message_follower_ids" widget="mail_followers" groups="!ModuloDisenoOdoo.group_disenador"/>
-                        <field name="activity_ids" widget="mail_activity" groups="!ModuloDisenoOdoo.group_disenador"/>
-                        <field name="message_ids" widget="mail_thread" options="{'post_refresh': '1', 'is_log': True, 'post_placeholder': 'Enviar mensaje'}" groups="!ModuloDisenoOdoo.group_disenador"/>
-                        <!-- Vista de solo lectura para diseñadores -->
-                        <field name="message_ids" widget="mail_thread" mode="tree" groups="ModuloDisenoOdoo.group_disenador">
-                            <tree>
-                                <field name="author_id" string="Autor"/>
-                                <field name="date" string="Fecha"/>
-                                <field name="body" string="Mensaje" widget="html"/>
-                            </tree>
-                        </field>
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
                     </div>
                 </form>
             </field>
