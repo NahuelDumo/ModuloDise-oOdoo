@@ -711,12 +711,27 @@ class Design(models.Model):
         self.ultimo_mensaje_cliente = mensaje_cliente
         self.state = 'correcciones_solicitadas'
 
+        # Eliminar archivos adjuntos existentes
+        if self.attachment_ids:
+            self.attachment_ids.unlink()
+
+        # Reiniciar listas de verificación del validador y diseñador
+        if self.checklist_ids:
+            self.checklist_ids.unlink()
+        
+        # Cargar nuevamente la plantilla de checklist para la etapa actual
+        self._cargar_checklist_etapa()
+
+        # Limpiar comentarios
+        self.comentario_validador = False
+        self.comentario_disenador = False
+
         # Registrar en historial
         self.env['design.revision_log'].create({
             'design_id': self.id,
             'usuario_id': self.env.user.id,
             'tipo': 'correcciones_cliente',
-            'observaciones': mensaje_cliente or 'Cliente solicitó correcciones'
+            'observaciones': mensaje_cliente or 'Cliente solicitó correcciones. Se reiniciaron los archivos adjuntos y listas de verificación.'
         })
 
         # Notificar al diseñador/validador
