@@ -98,7 +98,8 @@
                                                         
                                                         <!-- Información adicional -->
                                                         <div class="text-center mt-auto">
-                                                            <small class="text-muted" style="font-size: 9px;">
+                                                            <small class="text-muted normal-view-trigger" style="font-size: 9px; cursor: pointer;"
+                                                                   t-att-onclick="'window.open(\'/web/image/design.image/' + record.id.raw_value + '/file_data\', \'_blank\')'">
                                                                 <i class="fa fa-eye"/> Clic para ver
                                                             </small>
                                                         </div>
@@ -242,41 +243,52 @@
                         </div>
                     </div>
                     
-                    <!-- JavaScript para el modal -->
                     <script type="text/javascript">
-                        document.addEventListener('DOMContentLoaded', function() {
-                            // Event delegation para las imágenes
+                        setTimeout(function() {
                             document.addEventListener('click', function(e) {
                                 if (e.target.classList.contains('image-preview-trigger')) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    
                                     var imageId = e.target.getAttribute('data-image-id');
                                     var imageName = e.target.getAttribute('data-image-name');
                                     
-                                    var modal = document.getElementById('imagePreviewModal');
-                                    var modalTitle = document.getElementById('imageModalTitle');
-                                    var modalImage = document.getElementById('imageModalContent');
-                                    var downloadLink = document.getElementById('imageDownloadLink');
-                                    
-                                    if (modal &amp;&amp; modalTitle &amp;&amp; modalImage &amp;&amp; downloadLink &amp;&amp; imageId) {
-                                        var imageUrl = '/web/image/design.image/' + imageId + '/file_data';
-                                        var downloadUrl = '/web/content/design.image/' + imageId + '/file_data';
+                                    if (imageId) {
+                                        var modal = document.getElementById('imagePreviewModal');
+                                        var modalTitle = document.getElementById('imageModalTitle');
+                                        var modalImage = document.getElementById('imageModalContent');
+                                        var downloadLink = document.getElementById('imageDownloadLink');
                                         
-                                        modalTitle.textContent = imageName || 'Vista previa';
-                                        modalImage.src = imageUrl;
-                                        modalImage.alt = imageName || 'Imagen';
-                                        downloadLink.href = downloadUrl;
-                                        downloadLink.download = imageName || 'imagen';
-                                        
-                                        // Usar Bootstrap modal (compatible con versiones 4 y 5)
-                                        if (typeof bootstrap !== 'undefined' &amp;&amp; bootstrap.Modal) {
-                                            var bootstrapModal = new bootstrap.Modal(modal);
-                                            bootstrapModal.show();
-                                        } else if (typeof $ !== 'undefined' &amp;&amp; $.fn.modal) {
-                                            $(modal).modal('show');
+                                        if (modal) {
+                                            var imageUrl = '/web/image/design.image/' + imageId + '/file_data';
+                                            var downloadUrl = '/web/content/design.image/' + imageId + '/file_data';
+                                            
+                                            if (modalTitle) modalTitle.textContent = imageName || 'Vista previa';
+                                            if (modalImage) {
+                                                modalImage.src = imageUrl;
+                                                modalImage.alt = imageName || 'Imagen';
+                                            }
+                                            if (downloadLink) {
+                                                downloadLink.href = downloadUrl;
+                                                downloadLink.download = imageName || 'imagen';
+                                            }
+                                            
+                                            try {
+                                                if (window.bootstrap) {
+                                                    new bootstrap.Modal(modal).show();
+                                                } else if (window.jQuery) {
+                                                    jQuery(modal).modal('show');
+                                                }
+                                            } catch (err) {
+                                                console.log('Modal fallback');
+                                                modal.style.display = 'block';
+                                                modal.classList.add('show');
+                                            }
                                         }
                                     }
                                 }
                             });
-                        });
+                        }, 1000);
                     </script>
                 </form>
             </field>
