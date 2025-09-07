@@ -84,12 +84,14 @@
                                                             </div>
                                                         </div>
                                                         
-                                                        <!-- Previsualización de imagen -->
-                                                        <t t-if="record.mimetype.raw_value and record.mimetype.raw_value.indexOf('image') === 0">
+                                                        <!-- Previsualización de imagen con modal -->
+                                                        <t t-if="record.mimetype.raw_value && record.mimetype.raw_value.indexOf('image') === 0">
                                                             <div class="text-center mb-2 flex-grow-1">
                                                                 <img t-att-src="kanban_image('design.image', 'file_data', record.id.raw_value)" 
                                                                      class="img-fluid rounded" 
                                                                      style="max-height: 100px; cursor: pointer;"
+                                                                     t-att-data-bs-toggle="'modal'"
+                                                                     t-att-data-bs-target="'#imageModal_' + record.id.raw_value"
                                                                      alt="Adjunto"/>
                                                             </div>
                                                         </t>
@@ -107,6 +109,40 @@
                                     </templates>
                                 </kanban>
                             </field>
+                            
+                            <!-- Modal para vista previa de imágenes -->
+                            <t t-if="attachment_ids">
+                                <t t-foreach="attachment_ids" t-as="attachment">
+                                    <t t-if="attachment.mimetype and attachment.mimetype.startswith('image/')">
+                                        <div t-att-id="'imageModal_' + str(attachment.id)" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                                            <div class="modal-dialog modal-xl modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" t-esc="attachment.name"/>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                    </div>
+                                                    <div class="modal-body p-1">
+                                                        <div class="text-center">
+                                                            <img t-att-src="/web/image/design.image/" t-att-t-attf-src="{{'/web/image/design.image/' + str(attachment.id) + '/file_data'}}"
+                                                                 class="img-fluid" 
+                                                                 style="max-height: 80vh; max-width: 100%;"
+                                                                 t-att-alt="attachment.name"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <a t-att-href="/web/content/design.image/" t-att-t-attf-href="{{'/web/content/design.image/' + str(attachment.id) + '/file_data'}}" 
+                                                           t-att-download="attachment.name"
+                                                           class="btn btn-primary">
+                                                            <i class="fa fa-download me-1"></i> Descargar
+                                                        </a>
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </t>
+                            </t>
                         </group>
 
                         <!-- Mensaje cuando la etapa 1 no está completa -->
