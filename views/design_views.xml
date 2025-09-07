@@ -185,12 +185,8 @@
                                                on_change="1"/>
                                                
                                         <!-- Comentario - editable por ambos -->
-                                        <field name="comentario" 
-                                               attrs="{'readonly': [
-                                                   '&amp;', 
-                                                   ('current_user_is_designer', '=', False), 
-                                                   ('current_user_is_validator', '=', False)
-                                               ]}"/>
+                                        <field name="comentario" string="Comentario"
+                                               attrs="{'readonly': [('current_user_is_designer', '=', False), ('current_user_is_validator', '=', False)]}" />
                                         
                                         <!-- Mostrar fechas y usuarios de validación -->
                                         <field name="fecha_disenador" readonly="1"/>
