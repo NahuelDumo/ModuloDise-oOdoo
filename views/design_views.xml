@@ -88,9 +88,10 @@
                                                         <t t-if="record.mimetype.raw_value and record.mimetype.raw_value.indexOf('image') === 0">
                                                             <div class="text-center mb-2 flex-grow-1">
                                                                 <img t-att-src="kanban_image('design.image', 'file_data', record.id.raw_value)" 
-                                                                     class="img-fluid rounded" 
+                                                                     class="img-fluid rounded image-preview-trigger" 
                                                                      style="max-height: 100px; cursor: pointer;"
-                                                                     t-att-onclick="'showImageModal(' + record.id.raw_value + ', \'' + record.name.raw_value + '\')'"
+                                                                     t-att-data-image-id="record.id.raw_value"
+                                                                     t-att-data-image-name="record.name.raw_value"
                                                                      alt="Adjunto"/>
                                                             </div>
                                                         </t>
@@ -243,27 +244,39 @@
                     
                     <!-- JavaScript para el modal -->
                     <script type="text/javascript">
-                        function showImageModal(imageId, imageName) {
-                            var modal = document.getElementById('imagePreviewModal');
-                            var modalTitle = document.getElementById('imageModalTitle');
-                            var modalImage = document.getElementById('imageModalContent');
-                            var downloadLink = document.getElementById('imageDownloadLink');
-                            
-                            if (modal &amp;&amp; modalTitle &amp;&amp; modalImage &amp;&amp; downloadLink) {
-                                var imageUrl = '/web/image/design.image/' + imageId + '/file_data';
-                                var downloadUrl = '/web/content/design.image/' + imageId + '/file_data';
-                                
-                                modalTitle.textContent = imageName;
-                                modalImage.src = imageUrl;
-                                modalImage.alt = imageName;
-                                downloadLink.href = downloadUrl;
-                                downloadLink.download = imageName;
-                                
-                                // Usar Bootstrap 5 modal
-                                var bootstrapModal = new bootstrap.Modal(modal);
-                                bootstrapModal.show();
-                            }
-                        }
+                        document.addEventListener('DOMContentLoaded', function() {
+                            // Event delegation para las imágenes
+                            document.addEventListener('click', function(e) {
+                                if (e.target.classList.contains('image-preview-trigger')) {
+                                    var imageId = e.target.getAttribute('data-image-id');
+                                    var imageName = e.target.getAttribute('data-image-name');
+                                    
+                                    var modal = document.getElementById('imagePreviewModal');
+                                    var modalTitle = document.getElementById('imageModalTitle');
+                                    var modalImage = document.getElementById('imageModalContent');
+                                    var downloadLink = document.getElementById('imageDownloadLink');
+                                    
+                                    if (modal &amp;&amp; modalTitle &amp;&amp; modalImage &amp;&amp; downloadLink &amp;&amp; imageId) {
+                                        var imageUrl = '/web/image/design.image/' + imageId + '/file_data';
+                                        var downloadUrl = '/web/content/design.image/' + imageId + '/file_data';
+                                        
+                                        modalTitle.textContent = imageName || 'Vista previa';
+                                        modalImage.src = imageUrl;
+                                        modalImage.alt = imageName || 'Imagen';
+                                        downloadLink.href = downloadUrl;
+                                        downloadLink.download = imageName || 'imagen';
+                                        
+                                        // Usar Bootstrap modal (compatible con versiones 4 y 5)
+                                        if (typeof bootstrap !== 'undefined' &amp;&amp; bootstrap.Modal) {
+                                            var bootstrapModal = new bootstrap.Modal(modal);
+                                            bootstrapModal.show();
+                                        } else if (typeof $ !== 'undefined' &amp;&amp; $.fn.modal) {
+                                            $(modal).modal('show');
+                                        }
+                                    }
+                                }
+                            });
+                        });
                     </script>
                 </form>
             </field>
