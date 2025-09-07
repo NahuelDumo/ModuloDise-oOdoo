@@ -156,7 +156,7 @@
                         <notebook>
                             <page string="Checklist">
                                 <field name="checklist_ids">
-                                    <tree>
+                                    <tree editable="bottom">
                                         <!-- Campos necesarios para los attrs -->
                                         <field name="current_user_is_designer" invisible="1"/>
                                         <field name="current_user_is_validator" invisible="1"/>
@@ -169,25 +169,21 @@
                                         <!-- Campo validado_por_disenador - solo editable por diseñador -->
                                         <field name="validado_por_disenador"
                                                widget="boolean_toggle"
-                                               options='{"type": "bool"}'
                                                attrs="{
                                                    'readonly': [('current_user_is_designer', '=', False)]
-                                               }"
-                                               on_change="1"/>
+                                               }"/>
                                         
                                         <!-- Campo validado_por_validador - solo editable por validador -->
                                         <field name="validado_por_validador"
                                                widget="boolean_toggle"
-                                               options='{"type": "bool"}'
                                                attrs="{
                                                    'readonly': [('current_user_is_validator', '=', False)]
-                                               }"
-                                               on_change="1"/>
+                                               }"/>
                                                
                                         <!-- Comentario - editable por ambos -->
-                                        <field name="comentario" string="Comentario"
-                                               attrs="{'readonly': [('current_user_is_designer', '=', False), ('current_user_is_validator', '=', False)]}">
-                                        </field>
+                                        <field name="comentario" 
+                                               string="Comentario"
+                                               attrs="{'readonly': [('current_user_is_designer', '=', False), ('current_user_is_validator', '=', False)]}"/>
                                         
                                         <!-- Mostrar fechas y usuarios de validación -->
                                         <field name="fecha_disenador" readonly="1"/>
@@ -256,6 +252,7 @@
                 </form>
             </field>
         </record>
+        
         <!-- Vista de lista de diseños -->
         <record id="view_tree_design" model="ir.ui.view">
             <field name="name">design.design.tree</field>
