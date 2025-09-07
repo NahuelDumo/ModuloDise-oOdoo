@@ -90,8 +90,7 @@
                                                                 <img t-att-src="kanban_image('design.image', 'file_data', record.id.raw_value)" 
                                                                      class="img-fluid rounded" 
                                                                      style="max-height: 100px; cursor: pointer;"
-                                                                     t-att-data-bs-toggle="'modal'"
-                                                                     t-att-data-bs-target="'#imageModal_' + record.id.raw_value"
+                                                                     t-att-onclick="'showImageModal(' + record.id.raw_value + ', \'' + record.name.raw_value + '\')'"
                                                                      alt="Adjunto"/>
                                                             </div>
                                                         </t>
@@ -109,40 +108,6 @@
                                     </templates>
                                 </kanban>
                             </field>
-                            
-                            <!-- Modal para vista previa de imágenes -->
-                            <t t-if="attachment_ids">
-                                <t t-foreach="attachment_ids" t-as="attachment">
-                                    <t t-if="attachment.mimetype and attachment.mimetype.startswith('image/')">
-                                        <div t-att-id="'imageModal_' + str(attachment.id)" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-                                            <div class="modal-dialog modal-xl modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" t-esc="attachment.name"/>
-                                                        <button name="close_modal" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                                                    </div>
-                                                    <div class="modal-body p-1">
-                                                        <div class="text-center">
-                                                            <img t-att-src="'/web/image/design.image/' + str(attachment.id) + '/file_data'"
-                                                                 class="img-fluid" 
-                                                                 style="max-height: 80vh; max-width: 100%;"
-                                                                 t-att-alt="attachment.name"/>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <a t-att-href="'/web/content/design.image/' + str(attachment.id) + '/file_data'" 
-                                                           t-att-download="attachment.name"
-                                                           class="btn btn-primary">
-                                                            <i class="fa fa-download me-1"></i> Descargar
-                                                        </a>
-                                                        <button name="close_modal_footer" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </t>
-                                </t>
-                            </t>
                         </group>
 
                         <!-- Mensaje cuando la etapa 1 no está completa -->
@@ -252,6 +217,54 @@
                         <field name="activity_ids" widget="mail_activity"/>
                         <field name="message_ids" widget="mail_thread"/>
                     </div>
+                    
+                    <!-- Modal único para vista previa de imágenes -->
+                    <div id="imagePreviewModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-xl modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="imageModalTitle">Vista previa</h5>
+                                    <button name="close_image_modal" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body p-1">
+                                    <div class="text-center">
+                                        <img id="imageModalContent" class="img-fluid" style="max-height: 80vh; max-width: 100%;" alt="Vista previa"/>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <a id="imageDownloadLink" href="#" download="" class="btn btn-primary">
+                                        <i class="fa fa-download me-1"></i> Descargar
+                                    </a>
+                                    <button name="close_image_modal_footer" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- JavaScript para el modal -->
+                    <script type="text/javascript">
+                        function showImageModal(imageId, imageName) {
+                            var modal = document.getElementById('imagePreviewModal');
+                            var modalTitle = document.getElementById('imageModalTitle');
+                            var modalImage = document.getElementById('imageModalContent');
+                            var downloadLink = document.getElementById('imageDownloadLink');
+                            
+                            if (modal &amp;&amp; modalTitle &amp;&amp; modalImage &amp;&amp; downloadLink) {
+                                var imageUrl = '/web/image/design.image/' + imageId + '/file_data';
+                                var downloadUrl = '/web/content/design.image/' + imageId + '/file_data';
+                                
+                                modalTitle.textContent = imageName;
+                                modalImage.src = imageUrl;
+                                modalImage.alt = imageName;
+                                downloadLink.href = downloadUrl;
+                                downloadLink.download = imageName;
+                                
+                                // Usar Bootstrap 5 modal
+                                var bootstrapModal = new bootstrap.Modal(modal);
+                                bootstrapModal.show();
+                            }
+                        }
+                    </script>
                 </form>
             </field>
         </record>
