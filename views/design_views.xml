@@ -85,7 +85,7 @@
                                                         </div>
                                                         
                                                         <!-- Previsualización de imagen con modal -->
-                                                        <t t-if="record.mimetype.raw_value && record.mimetype.raw_value.indexOf('image') === 0">
+                                                        <t t-if="record.mimetype.raw_value &amp;&amp; record.mimetype.raw_value.indexOf('image') === 0">
                                                             <div class="text-center mb-2 flex-grow-1">
                                                                 <img t-att-src="kanban_image('design.image', 'file_data', record.id.raw_value)" 
                                                                      class="img-fluid rounded" 
