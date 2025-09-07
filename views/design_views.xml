@@ -84,14 +84,12 @@
                                                             </div>
                                                         </div>
                                                         
-                                                        <!-- Previsualización de imagen con modal -->
-                                                        <t t-if="record.mimetype.raw_value &amp;&amp; record.mimetype.raw_value.indexOf('image') === 0">
+                                                        <!-- Previsualización de imagen -->
+                                                        <t t-if="record.mimetype.raw_value and record.mimetype.raw_value.indexOf('image') === 0">
                                                             <div class="text-center mb-2 flex-grow-1">
                                                                 <img t-att-src="kanban_image('design.image', 'file_data', record.id.raw_value)" 
                                                                      class="img-fluid rounded" 
                                                                      style="max-height: 100px; cursor: pointer;"
-                                                                     t-att-data-bs-toggle="'modal'"
-                                                                     t-att-data-bs-target="'#imageModal_' + record.id.raw_value"
                                                                      alt="Adjunto"/>
                                                             </div>
                                                         </t>
@@ -109,40 +107,6 @@
                                     </templates>
                                 </kanban>
                             </field>
-                            
-                            <!-- Modal para vista previa de imágenes -->
-                            <t t-if="attachment_ids">
-                                <t t-foreach="attachment_ids" t-as="attachment">
-                                    <t t-if="attachment.mimetype and attachment.mimetype.startswith('image/')">
-                                        <div t-att-id="'imageModal_' + str(attachment.id)" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-                                            <div class="modal-dialog modal-xl modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" t-esc="attachment.name"/>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                                                    </div>
-                                                    <div class="modal-body p-1">
-                                                        <div class="text-center">
-                                                            <img t-att-src="/web/image/design.image/" t-att-t-attf-src="{{'/web/image/design.image/' + str(attachment.id) + '/file_data'}}"
-                                                                 class="img-fluid" 
-                                                                 style="max-height: 80vh; max-width: 100%;"
-                                                                 t-att-alt="attachment.name"/>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <a t-att-href="/web/content/design.image/" t-att-t-attf-href="{{'/web/content/design.image/' + str(attachment.id) + '/file_data'}}" 
-                                                           t-att-download="attachment.name"
-                                                           class="btn btn-primary">
-                                                            <i class="fa fa-download me-1"></i> Descargar
-                                                        </a>
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </t>
-                                </t>
-                            </t>
                         </group>
 
                         <!-- Mensaje cuando la etapa 1 no está completa -->
@@ -156,7 +120,7 @@
                         <notebook>
                             <page string="Checklist">
                                 <field name="checklist_ids">
-                                    <tree editable="bottom">
+                                    <tree>
                                         <!-- Campos necesarios para los attrs -->
                                         <field name="current_user_is_designer" invisible="1"/>
                                         <field name="current_user_is_validator" invisible="1"/>
@@ -169,21 +133,28 @@
                                         <!-- Campo validado_por_disenador - solo editable por diseñador -->
                                         <field name="validado_por_disenador"
                                                widget="boolean_toggle"
+                                               options='{"type": "bool"}'
                                                attrs="{
                                                    'readonly': [('current_user_is_designer', '=', False)]
-                                               }"/>
+                                               }"
+                                               on_change="1"/>
                                         
                                         <!-- Campo validado_por_validador - solo editable por validador -->
                                         <field name="validado_por_validador"
                                                widget="boolean_toggle"
+                                               options='{"type": "bool"}'
                                                attrs="{
                                                    'readonly': [('current_user_is_validator', '=', False)]
-                                               }"/>
+                                               }"
+                                               on_change="1"/>
                                                
                                         <!-- Comentario - editable por ambos -->
                                         <field name="comentario" 
-                                               string="Comentario"
-                                               attrs="{'readonly': [('current_user_is_designer', '=', False), ('current_user_is_validator', '=', False)]}"/>
+                                               attrs="{'readonly': [
+                                                   '&amp;', 
+                                                   ('current_user_is_designer', '=', False), 
+                                                   ('current_user_is_validator', '=', False)
+                                               ]}"/>
                                         
                                         <!-- Mostrar fechas y usuarios de validación -->
                                         <field name="fecha_disenador" readonly="1"/>
@@ -252,7 +223,6 @@
                 </form>
             </field>
         </record>
-        
         <!-- Vista de lista de diseños -->
         <record id="view_tree_design" model="ir.ui.view">
             <field name="name">design.design.tree</field>
