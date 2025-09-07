@@ -84,14 +84,12 @@
                                                             </div>
                                                         </div>
                                                         
-                                                        <!-- Previsualización de imagen con modal -->
+                                                        <!-- Previsualización de imagen -->
                                                         <t t-if="record.mimetype.raw_value and record.mimetype.raw_value.indexOf('image') === 0">
                                                             <div class="text-center mb-2 flex-grow-1">
                                                                 <img t-att-src="kanban_image('design.image', 'file_data', record.id.raw_value)" 
-                                                                     class="img-fluid rounded image-preview-trigger" 
-                                                                     style="max-height: 100px; cursor: pointer;"
-                                                                     t-att-data-image-id="record.id.raw_value"
-                                                                     t-att-data-image-name="record.name.raw_value"
+                                                                     class="img-fluid rounded" 
+                                                                     style="max-height: 100px;"
                                                                      alt="Adjunto"/>
                                                             </div>
                                                         </t>
@@ -219,77 +217,6 @@
                         <field name="activity_ids" widget="mail_activity"/>
                         <field name="message_ids" widget="mail_thread"/>
                     </div>
-                    
-                    <!-- Modal único para vista previa de imágenes -->
-                    <div id="imagePreviewModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-                        <div class="modal-dialog modal-xl modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="imageModalTitle">Vista previa</h5>
-                                    <button name="close_image_modal" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" data-action-type="button"></button>
-                                </div>
-                                <div class="modal-body p-1">
-                                    <div class="text-center">
-                                        <img id="imageModalContent" class="img-fluid" style="max-height: 80vh; max-width: 100%;" alt="Vista previa"/>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <a id="imageDownloadLink" href="#" download="" class="btn btn-primary">
-                                        <i class="fa fa-download me-1"></i> Descargar
-                                    </a>
-                                    <button name="close_image_modal_footer" type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-action-type="button">Cerrar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <script type="text/javascript">
-                        setTimeout(function() {
-                            document.addEventListener('click', function(e) {
-                                if (e.target.classList.contains('image-preview-trigger')) {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    
-                                    var imageId = e.target.getAttribute('data-image-id');
-                                    var imageName = e.target.getAttribute('data-image-name');
-                                    
-                                    if (imageId) {
-                                        var modal = document.getElementById('imagePreviewModal');
-                                        var modalTitle = document.getElementById('imageModalTitle');
-                                        var modalImage = document.getElementById('imageModalContent');
-                                        var downloadLink = document.getElementById('imageDownloadLink');
-                                        
-                                        if (modal) {
-                                            var imageUrl = '/web/image/design.image/' + imageId + '/file_data';
-                                            var downloadUrl = '/web/content/design.image/' + imageId + '/file_data';
-                                            
-                                            if (modalTitle) modalTitle.textContent = imageName || 'Vista previa';
-                                            if (modalImage) {
-                                                modalImage.src = imageUrl;
-                                                modalImage.alt = imageName || 'Imagen';
-                                            }
-                                            if (downloadLink) {
-                                                downloadLink.href = downloadUrl;
-                                                downloadLink.download = imageName || 'imagen';
-                                            }
-                                            
-                                            try {
-                                                if (window.bootstrap) {
-                                                    new bootstrap.Modal(modal).show();
-                                                } else if (window.jQuery) {
-                                                    jQuery(modal).modal('show');
-                                                }
-                                            } catch (err) {
-                                                console.log('Modal fallback');
-                                                modal.style.display = 'block';
-                                                modal.classList.add('show');
-                                            }
-                                        }
-                                    }
-                                }
-                            });
-                        }, 1000);
-                    </script>
                 </form>
             </field>
         </record>
