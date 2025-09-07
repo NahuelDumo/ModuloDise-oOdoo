@@ -98,10 +98,10 @@
                                                         
                                                         <!-- Información adicional -->
                                                         <div class="text-center mt-auto">
-                                                            <small class="text-muted normal-view-trigger" style="font-size: 9px; cursor: pointer;"
-                                                                   t-att-onclick="'window.open(\'/web/image/design.image/' + record.id.raw_value + '/file_data\', \'_blank\')'">
+                                                            <a t-att-href="'/web/image/design.image/' + record.id.raw_value + '/file_data'" 
+                                                               target="_blank" class="text-muted" style="font-size: 9px; text-decoration: none;">
                                                                 <i class="fa fa-eye"/> Clic para ver
-                                                            </small>
+                                                            </a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -226,7 +226,7 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="imageModalTitle">Vista previa</h5>
-                                    <button name="close_image_modal" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                    <button name="close_image_modal" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" data-action-type="button"></button>
                                 </div>
                                 <div class="modal-body p-1">
                                     <div class="text-center">
@@ -237,7 +237,7 @@
                                     <a id="imageDownloadLink" href="#" download="" class="btn btn-primary">
                                         <i class="fa fa-download me-1"></i> Descargar
                                     </a>
-                                    <button name="close_image_modal_footer" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                    <button name="close_image_modal_footer" type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-action-type="button">Cerrar</button>
                                 </div>
                             </div>
                         </div>
