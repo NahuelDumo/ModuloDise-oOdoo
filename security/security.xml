@@ -196,4 +196,28 @@
         <field name="perm_create" eval="False"/>
         <field name="perm_unlink" eval="False"/>
     </record>
+
+    <!-- Reglas para plantillas de checklist - acceso de solo lectura para diseñadores -->
+
+    <record id="design_checklist_template_rule_disenador" model="ir.rule">
+        <field name="name">Diseñador: acceso a plantillas de checklist</field>
+        <field name="model_id" search="[('model', '=', 'design.checklist_template')]" model="ir.model"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_disenador'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="design_checklist_template_item_rule_disenador" model="ir.rule">
+        <field name="name">Diseñador: acceso a items de plantillas de checklist</field>
+        <field name="model_id" search="[('model', '=', 'design.checklist_template_item')]" model="ir.model"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_disenador'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
 </odoo>
