@@ -735,7 +735,7 @@ class Design(models.Model):
         })
 
         # Notificar al diseñador/validador
-        self.notificar_correcciones_solicitadas()
+        self.notificar_rechazo_cliente()
         return True
 
     def action_rechazado_por_cliente(self, motivo):
@@ -757,5 +757,37 @@ class Design(models.Model):
 
         # Notificar al diseñador/validador
         self.notificar_rechazo_cliente()
+
+    def action_confirmar_diseno(self):
+        """Acción para que un validador interno confirme el diseño manualmente"""
+        self.ensure_one()
+        
+        # Verificar permisos - solo validadores pueden confirmar diseños
+        if not self.env.user.has_group('ModuloDisenoOdoo.group_validador') and not self.env.user.has_group('base.group_system'):
+            raise AccessError(_("Solo los validadores pueden confirmar diseños."))
+            
+        # Verificar que el diseño esté en un estado que permita la confirmación
+        if self.state not in ['cliente', 'validacion', 'correcciones_solicitadas']:
+            raise UserError(_("No se puede confirmar un diseño en el estado actual."))
+            
+        # Cambiar el estado a aprobado
+        self.write({
+            'state': 'aprobado',
+            'fecha_aprobacion_cliente': fields.Datetime.now(),
+            'aprobado_cliente': True,
+            'rechazado': False
+        })
+        
+        # Registrar en el historial
+        self.env['design.revision_log'].create({
+            'design_id': self.id,
+            'usuario_id': self.env.user.id,
+            'tipo': 'aprobacion_validador',
+            'observaciones': 'Diseño confirmado manualmente por validador interno'
+        })
+        
+        # Notificar aprobación del diseño
+        self.notificar_aprobacion_cliente()
+        
         return True
 

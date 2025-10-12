@@ -25,6 +25,12 @@
                                 groups="ModuloDisenoOdoo.group_validador"
                                 confirm="¿Está seguro de que desea rechazar este diseño?"/>
                         
+                        <button name="action_confirmar_diseno" type="object" string="Confirmar diseño"
+                                class="btn btn-primary"
+                                attrs="{'invisible': ['|', ('state', 'not in', ['cliente', 'validacion', 'correcciones_solicitadas']), ('is_validator', '=', False)]}"
+                                groups="ModuloDisenoOdoo.group_validador"
+                                confirm="¿Está seguro de que desea confirmar este diseño?"/>
+                        
                         <button name="marcar_como_aprobado_por_cliente" type="object" string="Aprobar diseño"
                                 class="btn btn-primary"
                                 attrs="{'invisible': [('visible_para_cliente','=',False)]}"
