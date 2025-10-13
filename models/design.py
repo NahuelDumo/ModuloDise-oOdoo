@@ -782,7 +782,7 @@ class Design(models.Model):
         self.env['design.revision_log'].create({
             'design_id': self.id,
             'usuario_id': self.env.user.id,
-            'tipo': 'aprobacion_validador',
+            'tipo': 'validacion_validador',
             'observaciones': 'Diseño confirmado manualmente por validador interno'
         })
         
