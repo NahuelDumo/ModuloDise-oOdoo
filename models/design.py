@@ -513,6 +513,17 @@ class Design(models.Model):
         
         # Guardar cambios
         result = super(Design, self).write(vals)
+
+        # Asegurar transición a Etapa 2 cuando el estado llega a 'aprobado'
+        # Esto cubre casos donde el estado se cambió por otros flujos o personalizaciones
+        if 'state' in vals and vals.get('state') == 'aprobado':
+            for record in self:
+                if record.etapa != 'etapa2':
+                    try:
+                        record._transicion_a_etapa2_aprobado()
+                        record.message_post(body="Estado 'Aprobado' detectado. Transición automática a Etapa 2 aplicada.")
+                    except Exception as e:
+                        _logger.error(f"Error forzando transición a Etapa 2 post-aprobación: {e}")
         
         # Verificar si se completó el checklist después de la actualización
         if checklist_actualizado:
@@ -521,6 +532,19 @@ class Design(models.Model):
                     record._enviar_notificacion_checklist_completo()
         
         return result
+
+    def action_forzar_etapa2(self):
+        """Forzar transición a Etapa 2 para registros ya aprobados que siguen en Etapa 1."""
+        self.ensure_one()
+        if not self.env.user.has_group('base.group_system'):
+            raise AccessError(_("Solo los administradores pueden forzar la transición de etapa."))
+        if self.state != 'aprobado':
+            raise UserError(_("Solo se puede forzar la transición cuando el estado es 'Aprobado'."))
+        if self.etapa == 'etapa2':
+            return True
+        self._transicion_a_etapa2_aprobado()
+        self.message_post(body="Transición forzada a Etapa 2 por administrador.")
+        return True
 
     def abrir_wizard_rechazo(self):
         return {

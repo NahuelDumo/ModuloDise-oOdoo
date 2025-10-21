@@ -31,6 +31,13 @@
                                 groups="ModuloDisenoOdoo.group_validador"
                                 confirm="¿Está seguro de que desea confirmar este diseño?"/>
 
+                        <!-- Botón solo para Administrador: Forzar transición a Etapa 2 si el registro quedó aprobado pero en Etapa 1 -->
+                        <button name="action_forzar_etapa2" type="object" string="Forzar Etapa 2"
+                                class="btn btn-secondary"
+                                attrs="{'invisible': ['|', ('state', '!=', 'aprobado'), ('etapa', '=', 'etapa2')]}"
+                                groups="base.group_system"
+                                confirm="Esto forzará la transición a Etapa 2. ¿Desea continuar?"/>
+
                         <button name="marcar_como_aprobado_por_cliente" type="object" string="Aprobar diseño"
                                 class="btn btn-primary"
                                 attrs="{'invisible': [('visible_para_cliente','=',False)]}"
