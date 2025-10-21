@@ -770,6 +770,10 @@ class Design(models.Model):
         if self.state not in ['cliente', 'validacion', 'correcciones_solicitadas']:
             raise UserError(_("No se puede confirmar un diseño en el estado actual."))
             
+        # Realizar la transición a etapa 2 (igual que cuando aprueba el cliente)
+        # Esto además gestionará el checklist de etapa 2 si existe una plantilla
+        self._transicion_a_etapa2_aprobado()
+
         # Cambiar el estado a aprobado
         self.write({
             'state': 'aprobado',
@@ -783,7 +787,7 @@ class Design(models.Model):
             'design_id': self.id,
             'usuario_id': self.env.user.id,
             'tipo': 'validacion_validador',
-            'observaciones': 'Diseño confirmado manualmente por validador interno'
+            'observaciones': 'Diseño confirmado manualmente por validador interno. Transición a Etapa 2 realizada.'
         })
         
         # Notificar aprobación del diseño
